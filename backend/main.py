@@ -9,6 +9,7 @@ sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
 fastapi_app = FastAPI()
 
 origins_env = os.environ.get("CORS_ORIGINS", "").strip()
+regex_env = os.environ.get("CORS_ORIGIN_REGEX", "").strip()
 default_local = [
     "http://localhost:3000",
     "http://localhost:3001",
@@ -17,6 +18,7 @@ default_local = [
 ]
 extra = [o for o in (x.strip() for x in origins_env.split(",")) if o]
 allow_origins = list({*default_local, *extra})  # unique
+allow_origin_regex = regex_env or r"^https://[a-z0-9-]+\.vercel\.app$"
 
 fastapi_app.add_middleware(
     CORSMiddleware,
@@ -24,6 +26,7 @@ fastapi_app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_origin_regex=allow_origin_regex,
 )
 
 fastapi_app.include_router(routes.router)
