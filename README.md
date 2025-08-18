@@ -46,6 +46,15 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
 - Frontend: Vercel recommended. Set `NEXT_PUBLIC_API_URL` to your backend URL. A `vercel.json` at the repo root configures Vercel to build the Next.js app in `frontend/`.
 - Backend: Render/Railway/Fly.io/EC2. Ensure CORS allows your frontend origin.
 
+### Render (Backend)
+- Repo has `render.yaml` that deploys the FastAPI backend in `backend/` with Uvicorn.
+- Set env var `CORS_ORIGINS` to your Vercel domain, e.g. `https://your-app.vercel.app`.
+
+### Railway (Backend)
+- Repo has `backend/railway.json`. Create a Railway project from this repo and point the service at `backend/`.
+- Defaults: Nixpacks builder, install `requirements.txt`, start `uvicorn main:app --host 0.0.0.0 --port $PORT`.
+- Set env var `CORS_ORIGINS` to your Vercel domain, e.g. `https://your-app.vercel.app`.
+
 ## CI
 A GitHub Actions workflow runs lint, typecheck, and build for the frontend and installs backend requirements. See `.github/workflows/ci.yml`.
 
