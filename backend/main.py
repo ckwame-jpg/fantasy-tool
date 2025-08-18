@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+import os
 from app.api import routes
 import socketio
 
@@ -7,14 +8,19 @@ import socketio
 sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
 fastapi_app = FastAPI()
 
+origins_env = os.environ.get("CORS_ORIGINS", "").strip()
+default_local = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3001",
+]
+extra = [o for o in (x.strip() for x in origins_env.split(",")) if o]
+allow_origins = list({*default_local, *extra})  # unique
+
 fastapi_app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3001",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3001",
-    ],
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
