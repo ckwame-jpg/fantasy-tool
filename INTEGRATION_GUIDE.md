@@ -1,6 +1,6 @@
 # Platform Integration Guide
 
-## ✅ **Sleeper Integration** (Ready)
+##  **Sleeper Integration**
 
 ### How to Connect:
 1. Switch to **Online Mode** in your draftboard
@@ -18,9 +18,9 @@
 
 ---
 
-## 🚧 **ESPN Integration** (Coming Soon)
+## 🚧 **ESPN Integration** (In the works)
 
-ESPN's fantasy API requires authentication setup, which makes it more complex to implement. We're working on:
+ESPN's fantasy API requires authentication setup, which makes it more complex to implement. Working on:
 
 - **OAuth integration** for secure access
 - **Private league support** with proper authentication
@@ -30,9 +30,9 @@ ESPN's fantasy API requires authentication setup, which makes it more complex to
 
 ---
 
-## 🚧 **NFL.com Integration** (Coming Soon)
+## 🚧 **NFL.com Integration** (In the works)
 
-NFL.com has limited public API access, so we're exploring:
+NFL.com has limited public API access, exploring:
 
 - **Web scraping methods** for public leagues
 - **Browser extension** approach for private leagues
@@ -78,5 +78,3 @@ NFL.com has limited public API access, so we're exploring:
 - **Error handling**: Graceful fallbacks and user feedback
 - **Data mapping**: Converts platform data to unified format
 - **Performance**: Efficient polling with smart caching
-
-Ready to try it out? Switch to Online Mode and connect to your next live draft!
