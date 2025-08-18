@@ -50,7 +50,7 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
 A GitHub Actions workflow runs lint, typecheck, and build for the frontend and installs backend requirements. See `.github/workflows/ci.yml`.
 
 ## License
-MIT — see `LICENSE`.
+MIT - see `LICENSE`.
 
 ## Notes
 - Favorites are stored client‑side under `fantasy:favorites` and update instantly on toggle.
