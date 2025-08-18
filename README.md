@@ -43,7 +43,7 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
    - Set `NEXT_PUBLIC_API_URL` in `frontend/.env.local` (default fallback is `http://localhost:8004` if unset or invalid)
 
 ## Deployment
-- Frontend: Vercel recommended. Set `NEXT_PUBLIC_API_URL` to your backend URL.
+- Frontend: Vercel recommended. Set `NEXT_PUBLIC_API_URL` to your backend URL. A `vercel.json` at the repo root configures Vercel to build the Next.js app in `frontend/`.
 - Backend: Render/Railway/Fly.io/EC2. Ensure CORS allows your frontend origin.
 
 ## CI
