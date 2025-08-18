@@ -26,6 +26,15 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
 - Node.js 20+
 - Python 3.11+
 
+### Docker Compose (Local, one command)
+Run both backend and frontend with hot reload:
+
+1. Ensure Docker is running
+2. From repo root:
+   - Start services: `docker compose up --build`
+   - Frontend: http://localhost:3000
+   - Backend: http://localhost:8004
+
 ### Backend
 1. Copy env example and install deps:
    - Copy `backend/.env.example` to `backend/.env` (optional)
@@ -51,6 +60,12 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
 - Set env var `CORS_ORIGINS` to your Vercel domain, e.g. `https://your-app.vercel.app`.
 
 ### Railway (Backend)
+- Tip: Railway automatically provides `$PORT`. No change to code is needed.
+
+### GitHub Codespaces
+- Repo includes `.devcontainer/devcontainer.json` for instant setup.
+- Open in Codespaces → it preinstalls Node and Python and starts both services via Docker Compose.
+- Ports auto-forward: 3000 (frontend), 8004 (backend).
 - Repo has `backend/railway.json`. Create a Railway project from this repo and point the service at `backend/`.
 - Defaults: Nixpacks builder, install `requirements.txt`, start `uvicorn main:app --host 0.0.0.0 --port $PORT`.
 - Set env var `CORS_ORIGINS` to your Vercel domain, e.g. `https://your-app.vercel.app`.
