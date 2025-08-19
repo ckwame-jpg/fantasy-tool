@@ -2,6 +2,8 @@
 
 A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI backend. It includes a Draftboard, Players explorer with sticky headers and precise column alignment, favorites with localStorage persistence, and utilities for lineup optimization, trades, and waiver wire exploration.
 
+Live Demo: https://fantasy-tool-4gbiq4tuq-chris-prempehs-projects.vercel.app
+
 ## Features
 - Players page with:
   - Pixel‑perfect sticky table headers and aligned columns
@@ -17,7 +19,7 @@ A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI back
 - Backend: FastAPI, python-socketio (ASGI), httpx
 
 ## Monorepo layout
-- `frontend/` — Next.js app (UI)
+- Next.js app at repo root (App Router)
 - `backend/` — FastAPI app (API + Socket.IO)
 - `INTEGRATION_GUIDE.md` — integration notes
 
