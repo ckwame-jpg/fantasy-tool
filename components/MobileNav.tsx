@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from "react"
-import { Home, List, PersonStanding, Menu, X } from "lucide-react"
+import { Home, List, PersonStanding, Menu, X, Trophy, TrendingUp, Users, Target } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx"
@@ -72,6 +72,46 @@ export default function MobileNav() {
           onClick={closeNav}
         >
           <PersonStanding size={18} /> Players
+        </Link>
+
+        <Link
+          href="/draft-recap"
+          className={clsx("flex items-center gap-2 p-2 rounded", {
+            "bg-zinc-700": pathname === "/draft-recap"
+          })}
+          onClick={closeNav}
+        >
+          <Trophy size={18} /> Draft Recap
+        </Link>
+
+        <Link
+          href="/trade-analyzer"
+          className={clsx("flex items-center gap-2 p-2 rounded", {
+            "bg-zinc-700": pathname === "/trade-analyzer"
+          })}
+          onClick={closeNav}
+        >
+          <TrendingUp size={18} /> Trade Analyzer
+        </Link>
+
+        <Link
+          href="/waiver-wire"
+          className={clsx("flex items-center gap-2 p-2 rounded", {
+            "bg-zinc-700": pathname === "/waiver-wire"
+          })}
+          onClick={closeNav}
+        >
+          <Users size={18} /> Waiver Wire
+        </Link>
+
+        <Link
+          href="/lineup-optimizer"
+          className={clsx("flex items-center gap-2 p-2 rounded", {
+            "bg-zinc-700": pathname === "/lineup-optimizer"
+          })}
+          onClick={closeNav}
+        >
+          <Target size={18} /> Lineup Optimizer
         </Link>
       </aside>
     </>
