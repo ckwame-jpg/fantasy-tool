@@ -15,17 +15,17 @@ services:
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8004", "--reload"]
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: node:20-alpine
     container_name: fantasy-frontend
+    working_dir: /app
     ports:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8004
     volumes:
-      - ./frontend:/app
+      - ./:/app
       - /app/node_modules
       - /app/.next
+    command: sh -c "npm install && npm run dev"
     depends_on:
       - backend
