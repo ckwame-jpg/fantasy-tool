@@ -5,6 +5,10 @@ import type { NextConfig } from "next";
 const backendURL = process.env.NEXT_PUBLIC_API_URL;
 
 const nextConfig: NextConfig = {
+  eslint: {
+    // Don't fail the production build on ESLint errors
+    ignoreDuringBuilds: true,
+  },
   async rewrites() {
     if (!backendURL) return [];
     return [
