@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { API_BASE_URL } from "@/constants";
-import { fetcher } from "@/lib/api";
+import { API_BASE_URL } from "../../constants";
+import { fetcher } from "../../lib/api";
 
 // Extended Player type with normalized fields and computed fields
 type Player = {
@@ -183,7 +183,7 @@ function compare(a: Player, b: Player, key: keyof Player, direction: "asc" | "de
 const PlayersPage = () => {
   const FAVORITES_KEY = "fantasy:favorites";
   const currentYear = new Date().getFullYear();
-  const defaultStatsYear = currentYear - 1; // Default to last season's stats (2024)
+  const defaultStatsYear = currentYear - 1; // Default to last completed season's stats
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
@@ -237,7 +237,10 @@ const PlayersPage = () => {
     try {
       // Never ask the API for "Favorites" (it's a UI-only filter). Fetch ALL, then filter client-side.
       const queryPosition = position === "Favorites" ? "ALL" : position;
-      const data = await fetcher(`${API_BASE_URL}/players?position=${queryPosition}&season=${season}&on_team_only=true`);
+      // Backend expects `season` as the draft season and will show stats for (season - 1).
+      // To request stats for a given stats year, pass (statsYear + 1) as the season param.
+      const draftSeason = season + 1;
+      const data = await fetcher(`${API_BASE_URL}/players?position=${queryPosition}&season=${draftSeason}&on_team_only=true`);
       const normalized = (data || []).map((raw: any) => {
         const stats = normalizeStats(raw);
         // Only keep defined values so we don't overwrite existing fields with `undefined`
@@ -327,7 +330,8 @@ const PlayersPage = () => {
   }, [processedPlayers, search, position, favorites, sortField, sortDirection]);
 
   const positions = ["ALL", "QB", "RB", "WR", "TE"];
-  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
+  // Offer last 4 completed stat seasons (e.g., if currentYear=2025 -> 2024, 2023, 2022, 2021)
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - 1 - i);
 
   const SortableHeader = ({ field, children }: { field: keyof Player; children: React.ReactNode }) => (
     <th

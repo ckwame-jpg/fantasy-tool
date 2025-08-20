@@ -5,5 +5,5 @@ const looksAbsolute = /^https?:\/\//i.test(raw)
 const isBadValue = !raw || raw === "undefined" || raw === "null" || raw === "/" || raw.startsWith("/")
 
 export const API_BASE_URL = !isBadValue && looksAbsolute
-        ? raw.replace(/\/+$/, "") // strip trailing slashes
-        : "http://localhost:8004"
+	? raw.replace(/\/+$/, "") // strip trailing slashes
+	: "http://localhost:8000"

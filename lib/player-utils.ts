@@ -72,6 +72,7 @@ export const getPlayerTier = (position: string, adp: number): { tier: number; ti
 
   const tierNames = ['Elite', 'High-End', 'Mid-Tier', 'Depth', 'Waiver']
   const tierColors = ['text-purple-400', 'text-blue-400', 'text-green-400', 'text-yellow-400', 'text-gray-400']
+  
   return {
     tier,
     tierName: tierNames[tier - 1] || 'Waiver',
@@ -87,7 +88,7 @@ export const getTierColor = (tier: number): string => {
     4: 'bg-orange-100 text-orange-800 border-orange-200',  // Decent
     5: 'bg-gray-100 text-gray-800 border-gray-200'         // Deep
   }
-  return (colors as any)[tier] || colors[5]
+  return colors[tier as keyof typeof colors] || colors[5]
 }
 
 export const getTierLabel = (tier: number): string => {
@@ -98,7 +99,7 @@ export const getTierLabel = (tier: number): string => {
     4: 'Decent',
     5: 'Deep'
   }
-  return (labels as any)[tier] || 'Deep'
+  return labels[tier as keyof typeof labels] || 'Deep'
 }
 
 // Player projections (mock data - in production, fetch from fantasy API)
@@ -149,7 +150,7 @@ export const getPlayerProjections = (playerId: string, position: string) => {
     }
   }
 
-  return (baseProjections as any)[position] || (baseProjections as any).RB
+  return baseProjections[position as keyof typeof baseProjections] || baseProjections.RB
 }
 
 // Red zone stats (mock data)
@@ -177,7 +178,7 @@ export const getRedZoneStats = (playerId: string, position: string) => {
     }
   }
 
-  return (baseStats as any)[position] || null
+  return baseStats[position as keyof typeof baseStats] || null
 }
 
 // Strength of schedule (mock data)
@@ -219,7 +220,7 @@ export const getByeWeekInfo = (team: string) => {
     'TEN': 5, 'WAS': 14
   }
   
-  const week = (byeWeeks as any)[team] || 0
+  const week = byeWeeks[team] || 0
   const isEarly = week <= 7
   const isLate = week >= 12
   
@@ -242,7 +243,7 @@ export const analyzeBye = (team: string) => {
   }
 
   const teamCode = team?.trim().toUpperCase()
-  return (byeWeeks as any)[teamCode] || 0
+  return byeWeeks[teamCode?.toUpperCase()] || 0
 }
 
 // Simple bye week getter function
@@ -279,7 +280,7 @@ export const getPositionGrade = (position: string, count: number): { grade: stri
     'DEF': { min: 1, ideal: 1, max: 2 }
   }
   
-  const req = (requirements as any)[position] || { min: 1, ideal: 2, max: 3 }
+  const req = requirements[position] || { min: 1, ideal: 2, max: 3 }
   
   if (count < req.min) {
     return { grade: 'F', color: 'text-red-500', description: 'Severely lacking' }
@@ -290,4 +291,4 @@ export const getPositionGrade = (position: string, count: number): { grade: stri
   } else {
     return { grade: 'B', color: 'text-blue-500', description: 'Over-drafted' }
   }
-}
+} 

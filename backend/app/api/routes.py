@@ -98,6 +98,27 @@ class Pick(BaseModel):
     slot: Optional[str] = Field(default=None, description="QB/RB/WR/TE/FLEX/BN etc")
     timestamp: float
 
+def _safe_get_json(url: str, timeout: float = 30.0):
+    try:
+        r = httpx.get(url, timeout=timeout)
+        if r.status_code == 200:
+            return r.json()
+        logger.info(f"GET {url} -> {r.status_code}")
+        return None
+    except Exception as e:
+        logger.info(f"GET {url} failed: {e}")
+        return None
+
+
+# Minimal built-in fallback dataset to ensure API remains usable offline
+_DEMO_PLAYERS = [
+    {"id": "1", "first_name": "Ja'Marr", "last_name": "Chase", "team": "CIN", "position": "WR", "active": True},
+    {"id": "2", "first_name": "Bijan", "last_name": "Robinson", "team": "ATL", "position": "RB", "active": True},
+    {"id": "3", "first_name": "Saquon", "last_name": "Barkley", "team": "PHI", "position": "RB", "active": True},
+    {"id": "4", "first_name": "Justin", "last_name": "Jefferson", "team": "MIN", "position": "WR", "active": True},
+]
+
+
 @router.get("/players")
 def get_players(
     position: str = Query("ALL"),
@@ -171,19 +192,17 @@ def get_players(
     url_stats = f"https://api.sleeper.app/v1/stats/nfl/regular/{stats_year}"
     url_adp = f"https://api.sleeper.app/v1/adp/nfl/{adp_year}?type=ppr"
 
-    # Fetch base player info
+    # Fetch base player info (tolerant)
     logger.info(f"Fetching player data from {url_players}")
-    response_players = httpx.get(url_players, timeout=30)
-    logger.info(f"Players fetch status: {response_players.status_code}")
-    response_players.raise_for_status()
-    data_players = response_players.json()
+    data_players = _safe_get_json(url_players)
+    if not isinstance(data_players, dict):
+        # Convert demo list to Sleeper-like dict shape
+        data_players = {p["id"]: p for p in _DEMO_PLAYERS}
+        logger.info("Using built-in demo players: remote player feed unavailable")
 
-    # Fetch season stats (last year)
+    # Fetch season stats (last year) tolerant
     logger.info(f"Fetching stats from {url_stats} for year {stats_year}")
-    response_stats = httpx.get(url_stats, timeout=30)
-    logger.info(f"Stats fetch status: {response_stats.status_code}")
-    response_stats.raise_for_status()
-    data_stats = response_stats.json()
+    data_stats = _safe_get_json(url_stats) or {}
 
     # Fetch ADP for current draft season (Sleeper first, then FFC fallback)
     adp_dict: dict[str, float] = {}
@@ -192,10 +211,7 @@ def get_players(
     # 1) Try Sleeper ADP by player_id
     try:
         logger.info(f"Fetching ADP from {url_adp} for draft year {adp_year}")
-        response_adp = httpx.get(url_adp, timeout=30)
-        logger.info(f"ADP fetch status: {response_adp.status_code}")
-        response_adp.raise_for_status()
-        data_adp = response_adp.json()  # list of { player_id, adp, ... }
+        data_adp = _safe_get_json(url_adp)
         if isinstance(data_adp, list):
             for row in data_adp:
                 pid = row.get("player_id")
@@ -210,9 +226,8 @@ def get_players(
         try:
             ffc_url = f"https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year={adp_year}"
             logger.info(f"Fetching FFC ADP from {ffc_url}")
-            r_ffc = httpx.get(ffc_url, timeout=30, headers={"Accept": "application/json"})
-            if r_ffc.status_code == 200:
-                raw = r_ffc.json()
+            raw = _safe_get_json(ffc_url)
+            if raw is not None:
                 players_ffc = raw.get("players", raw) if isinstance(raw, dict) else raw
                 if isinstance(players_ffc, list):
                     for p in players_ffc:
@@ -222,7 +237,7 @@ def get_players(
                             if name and isinstance(adp_val, (int, float)):
                                 ffc_name_to_adp[name.lower()] = round(float(adp_val), 1)
             else:
-                logger.info(f"FFC ADP request failed with {r_ffc.status_code}")
+                logger.info("FFC ADP request failed")
         except Exception as e:
             logger.info(f"FFC ADP fetch failed: {e}")
 
@@ -316,7 +331,6 @@ def get_players(
             + receptions * 1,
             1,
         )
-
         full_name = f"{player_data.get('first_name', '')} {player_data.get('last_name', '')}".strip()
         # Prefer Sleeper ADP by id, otherwise try FFC name match
         adp_value = adp_dict.get(str(player_id))
@@ -398,65 +412,57 @@ def get_adp(season: int):
     Get ADP data for a specific season.
     Returns ADP data from Sleeper API or FFC as fallback.
     """
-    # Try Sleeper ADP first
+    # Try Sleeper ADP first (tolerant)
     url_adp = f"https://api.sleeper.app/v1/adp/nfl/{season}?type=ppr"
-    adp_entries = []
-    
-    try:
-        logger.info(f"Fetching ADP from {url_adp} for season {season}")
-        response_adp = httpx.get(url_adp, timeout=30)
-        logger.info(f"ADP fetch status: {response_adp.status_code}")
-        response_adp.raise_for_status()
-        data_adp = response_adp.json()
-        
-        if isinstance(data_adp, list):
-            # Get player data to map IDs to names
-            url_players = "https://api.sleeper.app/v1/players/nfl"
-            response_players = httpx.get(url_players, timeout=30)
-            response_players.raise_for_status()
-            players_data = response_players.json()
-            
-            for row in data_adp:
-                player_id = row.get("player_id")
-                adp_val = row.get("adp")
-                if player_id and isinstance(adp_val, (int, float)):
-                    player_info = players_data.get(str(player_id), {})
-                    name = f"{player_info.get('first_name', '')} {player_info.get('last_name', '')}".strip()
-                    if name:
-                        adp_entries.append({
-                            "player_id": str(player_id),
-                            "adp": round(float(adp_val), 1),
-                            "position": player_info.get("position", ""),
-                            "team": player_info.get("team", ""),
-                            "name": name
-                        })
-    except Exception as e:
-        logger.info(f"Sleeper ADP failed: {e}, trying FFC fallback")
-        
-        # Fallback to FantasyFootballCalculator
-        try:
-            ffc_url = f"https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year={season}"
-            logger.info(f"Fetching FFC ADP from {ffc_url}")
-            r_ffc = httpx.get(ffc_url, timeout=30, headers={"Accept": "application/json"})
-            if r_ffc.status_code == 200:
-                raw = r_ffc.json()
-                players_ffc = raw.get("players", raw) if isinstance(raw, dict) else raw
-                if isinstance(players_ffc, list):
-                    for p in players_ffc:
-                        if isinstance(p, dict):
-                            name = p.get("name")
-                            adp_val = p.get("adp")
-                            position = p.get("position", "")
-                            team = p.get("team", "")
-                            if name and isinstance(adp_val, (int, float)):
-                                adp_entries.append({
-                                    "player_id": "",  # FFC doesn't provide Sleeper IDs
-                                    "adp": round(float(adp_val), 1),
-                                    "position": position,
-                                    "team": team,
-                                    "name": name
-                                })
-        except Exception as e2:
-            logger.info(f"FFC ADP also failed: {e2}")
-    
+    adp_entries: list[dict] = []
+
+    data_adp = _safe_get_json(url_adp)
+    if isinstance(data_adp, list) and data_adp:
+        # Map IDs to names via players feed
+        players_data = _safe_get_json("https://api.sleeper.app/v1/players/nfl") or {}
+        for row in data_adp:
+            player_id = row.get("player_id")
+            adp_val = row.get("adp")
+            if player_id and isinstance(adp_val, (int, float)):
+                player_info = players_data.get(str(player_id), {})
+                name = f"{player_info.get('first_name', '')} {player_info.get('last_name', '')}".strip()
+                if name:
+                    adp_entries.append({
+                        "player_id": str(player_id),
+                        "adp": round(float(adp_val), 1),
+                        "position": player_info.get("position", ""),
+                        "team": player_info.get("team", ""),
+                        "name": name,
+                    })
+
+    # Fallback to FFC when needed
+    if not adp_entries:
+        ffc_url = f"https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year={season}"
+        raw = _safe_get_json(ffc_url)
+        if raw is not None:
+            players_ffc = raw.get("players", raw) if isinstance(raw, dict) else raw
+            if isinstance(players_ffc, list):
+                for p in players_ffc:
+                    if isinstance(p, dict):
+                        name = p.get("name")
+                        adp_val = p.get("adp")
+                        position = p.get("position", "")
+                        team = p.get("team", "")
+                        if name and isinstance(adp_val, (int, float)):
+                            adp_entries.append({
+                                "player_id": "",
+                                "adp": round(float(adp_val), 1),
+                                "position": position,
+                                "team": team,
+                                "name": name,
+                            })
+
+    # Final safety: small demo mapping if all upstreams fail
+    if not adp_entries:
+        adp_entries = [
+            {"player_id": "1", "adp": 1.5, "position": "WR", "team": "CIN", "name": "Ja'Marr Chase"},
+            {"player_id": "2", "adp": 2.2, "position": "RB", "team": "ATL", "name": "Bijan Robinson"},
+            {"player_id": "3", "adp": 2.5, "position": "RB", "team": "PHI", "name": "Saquon Barkley"},
+        ]
+
     return adp_entries
