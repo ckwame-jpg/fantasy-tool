@@ -28,7 +28,9 @@ const safelist = colorFamilies.flatMap(color =>
   })
 ).flat();
 
-/** @type {import('tailwindcss').Config} */
+// Add custom color manually to the safelist
+safelist.push("bg-slate-bg");
+
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",

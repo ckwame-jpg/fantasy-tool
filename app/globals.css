@@ -1,4 +1,7 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities; 
+
 @import "tw-animate-css";
 
 :root {
@@ -115,11 +118,11 @@
   }
 
   .favorite-star:hover {
-    color: #fbbf24; /* amber-400 */
+    color: #22d3ee; /* cyan-400 */
   }
 
   .favorite-star--active {
-    color: #fbbf24; /* amber-400 */
+    color: #22d3ee; /* cyan-400 */
   }
 }
 
