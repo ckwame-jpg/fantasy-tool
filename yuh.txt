@@ -1,50 +1,150 @@
-2025-08-22T15:45:28.477967365Z            ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-08-22T15:45:28.477990175Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/click/core.py", line 794, in invoke
-2025-08-22T15:45:28.477996055Z     return callback(*args, **kwargs)
-2025-08-22T15:45:28.478000205Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/main.py", line 413, in main
-2025-08-22T15:45:28.478004585Z     run(
-2025-08-22T15:45:28.478009185Z     ~~~^
-2025-08-22T15:45:28.478013635Z         app,
-2025-08-22T15:45:28.478018015Z         ^^^^
-2025-08-22T15:45:28.478022226Z     ...<45 lines>...
-2025-08-22T15:45:28.478026576Z         h11_max_incomplete_event_size=h11_max_incomplete_event_size,
-2025-08-22T15:45:28.478030896Z         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-08-22T15:45:28.478035586Z     )
-2025-08-22T15:45:28.478043586Z     ^
-2025-08-22T15:45:28.478047826Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/main.py", line 580, in run
-2025-08-22T15:45:28.478051796Z     server.run()
-2025-08-22T15:45:28.478055566Z     ~~~~~~~~~~^^
-2025-08-22T15:45:28.478059336Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 67, in run
-2025-08-22T15:45:28.478063656Z     return asyncio.run(self.serve(sockets=sockets))
-2025-08-22T15:45:28.478067156Z            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-08-22T15:45:28.478070616Z   File "/usr/local/lib/python3.13/asyncio/runners.py", line 195, in run
-2025-08-22T15:45:28.478074087Z     return runner.run(main)
-2025-08-22T15:45:28.478077616Z            ~~~~~~~~~~^^^^^^
-2025-08-22T15:45:28.478081537Z   File "/usr/local/lib/python3.13/asyncio/runners.py", line 118, in run
-2025-08-22T15:45:28.478085637Z     return self._loop.run_until_complete(task)
-2025-08-22T15:45:28.478089797Z            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
-2025-08-22T15:45:28.478093817Z   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
-2025-08-22T15:45:28.478097867Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 71, in serve
-2025-08-22T15:45:28.478101867Z     await self._serve(sockets)
-2025-08-22T15:45:28.478105907Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 78, in _serve
-2025-08-22T15:45:28.478120917Z     config.load()
-2025-08-22T15:45:28.478123917Z     ~~~~~~~~~~~^^
-2025-08-22T15:45:28.478126768Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/config.py", line 436, in load
-2025-08-22T15:45:28.478129457Z     self.loaded_app = import_from_string(self.app)
-2025-08-22T15:45:28.478132068Z                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-2025-08-22T15:45:28.478135538Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/importer.py", line 22, in import_from_string
-2025-08-22T15:45:28.478138408Z     raise exc from None
-2025-08-22T15:45:28.478141308Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/importer.py", line 19, in import_from_string
-2025-08-22T15:45:28.478144138Z     module = importlib.import_module(module_str)
-2025-08-22T15:45:28.478147538Z   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
-2025-08-22T15:45:28.478150458Z     return _bootstrap._gcd_import(name[level:], package, level)
-2025-08-22T15:45:28.478153518Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-2025-08-22T15:45:28.478156368Z   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
-2025-08-22T15:45:28.478158878Z   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
-2025-08-22T15:45:28.478161418Z   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
-2025-08-22T15:45:28.478163988Z   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
-2025-08-22T15:45:28.478166578Z   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
-2025-08-22T15:45:28.478168968Z   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
-2025-08-22T15:45:28.478171438Z   File "/opt/render/project/src/backend/main.py", line 2, in <module>
-2025-08-22T15:45:28.478173838Z     from bs4 import BeautifulSoup
-2025-08-22T15:45:28.478187639Z ModuleNotFoundError: No module named 'bs4'
+2025-08-22T16:07:17.290865605Z       copying src/lxml/etree_api.h -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290867675Z       copying src/lxml/lxml.etree.h -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290869735Z       copying src/lxml/lxml.etree_api.h -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290871785Z       copying src/lxml/etree.pyx -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290882255Z       copying src/lxml/objectify.pyx -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290884595Z       copying src/lxml/xmlschema.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290886686Z       copying src/lxml/xpath.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290888926Z       copying src/lxml/cleanup.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290890995Z       copying src/lxml/apihelpers.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290893166Z       copying src/lxml/xmlid.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290895216Z       copying src/lxml/xslt.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290897306Z       copying src/lxml/public-api.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290899366Z       copying src/lxml/xinclude.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290901426Z       copying src/lxml/iterparse.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290903486Z       copying src/lxml/xmlerror.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290905536Z       copying src/lxml/classlookup.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290907606Z       copying src/lxml/debug.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290909666Z       copying src/lxml/xsltext.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290911796Z       copying src/lxml/objectpath.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290913906Z       copying src/lxml/nsclasses.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290915946Z       copying src/lxml/extensions.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290918006Z       copying src/lxml/parsertarget.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290923616Z       copying src/lxml/docloader.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290925746Z       copying src/lxml/relaxng.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290927796Z       copying src/lxml/dtd.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290929856Z       copying src/lxml/proxy.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290931906Z       copying src/lxml/schematron.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290933976Z       copying src/lxml/saxparser.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290936006Z       copying src/lxml/readonlytree.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290938036Z       copying src/lxml/serializer.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290940136Z       copying src/lxml/parser.pxi -> build/lib.linux-x86_64-cpython-313/lxml
+2025-08-22T16:07:17.290942216Z       copying src/lxml/includes/xmlerror.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290944267Z       copying src/lxml/includes/dtdvalid.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290946316Z       copying src/lxml/includes/xpath.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290948347Z       copying src/lxml/includes/xslt.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290950467Z       copying src/lxml/includes/uri.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290952547Z       copying src/lxml/includes/__init__.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290954677Z       copying src/lxml/includes/c14n.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290956737Z       copying src/lxml/includes/relaxng.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290958797Z       copying src/lxml/includes/tree.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290960907Z       copying src/lxml/includes/xmlparser.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290963027Z       copying src/lxml/includes/htmlparser.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290965077Z       copying src/lxml/includes/etreepublic.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290967177Z       copying src/lxml/includes/config.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290969257Z       copying src/lxml/includes/schematron.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290971327Z       copying src/lxml/includes/xinclude.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290973387Z       copying src/lxml/includes/xmlschema.pxd -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290975437Z       copying src/lxml/includes/etree_defs.h -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290977497Z       copying src/lxml/includes/lxml-version.h -> build/lib.linux-x86_64-cpython-313/lxml/includes
+2025-08-22T16:07:17.290979587Z       creating build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/rng
+2025-08-22T16:07:17.290982087Z       copying src/lxml/isoschematron/resources/rng/iso-schematron.rng -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/rng
+2025-08-22T16:07:17.290991507Z       creating build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl
+2025-08-22T16:07:17.290994067Z       copying src/lxml/isoschematron/resources/xsl/RNG2Schtrn.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl
+2025-08-22T16:07:17.290999397Z       copying src/lxml/isoschematron/resources/xsl/XSD2Schtrn.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl
+2025-08-22T16:07:17.291001548Z       creating build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291004057Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/iso_schematron_message.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291006118Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/iso_svrl_for_xslt1.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291008768Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/iso_schematron_skeleton_for_xslt1.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291010878Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/iso_abstract_expand.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291012928Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/iso_dsdl_include.xsl -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291017088Z       copying src/lxml/isoschematron/resources/xsl/iso-schematron-xslt1/readme.txt -> build/lib.linux-x86_64-cpython-313/lxml/isoschematron/resources/xsl/iso-schematron-xslt1
+2025-08-22T16:07:17.291019278Z       running build_ext
+2025-08-22T16:07:17.291021368Z       building 'lxml.etree' extension
+2025-08-22T16:07:17.291023568Z       creating build/temp.linux-x86_64-cpython-313/src/lxml
+2025-08-22T16:07:17.291026098Z       gcc -fno-strict-overflow -Wsign-compare -DNDEBUG -g -O3 -Wall -fPIC -DCYTHON_CLINE_IN_TRACEBACK=0 -I/usr/include/libxml2 -Isrc -Isrc/lxml/includes -I/opt/render/project/src/.venv/include -I/usr/local/include/python3.13 -c src/lxml/etree.c -o build/temp.linux-x86_64-cpython-313/src/lxml/etree.o -w
+2025-08-22T16:07:17.291028248Z       src/lxml/etree.c: In function ‘__Pyx_init_assertions_enabled’:
+2025-08-22T16:07:17.291030348Z       src/lxml/etree.c:5988:105: error: invalid type argument of ‘->’ (have ‘int’)
+2025-08-22T16:07:17.291032478Z        5988 |     __pyx_assertions_enabled_flag = ! _PyInterpreterState_GetConfig(__Pyx_PyThreadState_Current->interp)->optimization_level;
+2025-08-22T16:07:17.291035128Z             |                                                                                                         ^~
+2025-08-22T16:07:17.291037178Z       src/lxml/etree.c: In function ‘__Pyx_PyIter_Next2’:
+2025-08-22T16:07:17.291039318Z       src/lxml/etree.c:265182:35: error: ‘_PyObject_NextNotImplemented’ undeclared (first use in this function); did you mean ‘PyObject_HashNotImplemented’?
+2025-08-22T16:07:17.291041438Z       265182 |         if (unlikely(iternext == &_PyObject_NextNotImplemented))
+2025-08-22T16:07:17.291043528Z              |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291045598Z       src/lxml/etree.c:1096:43: note: in definition of macro ‘unlikely’
+2025-08-22T16:07:17.291047708Z        1096 |   #define unlikely(x) __builtin_expect(!!(x), 0)
+2025-08-22T16:07:17.291049848Z             |                                           ^
+2025-08-22T16:07:17.291051989Z       src/lxml/etree.c:265182:35: note: each undeclared identifier is reported only once for each function it appears in
+2025-08-22T16:07:17.291054058Z       265182 |         if (unlikely(iternext == &_PyObject_NextNotImplemented))
+2025-08-22T16:07:17.291056149Z              |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291062849Z       src/lxml/etree.c:1096:43: note: in definition of macro ‘unlikely’
+2025-08-22T16:07:17.291065049Z        1096 |   #define unlikely(x) __builtin_expect(!!(x), 0)
+2025-08-22T16:07:17.291067119Z             |                                           ^
+2025-08-22T16:07:17.291069199Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_int’:
+2025-08-22T16:07:17.291071279Z       src/lxml/etree.c:269066:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.291073349Z       269066 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.291075399Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291077469Z       In file included from /usr/local/include/python3.13/longobject.h:107,
+2025-08-22T16:07:17.291079499Z                        from /usr/local/include/python3.13/Python.h:81,
+2025-08-22T16:07:17.291081539Z                        from src/lxml/etree.c:96:
+2025-08-22T16:07:17.291083639Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.291093469Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.291095829Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291097909Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_size_t’:
+2025-08-22T16:07:17.291100039Z       src/lxml/etree.c:269375:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.291102159Z       269375 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.291104239Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291106319Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.291108459Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.291110519Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291112559Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_unsigned_int’:
+2025-08-22T16:07:17.291114659Z       src/lxml/etree.c:269571:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.29111673Z       269571 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.29111889Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.29112096Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.29112305Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.29112521Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.2911274Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_signed__char’:
+2025-08-22T16:07:17.29112954Z       src/lxml/etree.c:269767:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.29113161Z       269767 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.29113366Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.29113574Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.29113779Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.29113985Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.29114197Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_unsigned_short’:
+2025-08-22T16:07:17.29114406Z       src/lxml/etree.c:270001:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.29114971Z       270001 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.29115181Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.29115392Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.29115595Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.29115801Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.29116005Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_xmlChar’:
+2025-08-22T16:07:17.291163191Z       src/lxml/etree.c:270235:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.29116536Z       270235 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.291167431Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291169491Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.29117154Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.291173591Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291175631Z       src/lxml/etree.c: In function ‘__Pyx_PyInt_As_long’:
+2025-08-22T16:07:17.291177711Z       src/lxml/etree.c:270438:27: error: too few arguments to function ‘_PyLong_AsByteArray’
+2025-08-22T16:07:17.291179791Z       270438 |                 int ret = _PyLong_AsByteArray((PyLongObject *)v,
+2025-08-22T16:07:17.291181871Z              |                           ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291183971Z       /usr/local/include/python3.13/cpython/longobject.h:111:17: note: declared here
+2025-08-22T16:07:17.291186011Z         111 | PyAPI_FUNC(int) _PyLong_AsByteArray(PyLongObject* v,
+2025-08-22T16:07:17.291188071Z             |                 ^~~~~~~~~~~~~~~~~~~
+2025-08-22T16:07:17.291190491Z       Compile failed: command '/usr/bin/gcc' failed with exit code 1
+2025-08-22T16:07:17.291192571Z       creating tmp
+2025-08-22T16:07:17.291194751Z       cc -I/usr/include/libxml2 -I/usr/include/libxml2 -c /tmp/xmlXPathInitken0zt29.c -o tmp/xmlXPathInitken0zt29.o
+2025-08-22T16:07:17.291196841Z       cc tmp/xmlXPathInitken0zt29.o -lxml2 -o a.out
+2025-08-22T16:07:17.291198941Z       error: command '/usr/bin/gcc' failed with exit code 1
+2025-08-22T16:07:17.291200991Z       [end of output]
+2025-08-22T16:07:17.291203061Z   
+2025-08-22T16:07:17.291205191Z   note: This error originates from a subprocess, and is likely not a problem with pip.
+2025-08-22T16:07:17.291213891Z   ERROR: Failed building wheel for lxml
+2025-08-22T16:07:17.291437185Z Failed to build lxml
+2025-08-22T16:07:17.296866422Z error: failed-wheel-build-for-install
+2025-08-22T16:07:17.296875342Z 
+2025-08-22T16:07:17.296878862Z × Failed to build installable wheels for some pyproject.toml based projects
+2025-08-22T16:07:17.296881312Z ╰─> lxml
+2025-08-22T16:07:17.560346676Z ==> Build failed 😞
+2025-08-22T16:07:17.560368107Z ==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
