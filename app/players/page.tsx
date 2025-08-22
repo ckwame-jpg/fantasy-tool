@@ -183,7 +183,7 @@ function compare(a: Player, b: Player, key: keyof Player, direction: "asc" | "de
 const PlayersPage = () => {
   const FAVORITES_KEY = "fantasy:favorites";
   const currentYear = new Date().getFullYear();
-  const defaultStatsYear = currentYear - 1; // Default to last completed season's stats
+  const defaultStatsYear = currentYear; // Default to last completed season's stats
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
@@ -331,7 +331,7 @@ const PlayersPage = () => {
 
   const positions = ["ALL", "QB", "RB", "WR", "TE"];
   // Offer last 4 completed stat seasons (e.g., if currentYear=2025 -> 2024, 2023, 2022, 2021)
-  const years = Array.from({ length: 4 }, (_, i) => currentYear - 1 - i);
+  const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
   const SortableHeader = ({ field, children }: { field: keyof Player; children: React.ReactNode }) => (
     <th
@@ -345,8 +345,8 @@ const PlayersPage = () => {
   return (
     <div className="h-screen overflow-hidden p-6 flex flex-col">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold">Players</h1>
-        <p className="text-sm text-zinc-400">Showing {season} stats</p>
+        <h1 className="text-3xl font-bold">players</h1>
+        <p className="text-sm text-slate-400">showing {season} stats</p>
       </div>
 
       {/* Filters */}
@@ -358,8 +358,8 @@ const PlayersPage = () => {
               onClick={() => setPosition(pos)}
               className={`px-3 py-1 rounded font-semibold text-sm transition-colors focus:outline-none ${
                 position === pos
-                  ? "bg-purple-600 text-white"
-                  : "bg-zinc-700 text-zinc-300 hover:bg-purple-500 hover:text-white"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-700 text-slate-300 hover:bg-indigo-500 hover:text-white"
               }`}
             >
               {pos}
@@ -370,17 +370,17 @@ const PlayersPage = () => {
             className={`px-3 py-1 rounded font-semibold text-sm transition-colors focus:outline-none ${
               position === "Favorites"
                 ? "bg-[#00CEC8] text-white"
-                : "bg-zinc-700 text-zinc-300 hover:bg-[#00CEC8] hover:text-white"
+                : "bg-slate-700 text-slate-300 hover:bg-[#00CEC8] hover:text-white"
             }`}
           >
-            ★ Favorites
+            ★ favorites
           </button>
         </div>
         <div>
           <select
             value={season}
             onChange={(e) => setSeason(Number(e.target.value))}
-            className="bg-zinc-700 text-white p-2 rounded border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="bg-slate-700 text-white p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             title="Select season to view player statistics for"
           >
             {years.map((yr) => (
@@ -396,7 +396,7 @@ const PlayersPage = () => {
       <div className="mb-4">
         <input
           type="text"
-          className="bg-zinc-700 text-white p-2 rounded w-full md:w-96 border border-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="bg-slate-700 text-white p-2 rounded w-full md:w-96 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           placeholder="Search by player name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -404,11 +404,11 @@ const PlayersPage = () => {
       </div>
 
       {/* Table */}
-      <div className="flex-1 bg-zinc-800 rounded-lg relative min-h-0 flex flex-col p-4">
+      <div className="flex-1 bg-slate-800 rounded-lg relative min-h-0 flex flex-col p-4">
         {loading ? (
-          <div className="text-center text-zinc-400 py-8">Loading players...</div>
+          <div className="text-center text-slate-400 py-8">Loading players...</div>
         ) : filteredPlayers.length === 0 ? (
-          <div className="text-center text-zinc-400 py-8">No players found.</div>
+          <div className="text-center text-slate-400 py-8">No players found.</div>
         ) : (
           <div className="flex-1 min-h-0">
             <div className="overflow-y-auto overflow-x-hidden h-full">
@@ -437,9 +437,9 @@ const PlayersPage = () => {
                     <col key={i} className={cls} />
                   ))}
                 </colgroup>
-                <thead className="sticky top-0 z-20 bg-zinc-800 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)]">
+                <thead className="sticky top-0 z-20 bg-slate-800 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)]">
                   {/* Row 1: frozen labels + grouped category headers */}
-                  <tr className="text-zinc-400 border-b border-zinc-700">
+                  <tr className="text-slate-400 border-b border-slate-700">
                     <th rowSpan={2} className={`${CELL} text-[10px] whitespace-nowrap`}>★</th>
                     <th rowSpan={2} className={`${CELL} text-[10px] cursor-pointer whitespace-nowrap`} onClick={() => handleSort('name')}>
                       Name {sortField === 'name' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
@@ -463,7 +463,7 @@ const PlayersPage = () => {
                     <th colSpan={4} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>PASSING</th>
                   </tr>
                   {/* Row 2: sortable sub-headers */}
-                  <tr className="text-zinc-400 border-b border-zinc-700">
+                  <tr className="text-slate-400 border-b border-slate-700">
                     <SortableHeader field="fantasyPoints">Pts</SortableHeader>
                     {/* Rushing */}
                     <SortableHeader field="rushAtt">Att</SortableHeader>
@@ -485,7 +485,7 @@ const PlayersPage = () => {
                   {filteredPlayers.map((player) => (
                     <tr
                       key={player.id}
-                      className="border-b border-zinc-700 hover:bg-zinc-700"
+                      className="border-b border-slate-700 hover:bg-slate-700"
                     >
                       <td className={`${CELL} text-center`}>
                         {(() => {
@@ -493,7 +493,7 @@ const PlayersPage = () => {
                           return (
                             <button onClick={() => toggleFavorite(player.id)} className="focus:outline-none" aria-label={isFav ? "Remove favorite" : "Add favorite"}>
                               <span
-                                className={`inline-block text-[16px] transition-colors ${isFav ? "text-[#00CEC8]" : "text-zinc-400"}`}
+                                className={`inline-block text-[16px] transition-colors ${isFav ? "text-[#00CEC8]" : "text-slate-400"}`}
                               >
                                 {isFav ? "★" : "☆"}
                               </span>

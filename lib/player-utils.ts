@@ -222,13 +222,13 @@ export const getByeWeekInfo = (team: string) => {
   
   const week = byeWeeks[team] || 0
   const isEarly = week <= 7
-  const isLate = week >= 12
+  const izinc = week >= 12
   
   return {
     week,
     status: week === 0 ? 'Unknown' : `Week ${week}`,
-    impact: isEarly ? 'Early (Good)' : isLate ? 'Late (Bad)' : 'Mid (OK)',
-    color: isEarly ? 'text-green-400' : isLate ? 'text-red-400' : 'text-yellow-400'
+    impact: isEarly ? 'Early (Good)' : izinc ? 'Late (Bad)' : 'Mid (OK)',
+    color: isEarly ? 'text-green-400' : izinc ? 'text-red-400' : 'text-yellow-400'
   }
 }
 

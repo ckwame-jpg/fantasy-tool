@@ -56,7 +56,7 @@ export default function TeamPage({ params }: TeamPageProps) {
   if (loading) {
     return (
       <div className="p-6">
-        <div className="text-zinc-400">Loading team...</div>
+        <div className="text-slate-400">Loading team...</div>
       </div>
     )
   }
@@ -65,7 +65,7 @@ export default function TeamPage({ params }: TeamPageProps) {
     return (
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-4">Team Not Found</h1>
-        <p className="text-zinc-400">Team with ID "{id}" was not found.</p>
+        <p className="text-slate-400">Team with ID "{id}" was not found.</p>
       </div>
     )
   }
@@ -86,13 +86,13 @@ export default function TeamPage({ params }: TeamPageProps) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold mb-2">{team.name}</h1>
-          <p className="text-zinc-400">
+          <p className="text-slate-400">
             {team.picks?.length || 0} players drafted
           </p>
           {/* Debug info */}
           <details className="mt-2">
-            <summary className="text-xs text-zinc-500 cursor-pointer">Debug Info</summary>
-            <pre className="text-xs text-zinc-600 mt-1 bg-zinc-900 p-2 rounded overflow-auto">
+            <summary className="text-xs text-slate-500 cursor-pointer">Debug Info</summary>
+            <pre className="text-xs text-slate-600 mt-1 bg-slate-900 p-2 rounded overflow-auto">
               {JSON.stringify(team, null, 2)}
             </pre>
           </details>
@@ -108,7 +108,7 @@ export default function TeamPage({ params }: TeamPageProps) {
       {team.picks && team.picks.length > 0 ? (
         <div className="space-y-6">
           {positions.map(position => (
-            <div key={position} className="bg-zinc-800 rounded-lg p-4">
+            <div key={position} className="bg-slate-800 rounded-lg p-4">
               <h2 className="text-xl font-semibold mb-3 text-purple-400">
                 {position} ({picksByPosition[position].length})
               </h2>
@@ -118,16 +118,16 @@ export default function TeamPage({ params }: TeamPageProps) {
                   .map((pick: any, index: number) => (
                   <div 
                     key={pick.id || index}
-                    className="flex items-center justify-between bg-zinc-700 rounded p-3"
+                    className="flex items-center justify-between bg-slate-700 rounded p-3"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-zinc-400 w-12">
+                      <span className="text-sm text-slate-400 w-12">
                         {pick.overall ? `#${pick.overall}` : '-'}
                       </span>
                       <span className="font-medium">{pick.player_name}</span>
-                      <span className="text-sm text-zinc-400">{pick.team}</span>
+                      <span className="text-sm text-slate-400">{pick.team}</span>
                     </div>
-                    <div className="text-sm text-zinc-400">
+                    <div className="text-sm text-slate-400">
                       Round {pick.round || '-'}
                     </div>
                   </div>
@@ -137,9 +137,9 @@ export default function TeamPage({ params }: TeamPageProps) {
           ))}
         </div>
       ) : (
-        <div className="bg-zinc-800 rounded-lg p-8 text-center">
-          <p className="text-zinc-400 mb-4">No players drafted yet</p>
-          <p className="text-sm text-zinc-500 mb-4">
+        <div className="bg-slate-800 rounded-lg p-8 text-center">
+          <p className="text-slate-400 mb-4">No players drafted yet</p>
+          <p className="text-sm text-slate-500 mb-4">
             This team was saved with 0 players. Go to the Draftboard to draft players, then save them to a new team.
           </p>
           <div className="flex gap-2 justify-center">

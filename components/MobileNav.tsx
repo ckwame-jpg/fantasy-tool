@@ -35,10 +35,10 @@ export default function MobileNav() {
       {/* Mobile navigation */}
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 text-white p-4 flex flex-col gap-4 border-r border-zinc-800 overflow-y-auto transform transition-transform duration-300 ease-in-out md:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-zinc-900 text-white p-4 flex flex-col gap-4 border-r border-zinc-800 overflow-y-auto transform transition-transform duration-500 ease-in-out md:hidden",
           {
-            "translate-x-0": isOpen,
-            "-translate-x-full": !isOpen,
+          "translate-x-0": isOpen,
+          "-translate-x-full": !isOpen,
           }
         )}
       >
@@ -46,32 +46,41 @@ export default function MobileNav() {
 
         <Link
           href="/"
-          className={clsx("flex items-center gap-2 p-2 rounded", {
+          className={clsx("flex items-center gap-2 p-2 rounded transition-colors duration-300 group", {
             "bg-zinc-700": pathname === "/"
           })}
           onClick={closeNav}
         >
-          <Home size={18} /> Home
+          <span className="transition-transform duration-300 group-hover:scale-110">
+            <Home size={18} />
+          </span>
+          Home
         </Link>
 
         <Link
           href="/draftboard"
-          className={clsx("flex items-center gap-2 p-2 rounded", {
+          className={clsx("flex items-center gap-2 p-2 rounded transition-colors duration-300 group", {
             "bg-zinc-700": pathname === "/draftboard"
           })}
           onClick={closeNav}
         >
-          <List size={18} /> Draftboard
+          <span className="transition-transform duration-300 group-hover:scale-110">
+            <List size={18} />
+          </span>
+          Draftboard
         </Link>
 
         <Link
           href="/players"
-          className={clsx("flex items-center gap-2 p-2 rounded", {
+          className={clsx("flex items-center gap-2 p-2 rounded transition-colors duration-300 group", {
             "bg-zinc-700": pathname === "/players"
           })}
           onClick={closeNav}
         >
-          <PersonStanding size={18} /> Players
+          <span className="transition-transform duration-300 group-hover:scale-110">
+            <PersonStanding size={18} />
+          </span>
+          Players
         </Link>
       </aside>
     </>

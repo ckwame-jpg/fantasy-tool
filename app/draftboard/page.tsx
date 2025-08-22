@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useCallback } from "react"
 import styles from "./page.module.css"
 import { API_BASE_URL } from "@/constants"
 import { fetcher } from "@/lib/api"
@@ -47,12 +47,16 @@ const BYE_WEEKS: Record<string, number> = {
 }
 
 // Helpers to read nested fields and coerce values
-function getPath(obj: any, path: string) {
+function getPath(obj: Record<string, unknown>, path: string): unknown {
   if (!obj || !path) return undefined
-  return path.split(".").reduce((acc: any, k: string) => (acc && acc[k] !== undefined ? acc[k] : undefined), obj)
+  return path.split(".").reduce((acc: unknown, k: string) => {
+    return (acc && typeof acc === 'object' && acc !== null && k in acc) 
+      ? (acc as Record<string, unknown>)[k] 
+      : undefined
+  }, obj)
 }
 
-function toNum(v: any) {
+function toNum(v: unknown): number | undefined {
   if (v === undefined || v === null) return undefined
   if (typeof v === "string") {
     const t = v.trim()
@@ -64,7 +68,7 @@ function toNum(v: any) {
 }
 
 // Map backend fields (flat or nested) to the local camelCase fields we render
-function normalizeStats(raw: any): Partial<Player> {
+function normalizeStats(raw: Record<string, unknown>): Partial<Player> {
   const pickFlat = (...keys: string[]) => {
     for (const k of keys) {
       if (raw?.[k] !== undefined && raw?.[k] !== null) return raw[k]
@@ -151,6 +155,22 @@ const toPickArray = (players: Player[], picksPerRound: number): Pick[] =>
     timestamp: Date.now() / 1000,
   }))
 
+// Helper to map progress % to Tailwind width class
+const getProgressWidthClass = (progress: number): string => {
+  const rounded = Math.round(progress)
+  if (rounded >= 100) return "w-full"
+  if (rounded >= 90) return "w-[90%]"
+  if (rounded >= 80) return "w-[80%]"
+  if (rounded >= 70) return "w-[70%]"
+  if (rounded >= 60) return "w-[60%]"
+  if (rounded >= 50) return "w-[50%]"
+  if (rounded >= 40) return "w-[40%]"
+  if (rounded >= 30) return "w-[30%]"
+  if (rounded >= 20) return "w-[20%]"
+  if (rounded >= 10) return "w-[10%]"
+  return "w-[5%]"
+}
+
 export default function DraftPage() {
   const [players, setPlayers] = useState<Player[]>([])
   const [position, setPosition] = useState("ALL")
@@ -158,18 +178,26 @@ export default function DraftPage() {
   const [drafted, setDrafted] = useState<Player[]>([])
   const [sortField, setSortField] = useState<keyof Player | null>("adp")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
-  const [socket, setSocket] = useState<any>(null)
+  const [socket, setSocket] = useState<ReturnType<typeof io> | null>(null)
   const [isOnlineMode, setIsOnlineMode] = useState(false)
   const [selectedWeek, setSelectedWeek] = useState(1)
   const [showByeWeeks, setShowByeWeeks] = useState(true)
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
   const draftId = "global-draft" // Single global draft board
+
+  // Platform sync state for Sleeper integration
+  const [selectedPlatform, setSelectedPlatform] = useState("")
+  const [sleeperDraftId, setSleeperDraftId] = useState<string | null>(null)
+  const [draftedFromPlatform, setDraftedFromPlatform] = useState<string[]>([])
 
   const CURRENT_YEAR = new Date().getFullYear() // for current draft season (2025)
   const STATS_YEAR = CURRENT_YEAR - 1 // for last year's stats (2024)
   const DISPLAY_YEAR = STATS_YEAR + 1 // show in UI subtitle (2025)
 
   const [adpByKey, setAdpByKey] = useState<Record<string, number>>({})
-  const makeKey = (name: string, pos: string) => `${name}`.trim().toUpperCase() + "|" + `${pos}`.trim().toUpperCase()
+  const makeKey = useCallback((name: string, pos: string) => 
+    `${name}`.trim().toUpperCase() + "|" + `${pos}`.trim().toUpperCase(), [])
 
   // Only show players who are currently on an NFL team (hide FAs/invalid placeholders)
   const isOnTeam = (p: Player) => {
@@ -199,8 +227,8 @@ export default function DraftPage() {
     }
   }
 
-  const PICKS_PER_ROUND = 10
-  const TOTAL_ROUNDS = 15
+  const PICKS_PER_ROUND = 15
+  const TOTAL_ROUNDS = 1
   const TOTAL_PICKS = PICKS_PER_ROUND * TOTAL_ROUNDS
   const progress = Math.min((drafted.length / TOTAL_PICKS) * 100, 100)
   const currentRound = Math.floor(drafted.length / PICKS_PER_ROUND) + 1
@@ -321,14 +349,14 @@ export default function DraftPage() {
 
   useEffect(() => {
     fetcher(`${API_BASE_URL}/players?position=${position}&season=${CURRENT_YEAR}&on_team_only=true`)
-      .then((data: Player[]) => {
-        const normalized = (data || []).map((raw: any) => {
+      .then((data: Record<string, unknown>[]) => {
+        const normalized = (data || []).map((raw: Record<string, unknown>) => {
           const stats = normalizeStats(raw)
           // Only keep defined values so we don't overwrite existing fields with `undefined`
           const cleaned = Object.fromEntries(
             Object.entries(stats).filter(([, v]) => v !== undefined)
           )
-          return { ...raw, ...cleaned }
+          return { ...raw, ...cleaned } as unknown as Player
         })
         
         const withAdp = normalized.map((p) => {
@@ -339,7 +367,7 @@ export default function DraftPage() {
         setPlayers(withAdp)
       })
       .catch(console.error)
-  }, [position, CURRENT_YEAR, adpByKey])
+  }, [position, CURRENT_YEAR, adpByKey, makeKey])
 
   useEffect(() => {
     if (!players.length || !Object.keys(adpByKey).length) return
@@ -348,7 +376,7 @@ export default function DraftPage() {
       const adp = adpByKey[key]
       return typeof adp === "number" ? { ...p, adp } : p
     }))
-  }, [adpByKey])
+  }, [adpByKey, makeKey, players.length])
 
   useEffect(() => {
     // Fetch ADP for the current draft season (e.g., 2025)
@@ -363,7 +391,7 @@ export default function DraftPage() {
         setAdpByKey(map)
       })
       .catch(console.warn)
-  }, [CURRENT_YEAR])
+  }, [CURRENT_YEAR, makeKey])
 
   const draftPlayer = async (player: Player) => {
     setDrafted((prev) => {
@@ -453,7 +481,7 @@ export default function DraftPage() {
     const withOverall = scored.map((p, i) => {
       const rank = i + 1
       let tier = "😴"
-      let tierClass = "bg-zinc-600 text-white"
+      let tierClass = "bg-slate-600 text-white"
 
       if (rank <= Math.ceil(n * 0.08)) {
         tier = "T1"; tierClass = "bg-purple-600 text-white"
@@ -483,16 +511,18 @@ export default function DraftPage() {
     return withOverall
   }, [players])
 
+  const progressWidthClass = getProgressWidthClass(progress)
+
   return (
-    <div className="h-screen overflow-hidden flex flex-col p-6">
+    <div className="h-screen overflow-hidden flex flex-col p-6 bg-slate-950">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold">Draftboard</h1>
-        <p className="text-sm text-zinc-400">
+        <h1 className="text-3xl font-bold">draftboard</h1>
+        <p className="text-sm text-slate-400">
           Showing {DISPLAY_YEAR} stats + ADP
           {selectedWeek > 0 && ` • Week ${selectedWeek} Focus`}
           {isOnlineMode ? " • Live Draft Mode" : " • Offline Mode"}
         </p>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-slate-500">
           ADP loaded: {Object.keys(adpByKey).length}
           {selectedWeek > 0 && !showByeWeeks && " • Bye week players hidden"}
         </p>
@@ -500,125 +530,187 @@ export default function DraftPage() {
 
       <div className="flex-1 min-h-0 flex gap-6 items-stretch">
         {/* Filters and Controls */}
-        <div className="w-[160px] shrink-0 bg-zinc-800 p-4 rounded-lg h-full overflow-auto">
-          <h2 className="text-lg font-semibold mb-2">Filters</h2>
+        <div className="w-[160px] shrink-0 p-4 rounded-lg h-full overflow-auto bg-slate-900">
+          <h2 className="text-lg font-semibold mb-2 text-gray-200">filters</h2>
           
           {/* Mode Toggle */}
           <div className="mb-4">
-            <label className="text-sm text-zinc-400 mb-2 block">Draft Mode</label>
+            <label className="text-sm text-slate-400 mb-2 block">draft mode</label>
             <div className="flex gap-1">
               <button
                 className={`px-2 py-1 text-xs rounded ${
                   !isOnlineMode 
-                    ? "bg-blue-600 text-white" 
-                    : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                    ? "bg-indigo-700 text-white" 
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
                 }`}
                 onClick={() => setIsOnlineMode(false)}
                 title="Focus on building your personal team"
               >
-                Offline
+                offline
               </button>
               <button
                 className={`px-2 py-1 text-xs rounded ${
                   isOnlineMode 
-                    ? "bg-green-600 text-white" 
-                    : "bg-zinc-700 text-zinc-300 hover:bg-zinc-600"
+                    ? "bg-cyan-700 text-white" 
+                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
                 }`}
                 onClick={() => setIsOnlineMode(true)}
                 title="Connect to live draft"
               >
-                Online
+                online
               </button>
             </div>
-            <p className="text-xs text-zinc-400 mt-1">
+            <p className="text-xs text-slate-400 mt-1">
               {isOnlineMode 
                 ? "Track live draft picks" 
                 : "Personal draft simulation"
               }
             </p>
+            {isOnlineMode && (
+              <div className="mt-2">
+                <label className="text-sm text-slate-400 mb-1 block">platform</label>
+                <select
+                  className="w-full text-white p-1 rounded text-sm bg-slate-800"
+                  title="Select fantasy platform to sync with"
+                  value={selectedPlatform}
+                  onChange={(e) => setSelectedPlatform(e.target.value)}
+                >
+                  <option value="" disabled>select platform</option>
+                  <option value="sleeper">Sleeper</option>
+                  <option value="espn">ESPN</option>
+                  <option value="nfl">NFL.com</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Week Selector */}
           <div className="mb-4">
-            <label className="text-sm text-zinc-400 mb-2 block">Week Focus</label>
+            <label className="text-sm text-slate-400 mb-2 block">week focus</label>
             <select
-              className="w-full bg-zinc-700 text-white p-1 rounded text-sm"
+              className="w-full text-white p-1 rounded text-sm bg-slate-800"
               value={selectedWeek}
               onChange={(e) => setSelectedWeek(Number(e.target.value))}
               title="Focus on players for specific week"
             >
-              <option value={0}>All Season</option>
+              <option value={0}>all season</option>
               {Array.from({ length: 18 }, (_, i) => i + 1).map(week => (
-                <option key={week} value={week}>Week {week}</option>
+                <option key={week} value={week}>week {week}</option>
               ))}
             </select>
           </div>
 
-          {/* Bye Week Toggle */}
-          <div className="mb-4">
-            <label className="flex items-center gap-2 text-sm text-zinc-400">
-              <input
-                type="checkbox"
-                checked={showByeWeeks}
-                onChange={(e) => setShowByeWeeks(e.target.checked)}
-                className="rounded"
-              />
-              Show Bye Weeks
-            </label>
-          </div>
-
           <select
-            className="w-full bg-zinc-700 text-white p-2 rounded"
+            className="w-full text-white p-2 rounded bg-slate-800"
             value={position}
             onChange={(e) => setPosition(e.target.value)}
             title="Filter players by position"
           >
-            <option value="ALL">All Positions</option>
-            <option value="QB">QB</option>
-            <option value="RB">RB</option>
-            <option value="WR">WR</option>
-            <option value="TE">TE</option>
-            <option value="K">K</option>
-            <option value="DEF">DEF</option>
+            <optgroup label="Positions">
+              <option value="ALL">all positions</option>
+              <option value="QB">QB</option>
+              <option value="RB">RB</option>
+              <option value="WR">WR</option>
+              <option value="TE">TE</option>
+              <option value="K">K</option>
+              <option value="DEF">DEF</option>
+            </optgroup>
+            <optgroup label="🚧 Tiers 🚧">
+              <option value="T1">T1</option>
+              <option value="T2">T2</option>
+              <option value="T3">T3</option>
+              <option value="T4">T4</option>
+              <option value="😴">😴</option>
+            </optgroup>
           </select>
+
+          <div className="mt-4">
+            <label htmlFor="favoriteFilter" className="text-sm text-slate-400 mb-2 block">the homies</label> {/* Filter by favorites */}
+            <select
+              id="favoriteFilter"
+              title="Filter by favorites"
+              className="w-full text-white p-1 rounded text-sm bg-slate-800"
+              value={showFavoritesOnly ? "favorites" : "all"}
+              onChange={(e) => setShowFavoritesOnly(e.target.value === "favorites")}
+            >
+              <option value="all">all players</option>
+              <option value="favorites">only favorites</option>
+            </select>
+          </div>
 
           <div className="mt-6">
             <button
               onClick={async () => { setDrafted([]); await clearPicks(draftId).catch(console.error) }}
-              className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold px-4 py-2 rounded w-full mb-2 opacity-90 hover:opacity-100 transition-opacity"
+              className="bg-slate-800 hover:bg-indigo-800 text-white text-sm font-bold px-4 py-2 rounded w-full mb-2 opacity-90 hover:opacity-100 transition-opacity"
             >
-              Clear All Picks
+              clear all picks
             </button>
             <button
-              className="mb-2 px-3 py-1 bg-blue-800 hover:bg-blue-900 text-white text-sm font-bold rounded w-full opacity-90 hover:opacity-100 transition-opacity"
+              className="mb-2 px-3 py-1 bg-slate-800 hover:bg-indigo-800 text-white text-sm font-bold rounded w-full opacity-90 hover:opacity-100 transition-opacity"
               onClick={saveCurrentTeam}
               title="Save current drafted players as a named team"
             >
-              Save as Team
+              🚧 save as team 🚧
             </button>
-            <p className="text-sm text-zinc-400 mb-1">
+            <p className="text-sm text-slate-400 mb-1">
               Round {currentRound} • Pick {currentPick} of {PICKS_PER_ROUND}
             </p>
-            <div className={styles.progressBarContainer}>
+            <div className="w-full h-3 bg-slate-700 rounded overflow-hidden mb-2">
               <div
-                className={styles.progressBarFill}
-                data-progress={progress}
-                title={`Draft progress: ${progress.toFixed(1)}% complete`}
+                className={`h-full bg-linear-45 bg-linear-to-r/oklch from-cyan-400 via-sky-400 to-indigo-400 transition-all duration-300 ${progressWidthClass}`}
                 role="progressbar"
+                aria-valuenow={Math.round(progress)}
+                aria-valuemin={0}
+                aria-valuemax={100}
                 aria-label={`Draft progress: ${drafted.length} of ${TOTAL_PICKS} picks completed`}
+                title={`Draft progress: ${progress.toFixed(1)}% complete`}
               />
             </div>
-            <p className="text-xs text-zinc-400 mb-2">
+            <p className="text-xs text-slate-400 mb-2">
               {drafted.length} of {TOTAL_PICKS} picks completed ({progress.toFixed(1)}%)
             </p>
-            <h2 className="text-lg font-semibold mb-2">Starters</h2>
+            <h2 className="text-lg font-semibold mb-2">starters</h2>
             <ul className="text-sm space-y-1 mb-4">
               {starterSlots.map((slot, index) => {
                 const player = startersWithSlots[index]
-                return (
+
+
+  // Fetch picks from backend scraper for Sleeper, ESPN, NFL
+  useEffect(() => {
+    if (!isOnlineMode || !selectedPlatform) return;
+
+    fetch(`${API_BASE_URL}/scrape/${selectedPlatform}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (!Array.isArray(data)) return;
+        const draftedIds = data.map((p) => String(p.player_id || p.id));
+        setDraftedFromPlatform(draftedIds);
+      })
+      .catch((err) => console.error(`Failed to fetch picks from ${selectedPlatform}:`, err));
+  }, [selectedPlatform, isOnlineMode])
+
+  // Polling effect for platform picks every 5 seconds from backend
+  useEffect(() => {
+    if (!isOnlineMode || !selectedPlatform) return;
+
+    const interval = setInterval(() => {
+      fetch(`${API_BASE_URL}/scrape/${selectedPlatform}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (!Array.isArray(data)) return;
+          const draftedIds = data.map((p) => String(p.player_id || p.id));
+          setDraftedFromPlatform(draftedIds);
+        })
+        .catch((err) => console.error(`Polling ${selectedPlatform} failed:`, err));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [selectedPlatform, isOnlineMode]);
+
+  return (
                   <li
                     key={index}
-                    className="cursor-pointer hover:text-purple-400"
+                    className="cursor-pointer hover:text-indigo-400"
                     onClick={() => player && removePlayer(player.id)}
                   >
                     {slot}: {player ? player.name : "Empty"}
@@ -626,12 +718,12 @@ export default function DraftPage() {
                 )
               })}
             </ul>
-            <h2 className="text-lg font-semibold mb-2">Bench</h2>
+            <h2 className="text-lg font-semibold mb-2">bench</h2>
             <ul className="text-sm space-y-1">
               {bench.map((p) => (
                 <li
                   key={p.id}
-                  className="cursor-pointer hover:text-purple-400"
+                  className="cursor-pointer hover:text-indigo-400"
                   onClick={() => removePlayer(p.id)}
                 >
                   {p.name}
@@ -642,14 +734,14 @@ export default function DraftPage() {
         </div>
 
         {/* Player Table */}
-        <div className="flex-1 min-w-0 bg-zinc-800 p-4 rounded-lg flex flex-col min-h-0">
+        <div className="flex-1 min-w-0 p-4 rounded-lg flex flex-col min-h-0 bg-slate-900">
           <div className="flex items-center mb-2">
-            <h2 className="text-lg font-semibold">Players</h2>
+            <h2 className="text-lg font-semibold text-white">players</h2>
           </div>
           <input
             type="text"
-            placeholder="Search players..."
-            className="mb-3 w-full bg-zinc-700 text-white p-2 rounded"
+            placeholder="search players..."
+            className="mb-3 w-full text-white p-1 rounded bg-slate-800"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             title="Search for players by name"
@@ -676,9 +768,9 @@ export default function DraftPage() {
                 <col className="w-[3%]" />
                 <col className="w-[3%]" />
               </colgroup>
-              <thead className="sticky top-0 bg-zinc-800 z-10">
+              <thead className="sticky top-0 bg-slate-800 z-10">
                 {/* Row 1: frozen labels + grouped category headers */}
-                <tr className="text-zinc-400 border-b border-zinc-700 whitespace-nowrap">
+                <tr className="text-slate-400 border-b border-slate-900 whitespace-nowrap">
                   <th rowSpan={2} className={`${CELL} text-[8px]`}>Name</th>
                   <th rowSpan={2} className={`${CELL} text-[8px] cursor-pointer`} onClick={() => handleSort('team')}>
                     Team {sortField === 'team' ? (sortOrder === "asc" ? "▲" : "▼") : ""}
@@ -700,7 +792,7 @@ export default function DraftPage() {
                   <th colSpan={4} className={`${CELL_NUM} text-[8px] tracking-wide text-center`}>PASSING</th>
                 </tr>
                 {/* Row 2: sortable sub-headers */}
-                <tr className="text-zinc-400 border-b border-zinc-700 whitespace-nowrap">
+                <tr className="text-slate-400 border-b border-slate-700 whitespace-nowrap">
                   <th
                     className={`${CELL_NUM} cursor-pointer text-[8px] font-normal`}
                     onClick={() => handleSort("fantasyPoints")}
@@ -783,20 +875,26 @@ export default function DraftPage() {
                   .filter((player) => {
                     const matchesSearch = player.name.toLowerCase().includes(searchTerm.toLowerCase())
                     const onTeam = isOnTeam(player) && !nameBlacklist.test(player.name)
-                    
+
                     // Bye week filtering
                     if (!showByeWeeks && selectedWeek > 0) {
                       const { isBye } = getByeWeekInfo(player.team, selectedWeek)
                       if (isBye) return false
                     }
-                    
-                    return matchesSearch && onTeam
+
+                    const matchesTier = ["T1", "T2", "T3", "T4", "😴"].includes(position)
+                      ? player.tier === position
+                      : true
+
+                    if (showFavoritesOnly && !favoriteIds.includes(player.id)) return false
+
+                    return matchesSearch && onTeam && matchesTier
                   })
                   .sort((a, b) => {
                     if (!sortField) return 0
 
-                    const va = (a as any)[sortField]
-                    const vb = (b as any)[sortField]
+                    const va = a[sortField]
+                    const vb = b[sortField]
 
                     // Fields that should be compared numerically
                     const numericFields: (keyof Player)[] = [
@@ -845,21 +943,22 @@ export default function DraftPage() {
                     return sortOrder === "asc" ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr)
                   })
                   .map((player) => {
-                    const isDrafted = drafted.find((p) => p.id === player.id)
-                    const isSlotAvailable = hasAvailableStarterSlot(player)
+                    const isDrafted = drafted.find((p) => p.id === player.id) ||
+                      (isOnlineMode && draftedFromPlatform.includes(player.id))
+                    const isSlotAvailable = true
                     const { isBye, byeWeek } = getByeWeekInfo(player.team, selectedWeek)
                     
                     return (
                       <tr
                         key={player.id}
-                        className={`border-b border-zinc-700 cursor-pointer ${
+                        className={`border-b border-slate-700 cursor-pointer ${
                           isDrafted
-                            ? "bg-zinc-900 text-zinc-500 cursor-not-allowed"
+                            ? "bg-slate-900 text-slate-500 cursor-not-allowed"
                             : !isSlotAvailable
-                            ? "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+                            ? "bg-slate-800 text-slate-500 cursor-not-allowed"
                             : isBye && selectedWeek > 0
                             ? "bg-red-900/20 text-red-300 hover:bg-red-800/30"
-                            : "hover:bg-zinc-700"
+                            : "hover:bg-slate-700"
                         }`}
                         onClick={() => {
                           if (isDrafted) {
@@ -871,10 +970,36 @@ export default function DraftPage() {
                       >
                         <td className={`${CELL} flex items-center gap-0.5 min-w-0`}>
                           <span className="truncate text-[10px]" title={player.name}>{player.name}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setFavoriteIds((prev) =>
+                                prev.includes(player.id)
+                                  ? prev.filter((id) => id !== player.id)
+                                  : [...prev, player.id]
+                              )
+                            }}
+                            className="ml-1 text-cyan-400"
+                            title="toggle favorite"
+                          >
+                            {favoriteIds.includes(player.id) ? "★" : "☆"}
+                          </button>
                           {player.tier && (
-                            <span className="bg-purple-600 text-white text-[8px] font-semibold px-1 py-0.5 rounded-full flex-shrink-0">
-                              T{player.tier}
-                            </span>
+                            <strong
+                              className={`ml-3 text-[10px] font-bold ${
+                                player.tier === "T1"
+                                  ? "text-indigo-400"
+                                  : player.tier === "T2"
+                                  ? "text-red-300"
+                                  : player.tier === "T3"
+                                  ? "text-teal-400"
+                                  : player.tier === "T4"
+                                  ? "text-amber-400"
+                                  : "text-slate-400"
+                              }`}
+                            >
+                              {player.tier}
+                            </strong>
                           )}
                         </td>
                         <td className={CELL}>{player.team}</td>

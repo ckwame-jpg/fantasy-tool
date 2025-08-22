@@ -1,6 +1,6 @@
 # W fantasy
 
-A full‑stack fantasy football toolkit with a Next.js frontend and FastAPI backend. It includes a Draftboard, Players explorer with sticky headers and precise column alignment, favorites with localStorage persistence, and utilities for lineup optimization, trades, and waiver wire exploration.
+A full‑stack fantasy football toolkit confidently featured on my portfolio, built with a Next.js frontend and FastAPI backend. It includes a Draftboard, Players explorer with sticky headers and precise column alignment, favorites with localStorage persistence, and utilities for lineup optimization, trades, and waiver wire exploration.
 
 Live Demo: https://fantasy-tool-4gbiq4tuq-chris-prempehs-projects.vercel.app
 
