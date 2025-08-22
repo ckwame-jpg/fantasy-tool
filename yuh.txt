@@ -1,0 +1,50 @@
+2025-08-22T15:45:28.477967365Z            ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-22T15:45:28.477990175Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/click/core.py", line 794, in invoke
+2025-08-22T15:45:28.477996055Z     return callback(*args, **kwargs)
+2025-08-22T15:45:28.478000205Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/main.py", line 413, in main
+2025-08-22T15:45:28.478004585Z     run(
+2025-08-22T15:45:28.478009185Z     ~~~^
+2025-08-22T15:45:28.478013635Z         app,
+2025-08-22T15:45:28.478018015Z         ^^^^
+2025-08-22T15:45:28.478022226Z     ...<45 lines>...
+2025-08-22T15:45:28.478026576Z         h11_max_incomplete_event_size=h11_max_incomplete_event_size,
+2025-08-22T15:45:28.478030896Z         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-22T15:45:28.478035586Z     )
+2025-08-22T15:45:28.478043586Z     ^
+2025-08-22T15:45:28.478047826Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/main.py", line 580, in run
+2025-08-22T15:45:28.478051796Z     server.run()
+2025-08-22T15:45:28.478055566Z     ~~~~~~~~~~^^
+2025-08-22T15:45:28.478059336Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 67, in run
+2025-08-22T15:45:28.478063656Z     return asyncio.run(self.serve(sockets=sockets))
+2025-08-22T15:45:28.478067156Z            ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-22T15:45:28.478070616Z   File "/usr/local/lib/python3.13/asyncio/runners.py", line 195, in run
+2025-08-22T15:45:28.478074087Z     return runner.run(main)
+2025-08-22T15:45:28.478077616Z            ~~~~~~~~~~^^^^^^
+2025-08-22T15:45:28.478081537Z   File "/usr/local/lib/python3.13/asyncio/runners.py", line 118, in run
+2025-08-22T15:45:28.478085637Z     return self._loop.run_until_complete(task)
+2025-08-22T15:45:28.478089797Z            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+2025-08-22T15:45:28.478093817Z   File "uvloop/loop.pyx", line 1518, in uvloop.loop.Loop.run_until_complete
+2025-08-22T15:45:28.478097867Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 71, in serve
+2025-08-22T15:45:28.478101867Z     await self._serve(sockets)
+2025-08-22T15:45:28.478105907Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/server.py", line 78, in _serve
+2025-08-22T15:45:28.478120917Z     config.load()
+2025-08-22T15:45:28.478123917Z     ~~~~~~~~~~~^^
+2025-08-22T15:45:28.478126768Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/config.py", line 436, in load
+2025-08-22T15:45:28.478129457Z     self.loaded_app = import_from_string(self.app)
+2025-08-22T15:45:28.478132068Z                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+2025-08-22T15:45:28.478135538Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/importer.py", line 22, in import_from_string
+2025-08-22T15:45:28.478138408Z     raise exc from None
+2025-08-22T15:45:28.478141308Z   File "/opt/render/project/src/.venv/lib/python3.13/site-packages/uvicorn/importer.py", line 19, in import_from_string
+2025-08-22T15:45:28.478144138Z     module = importlib.import_module(module_str)
+2025-08-22T15:45:28.478147538Z   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+2025-08-22T15:45:28.478150458Z     return _bootstrap._gcd_import(name[level:], package, level)
+2025-08-22T15:45:28.478153518Z            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-08-22T15:45:28.478156368Z   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+2025-08-22T15:45:28.478158878Z   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+2025-08-22T15:45:28.478161418Z   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+2025-08-22T15:45:28.478163988Z   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+2025-08-22T15:45:28.478166578Z   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+2025-08-22T15:45:28.478168968Z   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+2025-08-22T15:45:28.478171438Z   File "/opt/render/project/src/backend/main.py", line 2, in <module>
+2025-08-22T15:45:28.478173838Z     from bs4 import BeautifulSoup
+2025-08-22T15:45:28.478187639Z ModuleNotFoundError: No module named 'bs4'
