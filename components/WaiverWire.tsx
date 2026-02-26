@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { getPlayerProjections, getPlayerTier, getByeWeekInfo, getTargetShare } from '@/lib/player-utils'
+import { getPlayerTier, getByeWeekInfo, getTargetShare } from '@/lib/player-utils'
 
 interface WaiverWireProps {
   allPlayers: any[]
   draftedPlayers: any[]
   onClose: () => void
+  isPage?: boolean
 }
 
 interface WaiverTarget {
@@ -17,7 +18,7 @@ interface WaiverTarget {
   ownershipRate: number
 }
 
-export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: WaiverWireProps) {
+export default function WaiverWire({ allPlayers, draftedPlayers, onClose, isPage }: WaiverWireProps) {
   const [selectedWeek, setSelectedWeek] = useState(1)
   const [positionFilter, setPositionFilter] = useState('ALL')
   const [priorityFilter, setPriorityFilter] = useState('ALL')
@@ -28,27 +29,27 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
     const availablePlayers = allPlayers.filter(player => !draftedIds.has(player.id))
     
     return availablePlayers.map(player => {
-      const projections = getPlayerProjections(player.id, player.position)
+      const fp = player.fantasyPoints || 0
       const tier = getPlayerTier(player.position, player.adp || 999)
       const byeWeek = getByeWeekInfo(player.team)
       const targetShare = getTargetShare(player.id, player.position)
-      
-      // Mock ownership rate (in real app, fetch from API)
-      const ownershipRate = Math.max(0, Math.min(95, 
-        80 - (player.adp || 200) * 0.3 + Math.random() * 20
+
+      // Ownership estimate based on ADP (lower ADP = higher ownership)
+      const ownershipRate = Math.max(0, Math.min(95,
+        90 - (player.adp || 200) * 0.4
       ))
-      
+
       let priority: 'High' | 'Medium' | 'Low' = 'Low'
       let reason = ''
-      
+
       // Determine priority and reason
-      if (ownershipRate < 30 && projections.fantasyPoints > 200) {
+      if (ownershipRate < 30 && fp > 200) {
         priority = 'High'
         reason = 'High upside, low ownership'
       } else if (ownershipRate < 50 && tier.tier <= 6) {
         priority = 'High'
         reason = 'Quality player still available'
-      } else if (ownershipRate < 60 && projections.fantasyPoints > 150) {
+      } else if (ownershipRate < 60 && fp > 150) {
         priority = 'Medium'
         reason = 'Solid contributor, decent availability'
       } else if (player.position === 'RB' && ownershipRate < 70) {
@@ -75,7 +76,7 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
         player,
         priority,
         reason,
-        projectedPoints: projections.fantasyPoints,
+        projectedPoints: fp,
         ownershipRate: Math.round(ownershipRate)
       } as WaiverTarget
     }).sort((a, b) => {
@@ -98,7 +99,7 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
       case 'High': return 'text-red-400 bg-red-900/20'
       case 'Medium': return 'text-yellow-400 bg-yellow-900/20'
       case 'Low': return 'text-green-400 bg-green-900/20'
-      default: return 'text-zinc-400 bg-zinc-800'
+      default: return 'text-slate-400 bg-slate-800'
     }
   }
 
@@ -131,34 +132,43 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
     return tips
   }
 
+  const outer = isPage
+    ? 'min-h-screen bg-slate-950 text-white'
+    : 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4'
+  const inner = isPage
+    ? 'bg-slate-900 w-full min-h-screen'
+    : 'bg-slate-900 rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto'
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 rounded-lg w-full max-w-6xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-zinc-700">
+    <div className={outer}>
+      <div className={inner}>
+        <div className="p-6 border-b border-slate-700">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-bold">Waiver Wire Assistant</h2>
-            <button
-              onClick={onClose}
-              className="text-zinc-400 hover:text-white text-xl font-bold"
-            >
-              ×
-            </button>
+            <h2 className="text-2xl font-bold">waiver wire</h2>
+            {!isPage && (
+              <button
+                onClick={onClose}
+                className="text-slate-400 hover:text-white text-xl font-bold"
+              >
+                ×
+              </button>
+            )}
           </div>
-          <p className="text-sm text-zinc-400 mt-2">
+          <p className="text-sm text-slate-400 mt-2">
             Find the best available players for your team
           </p>
         </div>
 
         <div className="p-6">
           {/* Controls */}
-          <div className="bg-zinc-800 p-4 rounded-lg mb-6">
+          <div className="bg-slate-800 p-4 rounded-lg mb-6">
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="block text-sm text-zinc-400 mb-1">Week</label>
+                <label className="block text-sm text-slate-400 mb-1">Week</label>
                 <select
                   value={selectedWeek}
                   onChange={(e) => setSelectedWeek(Number(e.target.value))}
-                  className="w-full bg-zinc-700 text-white p-2 rounded"
+                  className="w-full bg-slate-700 text-white p-2 rounded"
                   title="Select week to view waiver wire targets for"
                 >
                   {Array.from({ length: 17 }, (_, i) => i + 1).map(week => (
@@ -167,11 +177,11 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-zinc-400 mb-1">Position</label>
+                <label className="block text-sm text-slate-400 mb-1">Position</label>
                 <select
                   value={positionFilter}
                   onChange={(e) => setPositionFilter(e.target.value)}
-                  className="w-full bg-zinc-700 text-white p-2 rounded"
+                  className="w-full bg-slate-700 text-white p-2 rounded"
                   title="Filter waiver wire players by position"
                 >
                   <option value="ALL">All Positions</option>
@@ -184,11 +194,11 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-zinc-400 mb-1">Priority</label>
+                <label className="block text-sm text-slate-400 mb-1">Priority</label>
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="w-full bg-zinc-700 text-white p-2 rounded"
+                  className="w-full bg-slate-700 text-white p-2 rounded"
                   title="Filter players by waiver wire priority level"
                 >
                   <option value="ALL">All Priorities</option>
@@ -199,11 +209,11 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
               </div>
             </div>
 
-            <div className="bg-zinc-700 p-3 rounded">
-              <h3 className="font-semibold mb-2">Week {selectedWeek} Tips</h3>
+            <div className="bg-slate-700 p-3 rounded">
+              <h3 className="font-semibold mb-2">week {selectedWeek} tips</h3>
               <ul className="text-sm space-y-1">
                 {getWaiverTips().map((tip, index) => (
-                  <li key={index} className="text-zinc-300">• {tip}</li>
+                  <li key={index} className="text-slate-300">• {tip}</li>
                 ))}
               </ul>
             </div>
@@ -211,55 +221,55 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
 
           {/* Summary Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-zinc-800 p-4 rounded-lg text-center">
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-red-400">
                 {filteredTargets.filter(t => t.priority === 'High').length}
               </div>
-              <div className="text-sm text-zinc-400">High Priority</div>
+              <div className="text-sm text-slate-400">high priority</div>
             </div>
-            <div className="bg-zinc-800 p-4 rounded-lg text-center">
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-yellow-400">
                 {filteredTargets.filter(t => t.priority === 'Medium').length}
               </div>
-              <div className="text-sm text-zinc-400">Medium Priority</div>
+              <div className="text-sm text-slate-400">medium priority</div>
             </div>
-            <div className="bg-zinc-800 p-4 rounded-lg text-center">
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-green-400">
                 {filteredTargets.filter(t => t.priority === 'Low').length}
               </div>
-              <div className="text-sm text-zinc-400">Low Priority</div>
+              <div className="text-sm text-slate-400">low priority</div>
             </div>
-            <div className="bg-zinc-800 p-4 rounded-lg text-center">
+            <div className="bg-slate-800 p-4 rounded-lg text-center">
               <div className="text-2xl font-bold text-purple-400">
                 {filteredTargets.filter(t => t.ownershipRate < 50).length}
               </div>
-              <div className="text-sm text-zinc-400">Low Ownership</div>
+              <div className="text-sm text-slate-400">low ownership</div>
             </div>
           </div>
 
           {/* Player List */}
-          <div className="bg-zinc-800 rounded-lg overflow-hidden">
+          <div className="bg-slate-800 rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-zinc-700">
+                <thead className="bg-slate-700">
                   <tr>
-                    <th className="text-left p-3">Player</th>
-                    <th className="text-left p-3">Position</th>
-                    <th className="text-left p-3">Priority</th>
-                    <th className="text-left p-3">Ownership</th>
-                    <th className="text-left p-3">Proj. Points</th>
-                    <th className="text-left p-3">Reason</th>
+                    <th className="text-left p-3">player</th>
+                    <th className="text-left p-3">position</th>
+                    <th className="text-left p-3">priority</th>
+                    <th className="text-left p-3">ownership</th>
+                    <th className="text-left p-3">proj. pts</th>
+                    <th className="text-left p-3">reason</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredTargets.map((target, index) => (
-                    <tr key={target.player.id} className="border-b border-zinc-700 hover:bg-zinc-700/50">
+                    <tr key={target.player.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                       <td className="p-3">
                         <div className="font-semibold">{target.player.name}</div>
-                        <div className="text-xs text-zinc-400">{target.player.team}</div>
+                        <div className="text-xs text-slate-400">{target.player.team}</div>
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-1 bg-zinc-600 rounded text-xs">
+                        <span className="px-2 py-1 bg-slate-600 rounded text-xs">
                           {target.player.position}
                         </span>
                       </td>
@@ -281,7 +291,7 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
                           {target.projectedPoints.toFixed(0)}
                         </span>
                       </td>
-                      <td className="p-3 text-zinc-300 text-xs">
+                      <td className="p-3 text-slate-300 text-xs">
                         {target.reason}
                       </td>
                     </tr>
@@ -292,7 +302,7 @@ export default function WaiverWire({ allPlayers, draftedPlayers, onClose }: Waiv
           </div>
 
           {filteredTargets.length === 0 && (
-            <div className="text-center text-zinc-400 py-8">
+            <div className="text-center text-slate-400 py-8">
               <p>No waiver wire targets match your current filters</p>
             </div>
           )}

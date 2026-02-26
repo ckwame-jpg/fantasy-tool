@@ -5,7 +5,16 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx"
 import { useState } from "react"
-import { motion } from "framer-motion"
+
+const links = [
+  { href: "/", label: "home", icon: Home },
+  { href: "/draftboard", label: "draftboard", icon: List },
+  { href: "/players", label: "players", icon: PersonStanding },
+  { href: "/trade-analyzer", label: "trade analyzer", icon: TrendingUp },
+  { href: "/waiver-wire", label: "waiver wire", icon: Users },
+  { href: "/lineup-optimizer", label: "lineup optimizer", icon: Target },
+  { href: "/draft-recap", label: "draft recap", icon: Trophy },
+]
 
 export default function Sidebar() {
   const pathname = usePathname()
@@ -14,121 +23,43 @@ export default function Sidebar() {
   return (
     <aside
       className={clsx(
-        "fixed inset-y-0 left-0 z-40 bg-slate-900 text-white p-4 hidden md:flex flex-col gap-4 border-r border-slate-800 overflow-y-auto transition-all duration-300",
+        "fixed inset-y-0 left-0 z-40 bg-slate-900 text-white p-4 hidden md:flex flex-col border-r border-slate-800 overflow-y-auto transition-all duration-300",
         collapsed ? "w-16 items-center" : "w-64"
       )}
     >
-      <div className="text-2xl font-bold mb-2">
-        {!collapsed && "only W's"}
-      </div>
-
-      <Link
-        href="/"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/"
-        })}
-        aria-label="Home"
-      >
-        <>
-          <Home size={18} />
-          {!collapsed && "home"}
-        </>
-      </Link>
-
-      <Link
-        href="/draftboard"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/draftboard"
-        })}
-        aria-label="Draftboard"
-      >
-        <>
-          <List size={18} />
-          {!collapsed && "draftboard"}
-        </>
-      </Link>
-
-      <Link
-        href="/players"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/players"
-        })}
-        aria-label="Players"
-      >
-        <>
-          <PersonStanding size={18} />
-          {!collapsed && "players"}
-        </>
-      </Link>
-
-      <Link
-        href="/draft-recap"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/draft-recap"
-        })}
-        aria-label="Draft Recap"
-      >
-        <>
-          <Trophy size={18} />
-          {!collapsed && "draft recap 🚧"}
-        </>
-      </Link>
-
-      <Link
-        href="/trade-analyzer"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/trade-analyzer"
-        })}
-        aria-label="Trade Analyzer"
-      >
-        <>
-          <TrendingUp size={18} />
-          {!collapsed && "trade analyzer 🚧"}
-        </>
-      </Link>
-
-      <Link
-        href="/waiver-wire"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/waiver-wire"
-        })}
-        aria-label="Waiver Wire"
-      >
-        <>
-          <Users size={18} />
-          {!collapsed && "waiver wire 🚧"}
-        </>
-      </Link>
-
-      <Link
-        href="/lineup-optimizer"
-        className={clsx("flex items-center gap-2 p-2 rounded", {
-          "bg-slate-800": pathname === "/lineup-optimizer"
-        })}
-        aria-label="Lineup Optimizer"
-      >
-        <>
-          <Target size={18} />
-          {!collapsed && "lineup optimizer 🚧"}
-        </>
-      </Link>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="absolute bottom-20 left-1/2 transform -translate-x-1/2"
-      >
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.1 }}
+      {/* Header with title + collapse toggle */}
+      <div className={clsx("flex items-center mb-4", collapsed ? "justify-center" : "justify-between")}>
+        {!collapsed && <div className="text-2xl font-bold">only W's</div>}
+        <button
+          type="button"
           onClick={() => setCollapsed(!collapsed)}
-          className="text-white p-1 rounded hover:bg-slate-800 transition"
+          className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
           aria-label="Toggle Sidebar"
         >
-          {collapsed ? <ChevronsRight size={20} /> : <ChevronsLeft size={20} />}
-        </motion.button>
-      </motion.div>
+          {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
+        </button>
+      </div>
+
+      {/* Navigation links */}
+      <nav className="flex flex-col gap-1.5 flex-1">
+        {links.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className={clsx(
+              "flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors",
+              pathname === href
+                ? "bg-slate-800 text-white"
+                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+            )}
+            aria-label={label}
+            title={collapsed ? label : undefined}
+          >
+            <Icon size={18} className="shrink-0" />
+            {!collapsed && label}
+          </Link>
+        ))}
+      </nav>
     </aside>
   )
 }

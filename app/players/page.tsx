@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { API_BASE_URL } from "../../constants";
 import { fetcher } from "../../lib/api";
+import PlayerDetailModal from "@/components/PlayerDetailModal";
+import { useLeague } from "@/lib/league-context";
 
 // Extended Player type with normalized fields and computed fields
 type Player = {
@@ -24,6 +26,15 @@ type Player = {
   passYds?: number;
   passTD?: number;
   adp?: number;
+  // Bio fields
+  rank?: number;
+  age?: number;
+  height?: string;
+  weight?: string;
+  college?: string;
+  years_exp?: number;
+  number?: number;
+  injury_status?: string | null;
   // Computed fields
   posRank?: number;
 };
@@ -181,9 +192,10 @@ function compare(a: Player, b: Player, key: keyof Player, direction: "asc" | "de
 }
 
 const PlayersPage = () => {
+  const { leagueSettings } = useLeague();
   const FAVORITES_KEY = "fantasy:favorites";
-  const currentYear = new Date().getFullYear();
-  const defaultStatsYear = currentYear; // Default to last completed season's stats
+  const currentYear = new Date().getFullYear() - 1; // last completed NFL season
+  const defaultStatsYear = currentYear;
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(false);
@@ -193,6 +205,7 @@ const PlayersPage = () => {
   const [position, setPosition] = useState("ALL");
   const [season, setSeason] = useState(defaultStatsYear);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   // Load persisted state from localStorage
   useEffect(() => {
@@ -240,7 +253,7 @@ const PlayersPage = () => {
       // Backend expects `season` as the draft season and will show stats for (season - 1).
       // To request stats for a given stats year, pass (statsYear + 1) as the season param.
       const draftSeason = season + 1;
-      const data = await fetcher(`${API_BASE_URL}/players?position=${queryPosition}&season=${draftSeason}&on_team_only=true`);
+      const data = await fetcher(`${API_BASE_URL}/players?position=${queryPosition}&season=${draftSeason}&on_team_only=true&scoring=${leagueSettings.scoringFormat}`);
       const normalized = (data || []).map((raw: any) => {
         const stats = normalizeStats(raw);
         // Only keep defined values so we don't overwrite existing fields with `undefined`
@@ -261,7 +274,7 @@ const PlayersPage = () => {
 
   useEffect(() => {
     fetchPlayers();
-  }, [position, season]);
+  }, [position, season, leagueSettings.scoringFormat]);
 
   // Process players: compute posRank
   const processedPlayers = useMemo(() => {
@@ -397,7 +410,7 @@ const PlayersPage = () => {
         <input
           type="text"
           className="bg-slate-700 text-white p-2 rounded w-full md:w-96 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder="Search by player name..."
+          placeholder="search by player name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -442,25 +455,25 @@ const PlayersPage = () => {
                   <tr className="text-slate-400 border-b border-slate-700">
                     <th rowSpan={2} className={`${CELL} text-[10px] whitespace-nowrap`}>★</th>
                     <th rowSpan={2} className={`${CELL} text-[10px] cursor-pointer whitespace-nowrap`} onClick={() => handleSort('name')}>
-                      Name {sortField === 'name' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                      name {sortField === 'name' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                     </th>
                     <th rowSpan={2} className={`${CELL} text-[10px] cursor-pointer whitespace-nowrap`} onClick={() => handleSort('team')}>
-                      Team {sortField === 'team' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                      team {sortField === 'team' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                     </th>
                     <th rowSpan={2} className={`${CELL} text-[10px] cursor-pointer whitespace-nowrap`} onClick={() => handleSort('position')}>
-                      Pos {sortField === 'position' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                      pos {sortField === 'position' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                     </th>
                     <th rowSpan={2} className={`${CELL_NUM} text-[10px] cursor-pointer whitespace-nowrap tabular-nums`} onClick={() => handleSort('posRank')}>
-                      Pos Rank {sortField === 'posRank' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                      rank {sortField === 'posRank' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                     </th>
                     <th rowSpan={2} className={`${CELL_NUM} text-[10px] cursor-pointer whitespace-nowrap tabular-nums`} onClick={() => handleSort('adp')}>
-                      ADP {sortField === 'adp' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
+                      adp {sortField === 'adp' ? (sortDirection === "asc" ? "▲" : "▼") : ""}
                     </th>
                     {/* Grouped headers */}
-                    <th colSpan={1} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>FANTASY</th>
-                    <th colSpan={3} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>RUSHING</th>
-                    <th colSpan={4} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>RECEIVING</th>
-                    <th colSpan={4} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>PASSING</th>
+                    <th colSpan={1} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>fantasy</th>
+                    <th colSpan={3} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>rushing</th>
+                    <th colSpan={4} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>receiving</th>
+                    <th colSpan={4} className={`${CELL_NUM} text-[9px] tracking-wide text-center whitespace-nowrap`}>passing</th>
                   </tr>
                   {/* Row 2: sortable sub-headers */}
                   <tr className="text-slate-400 border-b border-slate-700">
@@ -503,7 +516,11 @@ const PlayersPage = () => {
                       </td>
                       <td className={`${CELL} min-w-0`}>
                         <div className="flex items-center gap-1 min-w-0">
-                          <span className="truncate" title={player.name}>{player.name}</span>
+                          <span
+                            className="truncate hover:text-cyan-400 hover:underline cursor-pointer"
+                            title={player.name}
+                            onClick={() => setSelectedPlayer(player)}
+                          >{player.name}</span>
                         </div>
                       </td>
                       <td className={`${CELL} whitespace-nowrap`}>{player.team}</td>
@@ -537,6 +554,11 @@ const PlayersPage = () => {
           </div>
         )}
       </div>
+
+      <PlayerDetailModal
+        player={selectedPlayer}
+        onClose={() => setSelectedPlayer(null)}
+      />
     </div>
   );
 };

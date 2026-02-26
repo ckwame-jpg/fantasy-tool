@@ -102,57 +102,6 @@ export const getTierLabel = (tier: number): string => {
   return labels[tier as keyof typeof labels] || 'Deep'
 }
 
-// Player projections (mock data - in production, fetch from fantasy API)
-export const getPlayerProjections = (playerId: string, position: string) => {
-  // Mock projections based on position
-  const baseProjections = {
-    QB: {
-      passingYards: Math.floor(Math.random() * 1000) + 3500,
-      passingTDs: Math.floor(Math.random() * 10) + 25,
-      interceptions: Math.floor(Math.random() * 5) + 8,
-      rushingYards: Math.floor(Math.random() * 300) + 200,
-      rushingTDs: Math.floor(Math.random() * 5) + 3,
-      fantasyPoints: Math.floor(Math.random() * 100) + 300
-    },
-    RB: {
-      rushingYards: Math.floor(Math.random() * 500) + 800,
-      rushingTDs: Math.floor(Math.random() * 8) + 6,
-      receptions: Math.floor(Math.random() * 30) + 30,
-      receivingYards: Math.floor(Math.random() * 200) + 200,
-      receivingTDs: Math.floor(Math.random() * 3) + 2,
-      fantasyPoints: Math.floor(Math.random() * 80) + 180
-    },
-    WR: {
-      receptions: Math.floor(Math.random() * 40) + 60,
-      receivingYards: Math.floor(Math.random() * 400) + 800,
-      receivingTDs: Math.floor(Math.random() * 6) + 6,
-      rushingYards: Math.floor(Math.random() * 50) + 10,
-      rushingTDs: Math.floor(Math.random() * 2),
-      fantasyPoints: Math.floor(Math.random() * 80) + 160
-    },
-    TE: {
-      receptions: Math.floor(Math.random() * 30) + 40,
-      receivingYards: Math.floor(Math.random() * 300) + 500,
-      receivingTDs: Math.floor(Math.random() * 5) + 4,
-      fantasyPoints: Math.floor(Math.random() * 60) + 120
-    },
-    K: {
-      fieldGoals: Math.floor(Math.random() * 10) + 25,
-      extraPoints: Math.floor(Math.random() * 15) + 35,
-      fantasyPoints: Math.floor(Math.random() * 30) + 120
-    },
-    DEF: {
-      sacks: Math.floor(Math.random() * 20) + 30,
-      interceptions: Math.floor(Math.random() * 8) + 12,
-      fumbleRecoveries: Math.floor(Math.random() * 6) + 8,
-      defensiveTDs: Math.floor(Math.random() * 3) + 2,
-      fantasyPoints: Math.floor(Math.random() * 40) + 140
-    }
-  }
-
-  return baseProjections[position as keyof typeof baseProjections] || baseProjections.RB
-}
-
 // Red zone stats (mock data)
 export const getRedZoneStats = (playerId: string, position: string) => {
   const baseStats = {
@@ -222,13 +171,13 @@ export const getByeWeekInfo = (team: string) => {
   
   const week = byeWeeks[team] || 0
   const isEarly = week <= 7
-  const izinc = week >= 12
+  const isLate = week >= 12
   
   return {
     week,
     status: week === 0 ? 'Unknown' : `Week ${week}`,
-    impact: isEarly ? 'Early (Good)' : izinc ? 'Late (Bad)' : 'Mid (OK)',
-    color: isEarly ? 'text-green-400' : izinc ? 'text-red-400' : 'text-yellow-400'
+    impact: isEarly ? 'Early (Good)' : isLate ? 'Late (Bad)' : 'Mid (OK)',
+    color: isEarly ? 'text-green-400' : isLate ? 'text-red-400' : 'text-yellow-400'
   }
 }
 

@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import os
-from .app.api import routes
+from app.api import routes
 import socketio
 from fastapi.responses import JSONResponse
-from backend.scraper.scraper_runner import run_scraper
+from scraper.scraper_runner import run_scraper
 # Create Socket.IO server
 sio = socketio.AsyncServer(cors_allowed_origins="*", async_mode="asgi")
 fastapi_app = FastAPI()

@@ -4,27 +4,43 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 import httpx
 import time
+import json
+import os
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 from uuid import uuid4
 
 router = APIRouter()
-_players_cache: Dict[int, Dict[str, Any]] = {}
+_players_cache: Dict[str, Dict[str, Any]] = {}
 
 # In-memory draft picks store: { draft_id: { "picks": [Pick, ...], "updated": timestamp } }
 _draft_picks_store: dict[str, dict[str, Any]] = {}
 
 # -----------------------------
-# In-memory Teams & Favorites
+# Teams & Favorites (file-persisted)
 # -----------------------------
-_teams_store: dict[str, Any] = {
-    "list": [
-        {"id": "team-1", "name": "My League 1"},
-        {"id": "team-2", "name": "Dynasty Squad"},
-    ],
-    "active_id": "team-1",
-}
+_DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data")
+_TEAMS_FILE = os.path.join(_DATA_DIR, "teams.json")
+
+def _load_teams() -> dict[str, Any]:
+    try:
+        if os.path.exists(_TEAMS_FILE):
+            with open(_TEAMS_FILE, "r") as f:
+                return json.load(f)
+    except Exception as e:
+        logger.warning(f"Failed to load teams file: {e}")
+    return {"list": [], "active_id": None}
+
+def _save_teams(store: dict[str, Any]):
+    try:
+        os.makedirs(_DATA_DIR, exist_ok=True)
+        with open(_TEAMS_FILE, "w") as f:
+            json.dump(store, f, indent=2)
+    except Exception as e:
+        logger.warning(f"Failed to save teams file: {e}")
+
+_teams_store: dict[str, Any] = _load_teams()
 
 _favorites_store: dict[str, Any] = {
     "player_ids": []
@@ -33,6 +49,7 @@ _favorites_store: dict[str, Any] = {
 class Team(BaseModel):
     id: str
     name: str
+    picks: Optional[List[Dict[str, Any]]] = Field(default_factory=list)
 
 class TeamCreate(BaseModel):
     name: str
@@ -56,6 +73,7 @@ def create_team(payload: TeamCreate):
     _teams_store["list"].append(new_team)
     if not _teams_store.get("active_id"):
         _teams_store["active_id"] = new_team["id"]
+    _save_teams(_teams_store)
     return new_team
 
 @router.put("/teams/{team_id}")
@@ -63,7 +81,19 @@ def update_team(team_id: str, payload: TeamCreate):
     for i, t in enumerate(_teams_store["list"]):
         if t["id"] == team_id:
             _teams_store["list"][i] = {"id": team_id, "name": payload.name, "picks": payload.picks}
+            _save_teams(_teams_store)
             return {"ok": True, "team": _teams_store["list"][i]}
+    raise HTTPException(status_code=404, detail="team not found")
+
+@router.delete("/teams/{team_id}")
+def delete_team(team_id: str):
+    for i, t in enumerate(_teams_store["list"]):
+        if t["id"] == team_id:
+            _teams_store["list"].pop(i)
+            if _teams_store.get("active_id") == team_id:
+                _teams_store["active_id"] = _teams_store["list"][0]["id"] if _teams_store["list"] else None
+            _save_teams(_teams_store)
+            return {"ok": True}
     raise HTTPException(status_code=404, detail="team not found")
 
 @router.post("/teams/active")
@@ -71,6 +101,7 @@ def set_active_team_by_id(team_id: str = Query(...)):
     for t in _teams_store["list"]:
         if t["id"] == team_id:
             _teams_store["active_id"] = team_id
+            _save_teams(_teams_store)
             return {"ok": True}
     raise HTTPException(status_code=404, detail="team not found")
 
@@ -125,6 +156,7 @@ def get_players(
     # `season` is the draft season (e.g., 2025). We'll pull last year's stats (2024) but current season ADP (2025).
     season: int = Query(datetime.now().year),
     on_team_only: bool = Query(True),
+    scoring: str = Query("ppr"),  # "ppr", "half_ppr", "standard"
 ):
     # Small helpers to read nested fields and coalesce values
     def _get_path(obj: dict, path: str):
@@ -178,9 +210,10 @@ def get_players(
     adp_year = season
     stats_year = season - 1  # show last year's production on the draftboard
 
-    # Per-season cache (keyed by draft season)
+    # Per-season+scoring cache
     current_time = time.time()
-    cache_bucket = _players_cache.get(season, {})
+    cache_key = f"{season}:{scoring}"
+    cache_bucket = _players_cache.get(cache_key, {})
     if "data" in cache_bucket and current_time - cache_bucket.get("timestamp", 0) < 300:
         cached_players = cache_bucket["data"]
         if position == "ALL":
@@ -206,7 +239,6 @@ def get_players(
 
     # Fetch ADP for current draft season (Sleeper first, then FFC fallback)
     adp_dict: dict[str, float] = {}
-    ffc_name_to_adp: dict[str, float] = {}
 
     # 1) Try Sleeper ADP by player_id
     try:
@@ -221,25 +253,10 @@ def get_players(
     except Exception:
         logger.info("Sleeper ADP unavailable; will try FFC fallback")
 
-    # 2) If Sleeper produced nothing, try FantasyFootballCalculator by name
+    # 2) If Sleeper ADP endpoint produced nothing, use search_rank from player data
+    #    search_rank is Sleeper's current player ranking and stays up to date
     if not adp_dict:
-        try:
-            ffc_url = f"https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year={adp_year}"
-            logger.info(f"Fetching FFC ADP from {ffc_url}")
-            raw = _safe_get_json(ffc_url)
-            if raw is not None:
-                players_ffc = raw.get("players", raw) if isinstance(raw, dict) else raw
-                if isinstance(players_ffc, list):
-                    for p in players_ffc:
-                        if isinstance(p, dict):
-                            name = p.get("name")
-                            adp_val = p.get("adp")
-                            if name and isinstance(adp_val, (int, float)):
-                                ffc_name_to_adp[name.lower()] = round(float(adp_val), 1)
-            else:
-                logger.info("FFC ADP request failed")
-        except Exception as e:
-            logger.info(f"FFC ADP fetch failed: {e}")
+        logger.info("Using Sleeper search_rank as ADP (Sleeper ADP endpoint unavailable)")
 
     # Stats can be dict keyed by player_id or a list of rows with `player_id`
     if isinstance(data_stats, dict):
@@ -256,7 +273,9 @@ def get_players(
 
     for player_id, player_data in data_players.items():
         team_code = (player_data.get("team") or "").strip()
-        if on_team_only and not team_code:
+        is_rookie = player_data.get("years_exp", -1) == 0
+        # Include rookies even without a team (pre-NFL-draft prospects)
+        if on_team_only and not team_code and not is_rookie:
             continue
         # Skip explicitly inactive/retired entries when on_team_only is True
         if on_team_only and player_data.get("active") is False:
@@ -320,6 +339,7 @@ def get_players(
             )
         )
 
+        rec_multiplier = {"ppr": 1.0, "half_ppr": 0.5, "standard": 0.0}.get(scoring, 1.0)
         fantasyPoints = round(
             passTD * 4
             + passYds / 25
@@ -328,14 +348,16 @@ def get_players(
             + rushYds / 10
             + recTD * 6
             + recYds / 10
-            + receptions * 1,
+            + receptions * rec_multiplier,
             1,
         )
         full_name = f"{player_data.get('first_name', '')} {player_data.get('last_name', '')}".strip()
-        # Prefer Sleeper ADP by id, otherwise try FFC name match
+        # Prefer Sleeper ADP by id, then search_rank as fallback
         adp_value = adp_dict.get(str(player_id))
-        if adp_value is None and ffc_name_to_adp:
-            adp_value = ffc_name_to_adp.get(full_name.lower())
+        if adp_value is None:
+            sr = player_data.get("search_rank")
+            if sr is not None and isinstance(sr, (int, float)):
+                adp_value = float(sr)
 
         player: dict[str, Any] = {
             "id": str(player_id),
@@ -356,6 +378,14 @@ def get_players(
             "interceptions": interceptions,
             "sacks": sacks,
             "adp": adp_value if isinstance(adp_value, (int, float)) else None,
+            # Bio/metadata from Sleeper
+            "age": player_data.get("age"),
+            "height": player_data.get("height"),
+            "weight": player_data.get("weight"),
+            "college": player_data.get("college"),
+            "years_exp": player_data.get("years_exp"),
+            "number": player_data.get("number"),
+            "injury_status": player_data.get("injury_status"),
         }
 
         # Conditionally include requested flat keys only when valid numbers
@@ -371,7 +401,7 @@ def get_players(
         players.append(player)
 
     # Save per-season cache (key by desired draft season)
-    _players_cache[season] = {"data": players, "timestamp": current_time}
+    _players_cache[cache_key] = {"data": players, "timestamp": current_time}
 
     logger.info(f"Returning {len(players)} players for position {position}")
     if position == "ALL":
@@ -435,34 +465,114 @@ def get_adp(season: int):
                         "name": name,
                     })
 
-    # Fallback to FFC when needed
+    # Fallback: use search_rank from Sleeper player data as ADP proxy
     if not adp_entries:
-        ffc_url = f"https://fantasyfootballcalculator.com/api/v1/adp/ppr?teams=12&year={season}"
-        raw = _safe_get_json(ffc_url)
-        if raw is not None:
-            players_ffc = raw.get("players", raw) if isinstance(raw, dict) else raw
-            if isinstance(players_ffc, list):
-                for p in players_ffc:
-                    if isinstance(p, dict):
-                        name = p.get("name")
-                        adp_val = p.get("adp")
-                        position = p.get("position", "")
-                        team = p.get("team", "")
-                        if name and isinstance(adp_val, (int, float)):
-                            adp_entries.append({
-                                "player_id": "",
-                                "adp": round(float(adp_val), 1),
-                                "position": position,
-                                "team": team,
-                                "name": name,
-                            })
-
-    # Final safety: small demo mapping if all upstreams fail
-    if not adp_entries:
-        adp_entries = [
-            {"player_id": "1", "adp": 1.5, "position": "WR", "team": "CIN", "name": "Ja'Marr Chase"},
-            {"player_id": "2", "adp": 2.2, "position": "RB", "team": "ATL", "name": "Bijan Robinson"},
-            {"player_id": "3", "adp": 2.5, "position": "RB", "team": "PHI", "name": "Saquon Barkley"},
-        ]
+        players_data = _safe_get_json("https://api.sleeper.app/v1/players/nfl") or {}
+        valid_positions = {"QB", "RB", "WR", "TE", "K", "DEF"}
+        for player_id, p in players_data.items():
+            sr = p.get("search_rank")
+            pos = p.get("position")
+            if sr is not None and isinstance(sr, (int, float)) and pos in valid_positions:
+                team = (p.get("team") or "").strip()
+                name = f"{p.get('first_name', '')} {p.get('last_name', '')}".strip()
+                if name:
+                    adp_entries.append({
+                        "player_id": str(player_id),
+                        "adp": float(sr),
+                        "position": pos,
+                        "team": team,
+                        "name": name,
+                    })
+        adp_entries.sort(key=lambda x: x["adp"])
+        if adp_entries:
+            logger.info(f"Using Sleeper search_rank as ADP fallback ({len(adp_entries)} players)")
 
     return adp_entries
+
+
+# -------------------------------------------
+# Sleeper League / Roster Proxy Endpoints
+# -------------------------------------------
+
+@router.get("/sleeper/user/{username}")
+def sleeper_user(username: str):
+    """Look up a Sleeper user by username."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/user/{username}")
+    if data is None:
+        raise HTTPException(status_code=404, detail="Sleeper user not found")
+    return data
+
+
+@router.get("/sleeper/user/{user_id}/leagues/{season}")
+def sleeper_user_leagues(user_id: str, season: int):
+    """Get all NFL leagues for a Sleeper user in a given season."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/user/{user_id}/leagues/nfl/{season}")
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/league/{league_id}")
+def sleeper_league(league_id: str):
+    """Get Sleeper league settings and metadata."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}")
+    if data is None:
+        raise HTTPException(status_code=404, detail="Sleeper league not found")
+    return data
+
+
+@router.get("/sleeper/league/{league_id}/rosters")
+def sleeper_league_rosters(league_id: str):
+    """Get all rosters in a Sleeper league."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/rosters")
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/league/{league_id}/users")
+def sleeper_league_users(league_id: str):
+    """Get all users/members in a Sleeper league."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/users")
+    if data is None:
+        return []
+    return data
+
+
+# -------------------------------------------
+# ESPN Fantasy Proxy Endpoint
+# -------------------------------------------
+
+@router.get("/espn/league/{league_id}")
+def espn_league(league_id: str, season: int = Query(default=2025), view: str = Query(default="mRoster,mTeam")):
+    """Proxy ESPN fantasy league data (public leagues only)."""
+    views = "&".join(f"view={v.strip()}" for v in view.split(","))
+    url = f"https://lm-api-reads.fantasy.espn.com/apis/v3/games/ffl/seasons/{season}/segments/0/leagues/{league_id}?{views}"
+    data = _safe_get_json(url)
+    if data is None:
+        raise HTTPException(status_code=404, detail="ESPN league not found or is private")
+    return data
+
+
+# -------------------------------------------
+# Sleeper Trending Data
+# -------------------------------------------
+
+@router.get("/sleeper/trending/add")
+def sleeper_trending_add(lookback_hours: int = Query(default=24), limit: int = Query(default=50)):
+    """Get trending add players from Sleeper."""
+    url = f"https://api.sleeper.app/v1/players/nfl/trending/add?lookback_hours={lookback_hours}&limit={limit}"
+    data = _safe_get_json(url)
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/trending/drop")
+def sleeper_trending_drop(lookback_hours: int = Query(default=24), limit: int = Query(default=50)):
+    """Get trending drop players from Sleeper."""
+    url = f"https://api.sleeper.app/v1/players/nfl/trending/drop?lookback_hours={lookback_hours}&limit={limit}"
+    data = _safe_get_json(url)
+    if data is None:
+        return []
+    return data
