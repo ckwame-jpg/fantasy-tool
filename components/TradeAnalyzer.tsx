@@ -287,8 +287,8 @@ export default function TradeAnalyzer({
             <div>
               <h2 className="text-2xl font-bold">trade analyzer</h2>
               <p className="text-sm text-slate-400 mt-1">
-                VORP-based valuation &middot; {leagueSize}-team {isDynasty ? 'dynasty' : 'redraft'}
-                {hasSuperFlex ? ' &middot; superflex' : ''}
+                VORP-based valuation · {leagueSize}-team {isDynasty ? 'dynasty' : 'redraft'}
+                {hasSuperFlex ? ' · superflex' : ''}
               </p>
             </div>
             {!isPage && (
@@ -433,7 +433,7 @@ export default function TradeAnalyzer({
                             </div>
                             <div className="flex items-center gap-2 text-xs">
                               <span className="text-slate-400">
-                                {player.position} &middot; {player.team}
+                                {player.position} · {player.team}
                               </span>
                               <span className={tier.color}>{vorp.toFixed(1)} VORP</span>
                               <span className="text-slate-500">{tier.label}</span>

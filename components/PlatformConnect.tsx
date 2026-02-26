@@ -193,7 +193,7 @@ export default function PlatformConnect() {
               >
                 <div className="text-sm font-medium text-white">{league.name}</div>
                 <div className="text-xs text-slate-400">
-                  {league.total_rosters} teams &middot; {league.season}
+                  {league.total_rosters} teams · {league.season}
                 </div>
               </button>
             ))}
@@ -245,7 +245,7 @@ export default function PlatformConnect() {
             <span className="text-xs text-slate-500">via {platform}</span>
           </div>
           <div className="text-xs text-slate-400 mb-3">
-            {myPlayerIds.length} players on your roster &middot; {username}
+            {myPlayerIds.length} players on your roster · {username}
           </div>
           <div className="flex gap-2">
             <button
