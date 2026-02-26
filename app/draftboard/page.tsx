@@ -35,7 +35,7 @@ type Player = BasePlayer & {
 
 // Table cell helpers for consistent spacing and alignment
 const CELL = "px-2 py-1.5 whitespace-nowrap";
-const CELL_NUM = `${CELL} text-right tabular-nums font-mono`;
+const CELL_NUM = `${CELL} text-right tabular-nums font-aptos`;
 
 // Bye week mapping for 2025 NFL season
 const BYE_WEEKS: Record<string, number> = {
@@ -574,10 +574,10 @@ export default function DraftPage() {
   const progressWidthClass = getProgressWidthClass(progress)
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white p-6">
+    <div className="min-h-screen bg-slate-950 text-slate-300 p-6">
       {/* Header */}
       <div className="mb-4">
-        <h1 className="text-3xl font-bold">draftboard</h1>
+        <h1 className="text-2xl font-bold">draftboard</h1>
         <p className="text-sm text-slate-400">
           showing {DISPLAY_YEAR} stats + adp
           {selectedWeek > 0 && ` • week ${selectedWeek} focus`}
@@ -598,8 +598,8 @@ export default function DraftPage() {
               <button
                 className={`flex-1 px-3 py-2 text-sm rounded ${
                   !isOnlineMode
-                    ? "bg-indigo-700 text-white"
-                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    ? "bg-indigo-700 text-slate-200"
+                    : "bg-slate-700 text-slate-400 hover:bg-slate-600"
                 }`}
                 onClick={() => setIsOnlineMode(false)}
                 title="Focus on building your personal team"
@@ -609,8 +609,8 @@ export default function DraftPage() {
               <button
                 className={`flex-1 px-3 py-2 text-sm rounded ${
                   isOnlineMode
-                    ? "bg-cyan-700 text-white"
-                    : "bg-slate-700 text-slate-300 hover:bg-slate-600"
+                    ? "bg-cyan-700 text-slate-200"
+                    : "bg-slate-700 text-slate-400 hover:bg-slate-600"
                 }`}
                 onClick={() => setIsOnlineMode(true)}
                 title="Connect to live draft"
@@ -624,7 +624,7 @@ export default function DraftPage() {
           <div>
             <label className="block text-sm text-slate-400 mb-1">week focus</label>
             <select
-              className="w-full text-white p-2 rounded bg-slate-700"
+              className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
               value={selectedWeek}
               onChange={(e) => setSelectedWeek(Number(e.target.value))}
               title="Focus on players for specific week"
@@ -640,7 +640,7 @@ export default function DraftPage() {
           <div>
             <label className="block text-sm text-slate-400 mb-1">position</label>
             <select
-              className="w-full text-white p-2 rounded bg-slate-700"
+              className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
               value={position}
               onChange={(e) => setPosition(e.target.value)}
               title="Filter players by position"
@@ -660,7 +660,7 @@ export default function DraftPage() {
             <label className="block text-sm text-slate-400 mb-1">the homies</label>
             <select
               title="Filter by favorites"
-              className="w-full text-white p-2 rounded bg-slate-700"
+              className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
               value={showFavoritesOnly ? "favorites" : "all"}
               onChange={(e) => setShowFavoritesOnly(e.target.value === "favorites")}
             >
@@ -674,7 +674,7 @@ export default function DraftPage() {
             <div>
               <label className="block text-sm text-slate-400 mb-1">platform</label>
               <select
-                className="w-full text-white p-2 rounded bg-slate-700"
+                className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
                 title="Select fantasy platform to sync with"
                 value={selectedPlatform}
                 onChange={(e) => setSelectedPlatform(e.target.value)}
@@ -692,12 +692,12 @@ export default function DraftPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={async () => { setDrafted([]); await clearPicks(draftId).catch(console.error) }}
-            className="bg-slate-700 hover:bg-indigo-800 text-white text-sm font-bold px-4 py-2 rounded transition-colors"
+            className="bg-slate-700 hover:bg-indigo-800 text-slate-300 text-sm font-semibold px-4 py-2 rounded transition-colors"
           >
             clear all picks
           </button>
           <button
-            className="bg-slate-700 hover:bg-indigo-800 text-white text-sm font-bold px-4 py-2 rounded transition-colors"
+            className="bg-slate-700 hover:bg-indigo-800 text-slate-300 text-sm font-semibold px-4 py-2 rounded transition-colors"
             onClick={saveCurrentTeam}
             title="Save current drafted players as a named team"
           >
@@ -705,7 +705,7 @@ export default function DraftPage() {
           </button>
           <div className="relative">
             <button
-              className="bg-slate-700 hover:bg-indigo-800 text-white text-sm font-bold px-4 py-2 rounded transition-colors"
+              className="bg-slate-700 hover:bg-indigo-800 text-slate-300 text-sm font-semibold px-4 py-2 rounded transition-colors"
               onClick={() => { setShowSavedTeams(!showSavedTeams); if (!showSavedTeams) fetchSavedTeams() }}
               title="Load or manage saved teams"
             >
@@ -742,7 +742,7 @@ export default function DraftPage() {
           <input
             type="text"
             placeholder="search players..."
-            className="ml-auto w-72 text-white p-2 rounded bg-slate-700 placeholder-slate-500"
+            className="ml-auto w-72 text-slate-300 text-sm p-2 rounded bg-slate-700 placeholder-slate-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             title="Search for players by name"
@@ -791,7 +791,7 @@ export default function DraftPage() {
                         key={index}
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs ${
                           player
-                            ? "bg-slate-700 text-white cursor-pointer hover:bg-red-900/40"
+                            ? "bg-slate-700 text-slate-300 cursor-pointer hover:bg-red-900/40"
                             : "bg-slate-800 text-slate-500"
                         }`}
                         onClick={() => player && removePlayer(player.id)}
@@ -811,7 +811,7 @@ export default function DraftPage() {
                     {bench.map((p) => (
                       <span
                         key={p.id}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-slate-700 text-white cursor-pointer hover:bg-red-900/40"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-slate-700 text-slate-300 cursor-pointer hover:bg-red-900/40"
                         onClick={() => removePlayer(p.id)}
                       >
                         {p.name}
@@ -829,7 +829,7 @@ export default function DraftPage() {
       {/* Player Table */}
       <div className="bg-slate-900 rounded-lg p-4">
         <div className="overflow-y-auto overflow-x-auto max-h-[60vh]">
-            <table className="w-full table-fixed text-sm text-left leading-tight">
+            <table className="w-full table-fixed text-sm text-left leading-tight font-aptos">
               <colgroup>
                 <col className="w-[18%]" />
                 <col className="w-[3%]" />
@@ -952,7 +952,7 @@ export default function DraftPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="text-xs text-slate-400">
                 {[...processedPlayers]
                   .filter((player) => {
                     if (position !== "ALL" && player.position !== position) return false
@@ -1051,7 +1051,7 @@ export default function DraftPage() {
                       >
                         <td className={`${CELL} flex items-center gap-0.5 min-w-0`}>
                           <span
-                            className="truncate font-medium hover:text-cyan-400 hover:underline cursor-pointer"
+                            className="truncate font-medium hover:text-indigo-400 hover:underline cursor-pointer"
                             title={player.name}
                             onClick={(e) => {
                               e.stopPropagation()

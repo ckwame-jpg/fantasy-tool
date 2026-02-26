@@ -25,7 +25,6 @@ const DEFAULT_SLOTS = ["QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DEF"]
 
 export default function LineupOptimizer({ draftedPlayers, onClose, isPage, rosterSlots }: LineupOptimizerProps) {
   const [selectedWeek, setSelectedWeek] = useState(1)
-  const [optimizationStrategy, setOptimizationStrategy] = useState<'ceiling' | 'floor' | 'projected'>('projected')
 
   const slots = rosterSlots || DEFAULT_SLOTS
 
@@ -33,20 +32,7 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
     const basePoints = player.fantasyPoints || 0
     const byeWeek = getByeWeekInfo(player.team)
     if (byeWeek.week === week) return 0
-
-    let score = basePoints
-    switch (optimizationStrategy) {
-      case 'ceiling':
-        score += Math.random() * 30 - 10
-        break
-      case 'floor':
-        score *= 0.85 + Math.random() * 0.3
-        break
-      case 'projected':
-        score *= 0.95 + Math.random() * 0.1
-        break
-    }
-    return Math.max(0, score)
+    return Math.max(0, basePoints * (0.95 + Math.random() * 0.1))
   }
 
   const optimalLineup = useMemo((): OptimalLineup => {
@@ -80,7 +66,7 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
 
     const totalPoints = filledSlots.reduce((sum, s) => sum + (s.player?.weekScore || 0), 0)
     return { slots: filledSlots, totalPoints }
-  }, [draftedPlayers, selectedWeek, optimizationStrategy, slots])
+  }, [draftedPlayers, selectedWeek, slots])
 
   const getPositionAdvice = () => {
     const advice: string[] = []
@@ -121,41 +107,18 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
 
   const controlsUI = (
     <div className="bg-slate-800 p-4 rounded-lg mb-6">
-      <div className="grid md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label className="block text-sm text-slate-400 mb-1">Week</label>
-          <select
-            value={selectedWeek}
-            onChange={(e) => setSelectedWeek(Number(e.target.value))}
-            className="w-full bg-slate-700 text-white p-2 rounded"
-            title="Select which week to optimize lineup for"
-          >
-            {Array.from({ length: 17 }, (_, i) => i + 1).map(week => (
-              <option key={week} value={week}>Week {week}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-sm text-slate-400 mb-1">Strategy</label>
-          <select
-            value={optimizationStrategy}
-            onChange={(e) => setOptimizationStrategy(e.target.value as any)}
-            className="w-full bg-slate-700 text-white p-2 rounded"
-            title="Select optimization strategy for lineup"
-          >
-            <option value="projected">Projected Points</option>
-            <option value="ceiling">High Ceiling</option>
-            <option value="floor">High Floor</option>
-          </select>
-        </div>
-      </div>
-      <div className="text-sm text-slate-300">
-        <strong>strategy guide:</strong>
-        <ul className="mt-1 space-y-1">
-          <li>• <strong>projected:</strong> most likely outcomes</li>
-          <li>• <strong>high ceiling:</strong> maximum upside for tournaments</li>
-          <li>• <strong>high floor:</strong> consistent points for cash games</li>
-        </ul>
+      <div className="max-w-xs">
+        <label className="block text-sm text-slate-400 mb-1">week</label>
+        <select
+          value={selectedWeek}
+          onChange={(e) => setSelectedWeek(Number(e.target.value))}
+          className="w-full bg-slate-700 text-slate-300 text-sm p-2 rounded"
+          title="Select which week to optimize lineup for"
+        >
+          {Array.from({ length: 17 }, (_, i) => i + 1).map(week => (
+            <option key={week} value={week}>week {week}</option>
+          ))}
+        </select>
       </div>
     </div>
   )

@@ -41,7 +41,7 @@ type Player = {
 
 // Table cell helpers for consistent spacing and alignment (copied from Draftboard)
 const CELL = "px-1.5 py-0.5 whitespace-nowrap";
-const CELL_NUM = `${CELL} text-right tabular-nums font-mono`;
+const CELL_NUM = `${CELL} text-right tabular-nums font-aptos`;
 
 // Helpers to read nested fields and coerce values (copied from Draftboard)
 function getPath(obj: any, path: string) {
@@ -358,7 +358,7 @@ const PlayersPage = () => {
   return (
     <div className="h-screen overflow-hidden p-6 flex flex-col">
       <div className="mb-4">
-        <h1 className="text-3xl font-bold">players</h1>
+        <h1 className="text-2xl font-bold text-slate-300">players</h1>
         <p className="text-sm text-slate-400">showing {season} stats</p>
       </div>
 
@@ -371,8 +371,8 @@ const PlayersPage = () => {
               onClick={() => setPosition(pos)}
               className={`px-3 py-1 rounded font-semibold text-sm transition-colors focus:outline-none ${
                 position === pos
-                  ? "bg-indigo-600 text-white"
-                  : "bg-slate-700 text-slate-300 hover:bg-indigo-500 hover:text-white"
+                  ? "bg-indigo-600 text-slate-200"
+                  : "bg-slate-700 text-slate-400 hover:bg-indigo-500 hover:text-slate-200"
               }`}
             >
               {pos}
@@ -382,8 +382,8 @@ const PlayersPage = () => {
             onClick={() => setPosition(position === "Favorites" ? "ALL" : "Favorites")}
             className={`px-3 py-1 rounded font-semibold text-sm transition-colors focus:outline-none ${
               position === "Favorites"
-                ? "bg-[#00CEC8] text-white"
-                : "bg-slate-700 text-slate-300 hover:bg-[#00CEC8] hover:text-white"
+                ? "bg-[#00CEC8] text-slate-200"
+                : "bg-slate-700 text-slate-400 hover:bg-[#00CEC8] hover:text-slate-200"
             }`}
           >
             ★ favorites
@@ -393,7 +393,7 @@ const PlayersPage = () => {
           <select
             value={season}
             onChange={(e) => setSeason(Number(e.target.value))}
-            className="bg-slate-700 text-white p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="bg-slate-700 text-slate-300 text-sm p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             title="Select season to view player statistics for"
           >
             {years.map((yr) => (
@@ -409,7 +409,7 @@ const PlayersPage = () => {
       <div className="mb-4">
         <input
           type="text"
-          className="bg-slate-700 text-white p-2 rounded w-full md:w-96 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="bg-slate-700 text-slate-300 text-sm p-2 rounded w-full md:w-96 border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           placeholder="search by player name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -425,7 +425,7 @@ const PlayersPage = () => {
         ) : (
           <div className="flex-1 min-h-0">
             <div className="overflow-y-auto overflow-x-hidden h-full">
-              <table className="w-full table-fixed text-sm text-left">
+              <table className="w-full table-fixed text-sm text-left font-aptos">
                 <colgroup>
                   {[
                     "w-[2%]",   // Fav
@@ -494,7 +494,7 @@ const PlayersPage = () => {
                     <SortableHeader field="passTD">TD</SortableHeader>
                   </tr>
                 </thead>
-                <tbody className="tabular-nums whitespace-nowrap">
+                <tbody className="tabular-nums whitespace-nowrap text-xs text-slate-400">
                   {filteredPlayers.map((player) => (
                     <tr
                       key={player.id}
@@ -517,7 +517,7 @@ const PlayersPage = () => {
                       <td className={`${CELL} min-w-0`}>
                         <div className="flex items-center gap-1 min-w-0">
                           <span
-                            className="truncate hover:text-cyan-400 hover:underline cursor-pointer"
+                            className="truncate hover:text-indigo-400 hover:underline cursor-pointer"
                             title={player.name}
                             onClick={() => setSelectedPlayer(player)}
                           >{player.name}</span>

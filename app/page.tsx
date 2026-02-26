@@ -9,23 +9,23 @@ const features = [
   {
     href: "/draftboard",
     icon: List,
-    title: "Draftboard",
-    description: "Mock draft with ADP rankings, positional tiers, and team builder.",
+    title: "draftboard",
+    description: "mock draft with ADP rankings, positional tiers, and team builder.",
     color: "text-indigo-400",
     bg: "bg-indigo-500/10",
   },
   {
     href: "/players",
     icon: PersonStanding,
-    title: "Players",
-    description: "Browse all NFL players with stats, projections, and detailed profiles.",
+    title: "players",
+    description: "browse all NFL players with stats, projections, and detailed profiles.",
     color: "text-cyan-400",
     bg: "bg-cyan-500/10",
   },
   {
     href: "/trade-analyzer",
     icon: TrendingUp,
-    title: "Trade Analyzer",
+    title: "trade analyzer",
     description: "VORP-based trade calculator with contender/rebuilder modes and lineup impact.",
     color: "text-green-400",
     bg: "bg-green-500/10",
@@ -33,24 +33,24 @@ const features = [
   {
     href: "/waiver-wire",
     icon: Users,
-    title: "Waiver Wire",
-    description: "Find available players ranked by priority with add/drop trends.",
+    title: "waiver wire",
+    description: "find available players ranked by priority with add/drop trends.",
     color: "text-amber-400",
     bg: "bg-amber-500/10",
   },
   {
     href: "/lineup-optimizer",
     icon: Target,
-    title: "Lineup Optimizer",
-    description: "Optimize your weekly lineup with projected, ceiling, and floor strategies.",
+    title: "lineup optimizer",
+    description: "optimize your weekly lineup with projected, ceiling, and floor strategies.",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
   },
   {
     href: "/draft-recap",
     icon: Trophy,
-    title: "Draft Recap",
-    description: "Post-draft analysis with grades, bye week distribution, and starting lineup.",
+    title: "draft recap",
+    description: "post-draft analysis with grades, bye week distribution, and starting lineup.",
     color: "text-rose-400",
     bg: "bg-rose-500/10",
   },
@@ -64,9 +64,9 @@ export default function HomePage() {
       <div className="max-w-4xl mx-auto">
         {/* Hero */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Only W's Fantasy</h1>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">only W's fantasy</h1>
           <p className="text-slate-400">
-            Your all-in-one fantasy football toolkit. Connect your Sleeper or ESPN league to get started.
+            your all-in-one fantasy football toolkit. connect your Sleeper or ESPN league to get started.
           </p>
         </div>
 

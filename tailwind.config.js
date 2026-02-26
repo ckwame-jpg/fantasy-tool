@@ -43,6 +43,9 @@ module.exports = {
   safelist,
   theme: {
     extend: {
+      fontFamily: {
+        aptos: ['Aptos', 'Calibri', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      },
       colors: {
         tier: {
           T1: '#a855f7',
