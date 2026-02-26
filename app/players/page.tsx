@@ -424,32 +424,8 @@ const PlayersPage = () => {
           <div className="text-center text-slate-400 py-8">No players found.</div>
         ) : (
           <div className="flex-1 min-h-0">
-            <div className="overflow-y-auto overflow-x-hidden h-full">
-              <table className="w-full table-fixed text-sm text-left font-aptos">
-                <colgroup>
-                  {[
-                    "w-[2%]",   // Fav
-                    "w-[18%]",  // Name
-                    "w-[5%]",   // Team
-                    "w-[4%]",   // Pos
-                    "w-[4%]",   // Pos Rank
-                    "w-[4%]",   // ADP
-                    "w-[5.5%]", // Fantasy Pts
-                    "w-[3.5%]", // Rush Att
-                    "w-[4.5%]", // Rush Yds
-                    "w-[3.5%]", // Rush TD
-                    "w-[3.5%]", // Targets
-                    "w-[3.5%]", // Rec
-                    "w-[4.5%]", // Rec Yds
-                    "w-[3.5%]", // Rec TD
-                    "w-[4%]",   // Pass Att
-                    "w-[4%]",   // Pass Cmp
-                    "w-[5%]",   // Pass Yds
-                    "w-[4%]",   // Pass TD
-                  ].map((cls, i) => (
-                    <col key={i} className={cls} />
-                  ))}
-                </colgroup>
+            <div className="overflow-y-auto overflow-x-auto h-full">
+              <table className="min-w-[900px] w-full text-sm text-left font-aptos">
                 <thead className="sticky top-0 z-20 bg-slate-800 shadow-[inset_0_-1px_0_0_rgba(255,255,255,0.06)]">
                   {/* Row 1: frozen labels + grouped category headers */}
                   <tr className="text-slate-400 border-b border-slate-700">

@@ -590,7 +590,7 @@ export default function DraftPage() {
 
       {/* Controls Bar */}
       <div className="bg-slate-800 p-4 rounded-lg mb-4">
-        <div className={`grid gap-4 mb-3 ${isOnlineMode ? "md:grid-cols-5" : "md:grid-cols-4"}`}>
+        <div className={`grid grid-cols-2 gap-4 mb-3 ${isOnlineMode ? "md:grid-cols-5" : "md:grid-cols-4"}`}>
           {/* Draft Mode */}
           <div>
             <label className="block text-sm text-slate-400 mb-1">draft mode</label>
@@ -689,7 +689,7 @@ export default function DraftPage() {
         </div>
 
         {/* Actions + Search */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={async () => { setDrafted([]); await clearPicks(draftId).catch(console.error) }}
             className="bg-slate-700 hover:bg-indigo-800 text-slate-300 text-sm font-semibold px-4 py-2 rounded transition-colors"
@@ -742,7 +742,7 @@ export default function DraftPage() {
           <input
             type="text"
             placeholder="search players..."
-            className="ml-auto w-72 text-slate-300 text-sm p-2 rounded bg-slate-700 placeholder-slate-500"
+            className="w-full md:w-72 md:ml-auto text-slate-300 text-sm p-2 rounded bg-slate-700 placeholder-slate-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             title="Search for players by name"
@@ -829,27 +829,7 @@ export default function DraftPage() {
       {/* Player Table */}
       <div className="bg-slate-900 rounded-lg p-4">
         <div className="overflow-y-auto overflow-x-auto max-h-[60vh]">
-            <table className="w-full table-fixed text-sm text-left leading-tight font-aptos">
-              <colgroup>
-                <col className="w-[18%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[4%]" />
-                <col className="w-[4%]" />
-                <col className="w-[4%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-                <col className="w-[3%]" />
-              </colgroup>
+            <table className="min-w-[900px] w-full text-sm text-left leading-tight font-aptos">
               <thead className="sticky top-0 bg-slate-800 z-10">
                 {/* Row 1: frozen labels + grouped category headers */}
                 <tr className="text-slate-400 border-b border-slate-900 whitespace-nowrap">
