@@ -2,7 +2,7 @@
 
 A full-stack fantasy football toolkit built with Next.js and FastAPI. Connect your Sleeper league to get personalized roster analysis, or use it standalone with league-wide NFL data.
 
-**[Live Demo](https://fantasy-tool-2g262ihmx-chris-prempehs-projects.vercel.app)**
+**[Live Demo](https://fantasy-tool-chris-prempehs-projects.vercel.app)**
 
 ## Features
 
