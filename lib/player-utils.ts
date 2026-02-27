@@ -240,4 +240,93 @@ export const getPositionGrade = (position: string, count: number): { grade: stri
   } else {
     return { grade: 'B', color: 'text-blue-500', description: 'Over-drafted' }
   }
-} 
+}
+
+// 2025 NFL Schedule — 18 weeks, team → list of opponents (@ = away, BYE = bye week)
+export const NFL_SCHEDULE_2025: Record<string, string[]> = {
+  'ARI': ['@NO','CAR','@SF','SEA','TEN','@IND','GB','BYE','@DAL','@SEA','SF','JAX','@TB','LAR','@HOU','ATL','@CIN','@LAR'],
+  'ATL': ['TB','@MIN','@CAR','WSH','BYE','BUF','@SF','MIA','@NE','@IND','CAR','@NO','@NYJ','SEA','@TB','@ARI','LAR','NO'],
+  'BAL': ['@BUF','CLE','DET','@KC','HOU','LAR','BYE','CHI','@MIA','@MIN','@CLE','NYJ','CIN','PIT','@CIN','NE','@GB','@PIT'],
+  'BUF': ['BAL','@NYJ','MIA','NO','NE','@ATL','BYE','@CAR','KC','@MIA','TB','@HOU','@PIT','CIN','@NE','@CLE','PHI','NYJ'],
+  'CAR': ['@JAX','@ARI','ATL','@NE','MIA','DAL','@NYJ','BUF','@GB','NO','@ATL','@SF','LAR','BYE','@NO','TB','SEA','@TB'],
+  'CHI': ['MIN','@DET','DAL','@LV','BYE','@WSH','NO','@BAL','@CIN','NYG','@MIN','PIT','@PHI','@GB','CLE','GB','@SF','DET'],
+  'CIN': ['@CLE','JAX','@MIN','@DEN','DET','@GB','PIT','NYJ','CHI','BYE','@PIT','NE','@BAL','@BUF','BAL','@MIA','ARI','CLE'],
+  'CLE': ['CIN','@BAL','GB','@DET','MIN','@PIT','MIA','@NE','BYE','@NYJ','BAL','@LV','SF','TEN','@CHI','BUF','PIT','@CIN'],
+  'DAL': ['@PHI','NYG','@CHI','GB','@NYJ','@CAR','WSH','@DEN','ARI','BYE','@LV','PHI','KC','@DET','MIN','LAC','@WSH','@NYG'],
+  'DEN': ['TEN','@IND','@LAC','CIN','@PHI','@NYJ','NYG','DAL','@HOU','LV','KC','BYE','@WSH','@LV','GB','JAX','@KC','LAC'],
+  'DET': ['@GB','CHI','@BAL','CLE','@CIN','@KC','TB','BYE','MIN','@WSH','@PHI','NYG','GB','DAL','@LAR','PIT','@MIN','@CHI'],
+  'GB':  ['DET','WSH','@CLE','@DAL','BYE','CIN','@ARI','@PIT','CAR','PHI','@NYG','MIN','@DET','CHI','@DEN','@CHI','BAL','@MIN'],
+  'HOU': ['@LAR','TB','@JAX','TEN','@BAL','BYE','@SEA','SF','DEN','JAX','@TEN','BUF','@IND','@KC','ARI','LV','@LAC','IND'],
+  'IND': ['MIA','DEN','@TEN','@LAR','LV','ARI','@LAC','TEN','@PIT','ATL','BYE','@KC','HOU','@JAX','@SEA','SF','JAX','@HOU'],
+  'JAX': ['CAR','@CIN','HOU','@SF','KC','SEA','LAR','BYE','@LV','@HOU','LAC','@ARI','@TEN','IND','NYJ','@DEN','@IND','TEN'],
+  'KC':  ['@LAC','PHI','@NYG','BAL','@JAX','DET','LV','WSH','@BUF','BYE','@DEN','IND','@DAL','HOU','LAC','@TEN','DEN','@LV'],
+  'LV':  ['@NE','LAC','@WSH','CHI','@IND','TEN','@KC','BYE','JAX','@DEN','DAL','CLE','@LAC','DEN','@PHI','@HOU','NYG','KC'],
+  'LAR': ['HOU','@TEN','@PHI','IND','SF','@BAL','@JAX','BYE','NO','@SF','SEA','TB','@CAR','@ARI','DET','@SEA','@ATL','ARI'],
+  'LAC': ['KC','@LV','DEN','@NYG','WSH','@MIA','IND','MIN','@TEN','PIT','@JAX','BYE','LV','PHI','@KC','@DAL','HOU','@DEN'],
+  'MIA': ['@IND','NE','@BUF','NYJ','@CAR','LAC','@CLE','@ATL','BAL','BUF','WSH','BYE','NO','@NYJ','@PIT','CIN','TB','@NE'],
+  'MIN': ['@CHI','ATL','CIN','@PIT','@CLE','BYE','PHI','@LAC','@DET','BAL','CHI','@GB','@SEA','WSH','@DAL','@NYG','DET','GB'],
+  'NE':  ['LV','@MIA','PIT','CAR','@BUF','@NO','@TEN','CLE','ATL','@TB','NYJ','@CIN','NYG','BYE','BUF','@BAL','@NYJ','MIA'],
+  'NO':  ['ARI','SF','@SEA','@BUF','NYG','NE','@CHI','TB','@LAR','@CAR','BYE','ATL','@MIA','@TB','CAR','NYJ','@TEN','@ATL'],
+  'NYG': ['@WSH','@DAL','KC','LAC','@NO','PHI','@DEN','@PHI','SF','@CHI','GB','@DET','@NE','BYE','WSH','MIN','@LV','DAL'],
+  'NYJ': ['PIT','BUF','@TB','@MIA','DAL','DEN','CAR','@CIN','BYE','CLE','@NE','@BAL','ATL','MIA','@JAX','@NO','NE','@BUF'],
+  'PHI': ['DAL','@KC','LAR','@TB','DEN','@NYG','@MIN','NYG','BYE','@GB','DET','@DAL','CHI','@LAC','LV','@WSH','@BUF','WSH'],
+  'PIT': ['@NYJ','SEA','@NE','MIN','BYE','CLE','@CIN','GB','IND','@LAC','CIN','@CHI','BUF','@BAL','MIA','@DET','@CLE','BAL'],
+  'SF':  ['@SEA','@NO','ARI','JAX','@LAR','@TB','ATL','@HOU','@NYG','LAR','@ARI','CAR','@CLE','BYE','TEN','@IND','CHI','SEA'],
+  'SEA': ['SF','@PIT','NO','@ARI','TB','@JAX','HOU','BYE','@WSH','ARI','@LAR','@TEN','MIN','@ATL','IND','LAR','@CAR','@SF'],
+  'TB':  ['@ATL','@HOU','NYJ','PHI','@SEA','SF','@DET','@NO','BYE','NE','@BUF','@LAR','ARI','NO','ATL','@CAR','@MIA','CAR'],
+  'TEN': ['@DEN','LAR','IND','@HOU','@ARI','@LV','NE','@IND','LAC','BYE','HOU','SEA','JAX','@CLE','@SF','KC','NO','@JAX'],
+  'WAS': ['NYG','@GB','LV','@ATL','@LAC','CHI','@DAL','@KC','SEA','DET','@MIA','BYE','DEN','@MIN','@NYG','PHI','DAL','@PHI'],
+}
+
+// Get opponent for a team in a given week (1-indexed)
+export const getOpponent = (team: string, week: number): string | null => {
+  const schedule = NFL_SCHEDULE_2025[team?.toUpperCase()]
+  if (!schedule || week < 1 || week > schedule.length) return null
+  const opp = schedule[week - 1]
+  if (opp === 'BYE') return null
+  return opp.replace('@', '')
+}
+
+// Check if a team is on bye a given week
+export const isOnBye = (team: string, week: number): boolean => {
+  return getOpponent(team, week) === null
+}
+
+// Compute defense multipliers from DEF player data
+// Higher DEF fantasy points = better defense = harder to score against
+// Returns multipliers where > 1.0 = weak defense (easier matchup), < 1.0 = strong defense (harder matchup)
+export const computeDefenseMultipliers = (allPlayers: any[]): Record<string, number> => {
+  const defPlayers = allPlayers.filter(p => p.position === 'DEF' && p.fantasyPoints > 0)
+  if (defPlayers.length === 0) return {}
+
+  // DEF fantasy points: higher = better defense
+  // We want to INVERT this for offensive matchup multiplier
+  // Playing against a good defense (high DEF pts) = lower multiplier
+  const avgDefPts = defPlayers.reduce((sum, p) => sum + p.fantasyPoints, 0) / defPlayers.length
+
+  const multipliers: Record<string, number> = {}
+  for (const def of defPlayers) {
+    const team = def.team?.toUpperCase()
+    if (!team) continue
+    // Invert: if DEF scores high, their opponents score less
+    // multiplier = avgDefPts / teamDefPts
+    // Good defense (high pts) → multiplier < 1 (harder for opponents)
+    // Bad defense (low pts) → multiplier > 1 (easier for opponents)
+    const raw = avgDefPts / def.fantasyPoints
+    // Clamp between 0.7 and 1.3 to avoid extreme swings
+    multipliers[team] = Math.max(0.7, Math.min(1.3, raw))
+  }
+
+  return multipliers
+}
+
+// Get matchup multiplier for a player's opponent in a given week
+export const getMatchupMultiplier = (
+  team: string,
+  week: number,
+  defenseMultipliers: Record<string, number>
+): number => {
+  const opponent = getOpponent(team, week)
+  if (!opponent) return 0 // bye week
+  return defenseMultipliers[opponent] || 1.0
+}

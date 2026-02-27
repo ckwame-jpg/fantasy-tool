@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { getByeWeekInfo } from '@/lib/player-utils'
+import { getByeWeekInfo, getMatchupMultiplier, getOpponent } from '@/lib/player-utils'
 import { SLOT_ELIGIBLE, sortSlotsByPriority, slotLabel } from '@/lib/roster-utils'
 
 interface LineupOptimizerProps {
@@ -9,6 +9,7 @@ interface LineupOptimizerProps {
   onClose: () => void
   isPage?: boolean
   rosterSlots?: string[]
+  defenseMultipliers?: Record<string, number>
 }
 
 interface FilledSlot {
@@ -23,16 +24,18 @@ interface OptimalLineup {
 
 const DEFAULT_SLOTS = ["QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DEF"]
 
-export default function LineupOptimizer({ draftedPlayers, onClose, isPage, rosterSlots }: LineupOptimizerProps) {
+export default function LineupOptimizer({ draftedPlayers, onClose, isPage, rosterSlots, defenseMultipliers = {} }: LineupOptimizerProps) {
   const [selectedWeek, setSelectedWeek] = useState(1)
 
   const slots = rosterSlots || DEFAULT_SLOTS
 
   const getPlayerScore = (player: any, week: number) => {
-    const basePoints = player.fantasyPoints || 0
-    const byeWeek = getByeWeekInfo(player.team)
-    if (byeWeek.week === week) return 0
-    return Math.max(0, basePoints * (0.95 + Math.random() * 0.1))
+    const seasonPoints = player.fantasyPoints || 0
+    const weeklyAvg = seasonPoints / 17
+    // Apply matchup multiplier based on opponent defense
+    const multiplier = getMatchupMultiplier(player.team, week, defenseMultipliers)
+    if (multiplier === 0) return 0 // bye week
+    return Math.max(0, weeklyAvg * multiplier)
   }
 
   const optimalLineup = useMemo((): OptimalLineup => {
@@ -72,35 +75,57 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
     const advice: string[] = []
     const byeWeekPlayers = draftedPlayers.filter(p => getByeWeekInfo(p.team).week === selectedWeek)
     if (byeWeekPlayers.length > 0) {
-      advice.push(`${byeWeekPlayers.length} players on bye this week: ${byeWeekPlayers.map(p => p.name).join(', ')}`)
+      advice.push(`${byeWeekPlayers.length} player${byeWeekPlayers.length > 1 ? 's' : ''} on bye this week: ${byeWeekPlayers.map(p => p.name).join(', ')}`)
     }
     const emptySlots = optimalLineup.slots.filter(s => !s.player)
     if (emptySlots.length > 0) {
       advice.push(`${emptySlots.length} empty slot${emptySlots.length > 1 ? 's' : ''}: ${emptySlots.map(s => slotLabel(s.slotName)).join(', ')}`)
+    }
+    // Highlight best and worst matchups in the lineup
+    const starters = optimalLineup.slots.filter(s => s.player)
+    if (starters.length > 0 && Object.keys(defenseMultipliers).length > 0) {
+      const bestMatchup = starters.reduce((best, s) => {
+        const m = getMatchupMultiplier(s.player.team, selectedWeek, defenseMultipliers)
+        const bm = getMatchupMultiplier(best.player.team, selectedWeek, defenseMultipliers)
+        return m > bm ? s : best
+      })
+      const worstMatchup = starters.reduce((worst, s) => {
+        const m = getMatchupMultiplier(s.player.team, selectedWeek, defenseMultipliers)
+        const wm = getMatchupMultiplier(worst.player.team, selectedWeek, defenseMultipliers)
+        return m < wm ? s : worst
+      })
+      const bestOpp = getOpponent(bestMatchup.player.team, selectedWeek)
+      const worstOpp = getOpponent(worstMatchup.player.team, selectedWeek)
+      if (bestOpp) advice.push(`best matchup: ${bestMatchup.player.name} vs ${bestOpp}`)
+      if (worstOpp) advice.push(`toughest matchup: ${worstMatchup.player.name} vs ${worstOpp}`)
     }
     return advice
   }
 
   const renderLineupSlot = (slot: FilledSlot, index: number) => {
     const label = slotLabel(slot.slotName)
-    if (!slot.player) {
-      return (
-        <div key={index} className="bg-slate-700 p-3 rounded border-2 border-dashed border-slate-600">
-          <div className="text-center text-slate-400">
-            <div className="font-semibold">{label}</div>
-            <div className="text-xs">empty</div>
-          </div>
-        </div>
-      )
-    }
+    const opponent = slot.player ? getOpponent(slot.player.team, selectedWeek) : null
+    const multiplier = slot.player ? getMatchupMultiplier(slot.player.team, selectedWeek, defenseMultipliers) : 1
+    const matchupColor = multiplier > 1.05 ? 'text-green-400' : multiplier < 0.95 ? 'text-red-400' : 'text-slate-400'
     return (
-      <div key={index} className="bg-slate-700 p-3 rounded border-2 border-slate-600 hover:border-slate-500">
-        <div className="text-xs text-slate-500 mb-0.5">{label}</div>
-        <div className="font-semibold">{slot.player.name}</div>
-        <div className="text-xs text-slate-400">{slot.player.position} - {slot.player.team}</div>
-        <div className="text-sm text-green-400 font-semibold">
-          {slot.player.weekScore?.toFixed(1) || '0.0'} pts
-        </div>
+      <div key={index} className="flex justify-between items-center py-2 px-3 bg-slate-700 rounded">
+        <span className="text-sm text-slate-400 min-w-[50px]">{label}:</span>
+        <span className="text-sm flex-1 ml-2">
+          {slot.player
+            ? <>
+                {slot.player.name} ({slot.player.team})
+                {opponent && (
+                  <span className={`ml-2 text-xs ${matchupColor}`}>
+                    vs {opponent}
+                  </span>
+                )}
+              </>
+            : <span className="text-slate-500">Empty</span>
+          }
+        </span>
+        <span className="text-sm text-green-400 font-semibold min-w-[60px] text-right">
+          {slot.player ? `${slot.player.weekScore?.toFixed(1)} pts` : '-'}
+        </span>
       </div>
     )
   }
@@ -115,7 +140,7 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
           className="w-full bg-slate-700 text-slate-300 text-sm p-2 rounded"
           title="Select which week to optimize lineup for"
         >
-          {Array.from({ length: 17 }, (_, i) => i + 1).map(week => (
+          {Array.from({ length: 18 }, (_, i) => i + 1).map(week => (
             <option key={week} value={week}>week {week}</option>
           ))}
         </select>
@@ -132,8 +157,10 @@ export default function LineupOptimizer({ draftedPlayers, onClose, isPage, roste
             {optimalLineup.totalPoints.toFixed(1)} pts
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {optimalLineup.slots.map((slot, i) => renderLineupSlot(slot, i))}
+        <div className="bg-slate-800 p-4 rounded-lg">
+          <div className="grid gap-2">
+            {optimalLineup.slots.map((slot, i) => renderLineupSlot(slot, i))}
+          </div>
         </div>
       </div>
 

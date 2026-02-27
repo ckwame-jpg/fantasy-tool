@@ -53,6 +53,7 @@ export interface LeagueConnection {
   allRosteredIds: string[]
   rosterOwners: RosterOwner[]
   season: number
+  totalRosters: number
   leagueSettings: LeagueSettings
   isConnected: boolean
   isLoading: boolean
@@ -92,6 +93,7 @@ const defaultState: LeagueConnection = {
   allRosteredIds: [],
   rosterOwners: [],
   season: new Date().getFullYear(),
+  totalRosters: 12,
   leagueSettings: { ...DEFAULT_SETTINGS },
   isConnected: false,
   isLoading: false,
@@ -273,6 +275,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
           myStarters,
           allRosteredIds: [...new Set(allRostered)],
           rosterOwners: owners,
+          totalRosters: leagueInfo?.total_rosters || 12,
           leagueSettings: {
             leagueType: detectedType,
             scoringFormat: detectedScoring,

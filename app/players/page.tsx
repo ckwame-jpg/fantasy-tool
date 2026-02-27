@@ -206,6 +206,7 @@ const PlayersPage = () => {
   const [season, setSeason] = useState(defaultStatsYear);
   const [favorites, setFavorites] = useState<string[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [rookiesOnly, setRookiesOnly] = useState(false);
 
   // Load persisted state from localStorage
   useEffect(() => {
@@ -337,10 +338,11 @@ const PlayersPage = () => {
         
         // Regular position filtering
         const matchesPosition = position === "ALL" || player.position === position;
+        if (rookiesOnly && player.years_exp !== 0) return false;
         return matchesSearch && matchesPosition;
       })
       .sort((a, b) => compare(a, b, sortField, sortDirection));
-  }, [processedPlayers, search, position, favorites, sortField, sortDirection]);
+  }, [processedPlayers, search, position, favorites, sortField, sortDirection, rookiesOnly]);
 
   const positions = ["ALL", "QB", "RB", "WR", "TE"];
   // Offer last 4 completed stat seasons (e.g., if currentYear=2025 -> 2024, 2023, 2022, 2021)
@@ -387,6 +389,16 @@ const PlayersPage = () => {
             }`}
           >
             ★ favorites
+          </button>
+          <button
+            onClick={() => setRookiesOnly(prev => !prev)}
+            className={`px-3 py-1 rounded font-semibold text-sm transition-colors focus:outline-none ${
+              rookiesOnly
+                ? "bg-indigo-600 text-slate-200"
+                : "bg-slate-700 text-slate-400 hover:bg-indigo-500 hover:text-slate-200"
+            }`}
+          >
+            rookies
           </button>
         </div>
         <div>

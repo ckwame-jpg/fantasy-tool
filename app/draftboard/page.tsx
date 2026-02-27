@@ -173,7 +173,7 @@ const getProgressWidthClass = (progress: number): string => {
 }
 
 export default function DraftPage() {
-  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings } = useLeague()
+  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters } = useLeague()
   const [players, setPlayers] = useState<Player[]>([])
   const [position, setPosition] = useState("ALL")
   const [searchTerm, setSearchTerm] = useState("")
@@ -186,6 +186,11 @@ export default function DraftPage() {
   const [showByeWeeks, setShowByeWeeks] = useState(true)
   const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false)
+  const [hideDrafted, setHideDrafted] = useState(false)
+  const [rookiesOnly, setRookiesOnly] = useState(false)
+  const [draftRounds, setDraftRounds] = useState(
+    leagueSettings.leagueType === "dynasty" ? 4 : leagueSettings.rosterSlots.length
+  )
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const draftId = "global-draft" // Single global draft board
 
@@ -246,9 +251,8 @@ export default function DraftPage() {
     }
   }
 
-  const PICKS_PER_ROUND = 15
-  const TOTAL_ROUNDS = 1
-  const TOTAL_PICKS = PICKS_PER_ROUND * TOTAL_ROUNDS
+  const PICKS_PER_ROUND = totalRosters
+  const TOTAL_PICKS = PICKS_PER_ROUND * draftRounds
   const progress = Math.min((drafted.length / TOTAL_PICKS) * 100, 100)
   const currentRound = Math.floor(drafted.length / PICKS_PER_ROUND) + 1
   const currentPick = (drafted.length % PICKS_PER_ROUND) + 1
@@ -430,6 +434,7 @@ export default function DraftPage() {
 
   const draftPlayer = async (player: Player) => {
     setDrafted((prev) => {
+      if (prev.some((p) => String(p.id) === String(player.id))) return prev
       const updated = [...prev, player]
       savePicks(draftId, toPickArray(updated, PICKS_PER_ROUND)).catch(console.error)
       return updated
@@ -590,7 +595,7 @@ export default function DraftPage() {
 
       {/* Controls Bar */}
       <div className="bg-slate-800 p-4 rounded-lg mb-4">
-        <div className={`grid grid-cols-2 gap-4 mb-3 ${isOnlineMode ? "md:grid-cols-5" : "md:grid-cols-4"}`}>
+        <div className="grid grid-cols-2 gap-4 mb-3 md:grid-cols-5">
           {/* Draft Mode */}
           <div>
             <label className="block text-sm text-slate-400 mb-1">draft mode</label>
@@ -669,23 +674,21 @@ export default function DraftPage() {
             </select>
           </div>
 
-          {/* Platform (online mode only) */}
-          {isOnlineMode && (
-            <div>
-              <label className="block text-sm text-slate-400 mb-1">platform</label>
-              <select
-                className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
-                title="Select fantasy platform to sync with"
-                value={selectedPlatform}
-                onChange={(e) => setSelectedPlatform(e.target.value)}
-              >
-                <option value="" disabled>select platform</option>
-                <option value="sleeper">Sleeper</option>
-                <option value="espn">ESPN</option>
-                <option value="nfl">NFL.com</option>
-              </select>
-            </div>
-          )}
+          {/* Rounds */}
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">rounds</label>
+            <select
+              className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
+              value={draftRounds}
+              onChange={(e) => setDraftRounds(Number(e.target.value))}
+              title="Number of draft rounds"
+            >
+              {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </div>
+
         </div>
 
         {/* Actions + Search */}
@@ -739,6 +742,22 @@ export default function DraftPage() {
               </div>
             )}
           </div>
+          <button
+            className={`text-sm font-semibold px-4 py-2 rounded transition-colors ${
+              hideDrafted ? "bg-indigo-700 text-slate-200" : "bg-slate-700 text-slate-300 hover:bg-indigo-800"
+            }`}
+            onClick={() => setHideDrafted(prev => !prev)}
+          >
+            {hideDrafted ? "show drafted" : "hide drafted"}
+          </button>
+          <button
+            className={`text-sm font-semibold px-4 py-2 rounded transition-colors ${
+              rookiesOnly ? "bg-indigo-700 text-slate-200" : "bg-slate-700 text-slate-300 hover:bg-indigo-800"
+            }`}
+            onClick={() => setRookiesOnly(prev => !prev)}
+          >
+            {rookiesOnly ? "all players" : "rookies only"}
+          </button>
           <input
             type="text"
             placeholder="search players..."
@@ -756,7 +775,7 @@ export default function DraftPage() {
         <div className="bg-slate-800 p-4 rounded-lg">
           <h3 className="font-semibold mb-2">draft progress</h3>
           <p className="text-sm text-slate-400 mb-2">
-            round {currentRound} • pick {currentPick} of {PICKS_PER_ROUND}
+            round {currentRound} of {draftRounds} · pick {currentPick} of {PICKS_PER_ROUND}
           </p>
           <div className="w-full h-3 bg-slate-700 rounded overflow-hidden mb-2">
             <div
@@ -774,11 +793,28 @@ export default function DraftPage() {
           </p>
         </div>
 
-        {/* My Roster */}
+        {/* My Roster / Picks */}
         <div className="bg-slate-800 p-4 rounded-lg">
-          <h3 className="font-semibold mb-2">my roster ({drafted.length} players)</h3>
+          <h3 className="font-semibold mb-2">
+            {leagueSettings.leagueType === "dynasty" ? "my picks" : "my roster"} ({drafted.length} players)
+          </h3>
           {drafted.length === 0 ? (
-            <p className="text-sm text-slate-500">click players below to draft them to your roster.</p>
+            <p className="text-sm text-slate-500">click players below to draft them.</p>
+          ) : leagueSettings.leagueType === "dynasty" ? (
+            <div className="flex flex-wrap gap-1.5">
+              {drafted.map((p, i) => (
+                <span
+                  key={p.id}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-slate-700 text-slate-300 cursor-pointer hover:bg-red-900/40"
+                  onClick={() => removePlayer(p.id)}
+                >
+                  <span className="font-bold text-slate-500">{i + 1}.</span>
+                  <span>{p.name}</span>
+                  <span className="text-slate-500">({p.position})</span>
+                  <span className="text-slate-500 hover:text-red-400">×</span>
+                </span>
+              ))}
+            </div>
           ) : (
             <div>
               <div className="mb-2">
@@ -947,6 +983,15 @@ export default function DraftPage() {
 
                     if (showFavoritesOnly && !favoriteIds.includes(player.id)) return false
 
+                    if (hideDrafted) {
+                      const isOwned = allRosteredIds.includes(String(player.id))
+                      const isMyPick = drafted.some((p) => String(p.id) === String(player.id))
+                      const isPlatformDrafted = isOnlineMode && draftedFromPlatform.includes(String(player.id))
+                      if (isOwned || isMyPick || isPlatformDrafted) return false
+                    }
+
+                    if (rookiesOnly && player.years_exp !== 0) return false
+
                     return matchesSearch && onTeam
                   })
                   .sort((a, b) => {
@@ -1022,11 +1067,8 @@ export default function DraftPage() {
                             : "hover:bg-slate-700"
                         }`}
                         onClick={() => {
-                          if (isDrafted) {
-                            removePlayer(player.id)
-                          } else if (isSlotAvailable) {
-                            draftPlayer(player)
-                          }
+                          if (isDrafted) return
+                          draftPlayer(player)
                         }}
                       >
                         <td className={`${CELL} flex items-center gap-0.5 min-w-0`}>

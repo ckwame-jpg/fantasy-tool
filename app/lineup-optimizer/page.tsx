@@ -4,10 +4,12 @@ import { useState, useEffect, useRef } from 'react'
 import { API_BASE_URL } from '@/constants'
 import LineupOptimizer from '@/components/LineupOptimizer'
 import { useLeague } from '@/lib/league-context'
+import { computeDefenseMultipliers } from '@/lib/player-utils'
 
 export default function LineupOptimizerPage() {
   const { season, isConnected, myPlayerIds, leagueName, leagueSettings } = useLeague()
   const [allPlayers, setAllPlayers] = useState<any[]>([])
+  const [defenseMultipliers, setDefenseMultipliers] = useState<Record<string, number>>({})
   const [roster, setRoster] = useState<any[]>([])
   const [rosterImported, setRosterImported] = useState(false)
   const [search, setSearch] = useState('')
@@ -22,6 +24,7 @@ export default function LineupOptimizerPage() {
       .then(data => {
         const players = Array.isArray(data) ? data : []
         setAllPlayers(players)
+        setDefenseMultipliers(computeDefenseMultipliers(players))
 
         // Auto-populate roster from league connection
         if (isConnected && myPlayerIds.length > 0 && !rosterImported) {
@@ -198,7 +201,7 @@ export default function LineupOptimizerPage() {
       </div>
 
       {/* Optimizer */}
-      <LineupOptimizer draftedPlayers={roster} onClose={() => {}} isPage rosterSlots={leagueSettings.rosterSlots} />
+      <LineupOptimizer draftedPlayers={roster} onClose={() => {}} isPage rosterSlots={leagueSettings.rosterSlots} defenseMultipliers={defenseMultipliers} />
     </div>
   )
 }
