@@ -173,7 +173,7 @@ const getProgressWidthClass = (progress: number): string => {
 }
 
 export default function DraftPage() {
-  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters, leagueId, platform } = useLeague()
+  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters, leagueId, platform, userId } = useLeague()
   const [players, setPlayers] = useState<Player[]>([])
   const [position, setPosition] = useState("ALL")
   const [searchTerm, setSearchTerm] = useState("")
@@ -438,9 +438,20 @@ export default function DraftPage() {
         .then((res) => res.json())
         .then((picks) => {
           if (!Array.isArray(picks)) return
-          const draftedIds = picks.map((p: any) => String(p.player_id))
-          console.log("[draft-sync] Fetched", draftedIds.length, "picks")
-          setDraftedFromPlatform(draftedIds)
+          const allDraftedIds = picks.map((p: any) => String(p.player_id))
+          console.log("[draft-sync] Fetched", allDraftedIds.length, "picks")
+          setDraftedFromPlatform(allDraftedIds)
+
+          // Auto-populate "my picks" from the user's Sleeper draft selections
+          if (userId && players.length) {
+            const myPicks = picks
+              .filter((p: any) => String(p.picked_by) === userId)
+              .sort((a: any, b: any) => a.pick_no - b.pick_no)
+            const myPlayers = myPicks
+              .map((p: any) => players.find((pl) => String(pl.id) === String(p.player_id)))
+              .filter(Boolean) as Player[]
+            setDrafted(myPlayers)
+          }
         })
         .catch((err) => console.error("[draft-sync] Failed to fetch Sleeper draft picks:", err))
     }
@@ -448,7 +459,7 @@ export default function DraftPage() {
     fetchPicks()
     const interval = setInterval(fetchPicks, 5000)
     return () => clearInterval(interval)
-  }, [isOnlineMode, sleeperDraftId])
+  }, [isOnlineMode, sleeperDraftId, userId, players])
 
   const draftPlayer = async (player: Player) => {
     setDrafted((prev) => {
