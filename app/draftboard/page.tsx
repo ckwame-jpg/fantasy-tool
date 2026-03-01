@@ -407,20 +407,26 @@ export default function DraftPage() {
   useEffect(() => {
     if (!isOnlineMode || platform !== "sleeper" || !leagueId) {
       setSleeperDraftId(null)
+      setDraftedFromPlatform([])
       return
     }
+    console.log("[draft-sync] Fetching drafts for league:", leagueId)
     fetch(`${API_BASE_URL}/sleeper/league/${leagueId}/drafts`)
       .then((res) => res.json())
       .then((drafts) => {
-        if (!Array.isArray(drafts) || drafts.length === 0) return
-        // Prefer an active draft, otherwise use the most recent one
-        const active = drafts.find((d: any) => d.status === "drafting")
+        if (!Array.isArray(drafts) || drafts.length === 0) {
+          console.log("[draft-sync] No drafts found")
+          return
+        }
+        // Prefer an actively drafting or paused draft, otherwise use the most recent one
+        const active = drafts.find((d: any) => d.status === "drafting" || d.status === "paused")
         const target = active || drafts[0]
+        console.log("[draft-sync] Found draft:", target.draft_id, "status:", target.status)
         if (target?.draft_id) {
           setSleeperDraftId(target.draft_id)
         }
       })
-      .catch((err) => console.error("Failed to fetch Sleeper drafts:", err))
+      .catch((err) => console.error("[draft-sync] Failed to fetch Sleeper drafts:", err))
   }, [isOnlineMode, platform, leagueId])
 
   // Fetch Sleeper draft picks and poll every 5 seconds
@@ -433,9 +439,10 @@ export default function DraftPage() {
         .then((picks) => {
           if (!Array.isArray(picks)) return
           const draftedIds = picks.map((p: any) => String(p.player_id))
+          console.log("[draft-sync] Fetched", draftedIds.length, "picks")
           setDraftedFromPlatform(draftedIds)
         })
-        .catch((err) => console.error("Failed to fetch Sleeper draft picks:", err))
+        .catch((err) => console.error("[draft-sync] Failed to fetch Sleeper draft picks:", err))
     }
 
     fetchPicks()
@@ -1059,7 +1066,7 @@ export default function DraftPage() {
                   })
                   .map((player, index) => {
                     const isDrafted = drafted.find((p) => p.id === player.id) ||
-                      (isOnlineMode && draftedFromPlatform.includes(player.id))
+                      (isOnlineMode && draftedFromPlatform.includes(String(player.id)))
                     const isSlotAvailable = true
                     const { isBye, byeWeek } = getByeWeekInfo(player.team, selectedWeek)
 
