@@ -173,7 +173,7 @@ const getProgressWidthClass = (progress: number): string => {
 }
 
 export default function DraftPage() {
-  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters } = useLeague()
+  const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters, leagueId, platform } = useLeague()
   const [players, setPlayers] = useState<Player[]>([])
   const [position, setPosition] = useState("ALL")
   const [searchTerm, setSearchTerm] = useState("")
@@ -403,34 +403,45 @@ export default function DraftPage() {
       .catch(console.warn)
   }, [CURRENT_YEAR, makeKey])
 
-  // Fetch picks from backend scraper for Sleeper, ESPN, NFL
+  // Auto-detect Sleeper draft ID when online mode is enabled
   useEffect(() => {
-    if (!isOnlineMode || !selectedPlatform) return
-    fetch(`${API_BASE_URL}/scrape/${selectedPlatform}`)
+    if (!isOnlineMode || platform !== "sleeper" || !leagueId) {
+      setSleeperDraftId(null)
+      return
+    }
+    fetch(`${API_BASE_URL}/sleeper/league/${leagueId}/drafts`)
       .then((res) => res.json())
-      .then((data) => {
-        if (!Array.isArray(data)) return
-        const draftedIds = data.map((p: any) => String(p.player_id || p.id))
-        setDraftedFromPlatform(draftedIds)
+      .then((drafts) => {
+        if (!Array.isArray(drafts) || drafts.length === 0) return
+        // Prefer an active draft, otherwise use the most recent one
+        const active = drafts.find((d: any) => d.status === "drafting")
+        const target = active || drafts[0]
+        if (target?.draft_id) {
+          setSleeperDraftId(target.draft_id)
+        }
       })
-      .catch((err) => console.error(`Failed to fetch picks from ${selectedPlatform}:`, err))
-  }, [selectedPlatform, isOnlineMode])
+      .catch((err) => console.error("Failed to fetch Sleeper drafts:", err))
+  }, [isOnlineMode, platform, leagueId])
 
-  // Poll platform picks every 5 seconds
+  // Fetch Sleeper draft picks and poll every 5 seconds
   useEffect(() => {
-    if (!isOnlineMode || !selectedPlatform) return
-    const interval = setInterval(() => {
-      fetch(`${API_BASE_URL}/scrape/${selectedPlatform}`)
+    if (!isOnlineMode || !sleeperDraftId) return
+
+    const fetchPicks = () => {
+      fetch(`${API_BASE_URL}/sleeper/draft/${sleeperDraftId}/picks`)
         .then((res) => res.json())
-        .then((data) => {
-          if (!Array.isArray(data)) return
-          const draftedIds = data.map((p: any) => String(p.player_id || p.id))
+        .then((picks) => {
+          if (!Array.isArray(picks)) return
+          const draftedIds = picks.map((p: any) => String(p.player_id))
           setDraftedFromPlatform(draftedIds)
         })
-        .catch((err) => console.error(`Polling ${selectedPlatform} failed:`, err))
-    }, 5000)
+        .catch((err) => console.error("Failed to fetch Sleeper draft picks:", err))
+    }
+
+    fetchPicks()
+    const interval = setInterval(fetchPicks, 5000)
     return () => clearInterval(interval)
-  }, [selectedPlatform, isOnlineMode])
+  }, [isOnlineMode, sleeperDraftId])
 
   const draftPlayer = async (player: Player) => {
     setDrafted((prev) => {

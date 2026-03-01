@@ -539,6 +539,24 @@ def sleeper_league_users(league_id: str):
     return data
 
 
+@router.get("/sleeper/league/{league_id}/drafts")
+def sleeper_league_drafts(league_id: str):
+    """Get all drafts for a Sleeper league."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/drafts")
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/draft/{draft_id}/picks")
+def sleeper_draft_picks(draft_id: str):
+    """Get all picks made in a Sleeper draft."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/draft/{draft_id}/picks")
+    if data is None:
+        return []
+    return data
+
+
 # -------------------------------------------
 # ESPN Fantasy Proxy Endpoint
 # -------------------------------------------

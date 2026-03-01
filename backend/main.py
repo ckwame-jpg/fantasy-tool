@@ -59,17 +59,6 @@ def root():
 #     output = scrape_nfl()
 #     return JSONResponse(content={"output": output})
 
-# Temporary mock scrape route for frontend compatibility
-@fastapi_app.get("/scrape/{platform}")
-async def mock_scrape(platform: str):
-    # TODO: Replace with real scraper route once platform scrapers are production-ready
-    return JSONResponse(content={
-        "output": [
-            {"name": "John Doe", "team": "Mockers", "pick_number": "1"},
-            {"name": "Jane Smith", "team": "Fakers", "pick_number": "2"}
-        ]
-    })
-
 # Socket.IO events
 @sio.event
 async def connect(sid, *args, **kwargs):
