@@ -548,6 +548,15 @@ def sleeper_league_drafts(league_id: str):
     return data
 
 
+@router.get("/sleeper/draft/{draft_id}")
+def sleeper_draft(draft_id: str):
+    """Get Sleeper draft metadata (settings, status, slot mapping)."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/draft/{draft_id}")
+    if data is None:
+        raise HTTPException(status_code=404, detail="Sleeper draft not found")
+    return data
+
+
 @router.get("/sleeper/draft/{draft_id}/picks")
 def sleeper_draft_picks(draft_id: str):
     """Get all picks made in a Sleeper draft."""

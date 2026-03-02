@@ -198,6 +198,7 @@ export default function DraftPage() {
   const [selectedPlatform, setSelectedPlatform] = useState("")
   const [sleeperDraftId, setSleeperDraftId] = useState<string | null>(null)
   const [draftedFromPlatform, setDraftedFromPlatform] = useState<string[]>([])
+  const [sleeperDraftSettings, setSleeperDraftSettings] = useState<{ teams: number; rounds: number } | null>(null)
 
   // Saved teams
   const [savedTeams, setSavedTeams] = useState<{ id: string; name: string; picks?: any[] }[]>([])
@@ -251,8 +252,9 @@ export default function DraftPage() {
     }
   }
 
-  const PICKS_PER_ROUND = totalRosters
-  const TOTAL_PICKS = PICKS_PER_ROUND * draftRounds
+  const PICKS_PER_ROUND = isOnlineMode && sleeperDraftSettings ? sleeperDraftSettings.teams : totalRosters
+  const effectiveDraftRounds = isOnlineMode && sleeperDraftSettings ? sleeperDraftSettings.rounds : draftRounds
+  const TOTAL_PICKS = PICKS_PER_ROUND * effectiveDraftRounds
   const totalDraftedCount = isOnlineMode && draftedFromPlatform.length > 0
     ? draftedFromPlatform.length
     : drafted.length
@@ -411,22 +413,27 @@ export default function DraftPage() {
     if (!isOnlineMode || platform !== "sleeper" || !leagueId) {
       setSleeperDraftId(null)
       setDraftedFromPlatform([])
+      setSleeperDraftSettings(null)
       return
     }
-    console.log("[draft-sync] Fetching drafts for league:", leagueId)
     fetch(`${API_BASE_URL}/sleeper/league/${leagueId}/drafts`)
       .then((res) => res.json())
-      .then((drafts) => {
-        if (!Array.isArray(drafts) || drafts.length === 0) {
-          console.log("[draft-sync] No drafts found")
-          return
-        }
-        // Prefer an actively drafting or paused draft, otherwise use the most recent one
+      .then(async (drafts) => {
+        if (!Array.isArray(drafts) || drafts.length === 0) return
         const active = drafts.find((d: any) => d.status === "drafting" || d.status === "paused")
         const target = active || drafts[0]
-        console.log("[draft-sync] Found draft:", target.draft_id, "status:", target.status)
-        if (target?.draft_id) {
-          setSleeperDraftId(target.draft_id)
+        if (!target?.draft_id) return
+
+        setSleeperDraftId(target.draft_id)
+
+        // Fetch draft settings for accurate team count and rounds
+        const draftRes = await fetch(`${API_BASE_URL}/sleeper/draft/${target.draft_id}`)
+        const draftData = await draftRes.json()
+        if (draftData?.settings) {
+          setSleeperDraftSettings({
+            teams: draftData.settings.teams || 12,
+            rounds: draftData.settings.rounds || 15,
+          })
         }
       })
       .catch((err) => console.error("[draft-sync] Failed to fetch Sleeper drafts:", err))
@@ -807,7 +814,7 @@ export default function DraftPage() {
         <div className="bg-slate-800 p-4 rounded-lg">
           <h3 className="font-semibold mb-2">draft progress</h3>
           <p className="text-sm text-slate-400 mb-2">
-            round {currentRound} of {draftRounds} · pick {currentPick} of {PICKS_PER_ROUND}
+            round {currentRound} of {effectiveDraftRounds} · pick {currentPick} of {PICKS_PER_ROUND}
           </p>
           <div className="w-full h-3 bg-slate-700 rounded overflow-hidden mb-2">
             <div
