@@ -253,9 +253,12 @@ export default function DraftPage() {
 
   const PICKS_PER_ROUND = totalRosters
   const TOTAL_PICKS = PICKS_PER_ROUND * draftRounds
-  const progress = Math.min((drafted.length / TOTAL_PICKS) * 100, 100)
-  const currentRound = Math.floor(drafted.length / PICKS_PER_ROUND) + 1
-  const currentPick = (drafted.length % PICKS_PER_ROUND) + 1
+  const totalDraftedCount = isOnlineMode && draftedFromPlatform.length > 0
+    ? draftedFromPlatform.length
+    : drafted.length
+  const progress = Math.min((totalDraftedCount / TOTAL_PICKS) * 100, 100)
+  const currentRound = Math.floor(totalDraftedCount / PICKS_PER_ROUND) + 1
+  const currentPick = (totalDraftedCount % PICKS_PER_ROUND) + 1
 
   const starterSlots = leagueSettings.rosterSlots
   const ROSTER_LIMITS = countSlots(starterSlots)
