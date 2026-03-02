@@ -566,6 +566,42 @@ def sleeper_draft_picks(draft_id: str):
     return data
 
 
+@router.get("/sleeper/league/{league_id}/matchups/{week}")
+def sleeper_league_matchups(league_id: str, week: int):
+    """Get all matchups for a Sleeper league in a given week."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/matchups/{week}")
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/league/{league_id}/transactions/{week}")
+def sleeper_league_transactions(league_id: str, week: int):
+    """Get all transactions for a Sleeper league in a given week."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/transactions/{week}")
+    if data is None:
+        return []
+    return data
+
+
+@router.get("/sleeper/projections/{season}/{week}")
+def sleeper_projections(season: int, week: int):
+    """Get weekly player projections from Sleeper."""
+    data = _safe_get_json(f"https://api.sleeper.app/v1/projections/nfl/{season}/{week}")
+    if data is None:
+        return {}
+    return data
+
+
+@router.get("/sleeper/state/nfl")
+def sleeper_nfl_state():
+    """Get the current NFL season state (week, season, etc)."""
+    data = _safe_get_json("https://api.sleeper.app/v1/state/nfl")
+    if data is None:
+        return {}
+    return data
+
+
 # -------------------------------------------
 # ESPN Fantasy Proxy Endpoint
 # -------------------------------------------

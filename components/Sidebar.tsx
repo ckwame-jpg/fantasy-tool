@@ -1,6 +1,6 @@
 'use client'
 
-import { Home, List, PersonStanding, Trophy, TrendingUp, Users, Target, ChevronsLeft, ChevronsRight } from "lucide-react"
+import { Home, List, PersonStanding, Trophy, TrendingUp, Users, Target, ChevronsLeft, ChevronsRight, Swords, ArrowLeftRight } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import clsx from "clsx"
@@ -12,6 +12,8 @@ const links = [
   { href: "/players", label: "players", icon: PersonStanding },
   { href: "/trade-analyzer", label: "trade analyzer", icon: TrendingUp },
   { href: "/waiver-wire", label: "waiver wire", icon: Users },
+  { href: "/matchups", label: "matchups", icon: Swords },
+  { href: "/transactions", label: "transactions", icon: ArrowLeftRight },
   { href: "/lineup-optimizer", label: "lineup optimizer", icon: Target },
   { href: "/draft-recap", label: "draft recap", icon: Trophy },
 ]

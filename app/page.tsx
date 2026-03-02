@@ -1,7 +1,7 @@
 'use client'
 
 import Link from "next/link"
-import { List, PersonStanding, TrendingUp, Users, Target, Trophy } from "lucide-react"
+import { List, PersonStanding, TrendingUp, Users, Target, Trophy, Swords, ArrowLeftRight } from "lucide-react"
 import PlatformConnect from "@/components/PlatformConnect"
 import { useLeague } from "@/lib/league-context"
 
@@ -45,6 +45,22 @@ const features = [
     description: "optimize your weekly lineup with projected, ceiling, and floor strategies.",
     color: "text-purple-400",
     bg: "bg-purple-500/10",
+  },
+  {
+    href: "/matchups",
+    icon: Swords,
+    title: "matchups",
+    description: "weekly head-to-head scores with starter breakdowns for every matchup.",
+    color: "text-orange-400",
+    bg: "bg-orange-500/10",
+  },
+  {
+    href: "/transactions",
+    icon: ArrowLeftRight,
+    title: "transactions",
+    description: "trades, waivers, and free agent moves with full player and pick details.",
+    color: "text-teal-400",
+    bg: "bg-teal-500/10",
   },
   {
     href: "/draft-recap",

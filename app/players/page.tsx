@@ -208,6 +208,12 @@ const PlayersPage = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [rookiesOnly, setRookiesOnly] = useState(false);
 
+  // Projections state
+  const [viewMode, setViewMode] = useState<"stats" | "projections">("stats");
+  const [projWeek, setProjWeek] = useState(1);
+  const [projections, setProjections] = useState<Record<string, any>>({});
+  const [projLoading, setProjLoading] = useState(false);
+
   // Load persisted state from localStorage
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -276,6 +282,31 @@ const PlayersPage = () => {
   useEffect(() => {
     fetchPlayers();
   }, [position, season, leagueSettings.scoringFormat]);
+
+  // Fetch current NFL week for projections default
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/sleeper/state/nfl`)
+      .then(r => r.json())
+      .then(data => {
+        const week = data.week || data.display_week || 1;
+        setProjWeek(Math.max(week, 1));
+      })
+      .catch(() => {});
+  }, []);
+
+  // Fetch projections when in projections mode
+  useEffect(() => {
+    if (viewMode !== "projections") return;
+    setProjLoading(true);
+    const projSeason = season + 1;
+    fetch(`${API_BASE_URL}/sleeper/projections/${projSeason}/${projWeek}`)
+      .then(r => r.json())
+      .then(data => {
+        setProjections(data && typeof data === "object" ? data : {});
+      })
+      .catch(() => setProjections({}))
+      .finally(() => setProjLoading(false));
+  }, [viewMode, projWeek, season]);
 
   // Process players: compute posRank
   const processedPlayers = useMemo(() => {
@@ -348,6 +379,16 @@ const PlayersPage = () => {
   // Offer last 4 completed stat seasons (e.g., if currentYear=2025 -> 2024, 2023, 2022, 2021)
   const years = Array.from({ length: 4 }, (_, i) => currentYear - i);
 
+  // Get projection value for a player
+  const getProj = (playerId: string, ...keys: string[]): number | undefined => {
+    const proj = projections[playerId];
+    if (!proj) return undefined;
+    for (const k of keys) {
+      if (proj[k] !== undefined && proj[k] !== null) return toNum(proj[k]);
+    }
+    return undefined;
+  };
+
   const SortableHeader = ({ field, children }: { field: keyof Player; children: React.ReactNode }) => (
     <th
       className={`${CELL_NUM} cursor-pointer text-[9px] font-normal whitespace-nowrap tabular-nums`}
@@ -361,7 +402,9 @@ const PlayersPage = () => {
     <div className="h-screen overflow-hidden p-6 flex flex-col">
       <div className="mb-4">
         <h1 className="text-2xl font-bold text-slate-300">players</h1>
-        <p className="text-sm text-slate-400">showing {season} stats</p>
+        <p className="text-sm text-slate-400">
+          {viewMode === "stats" ? `showing ${season} stats` : `week ${projWeek} projections`}
+        </p>
       </div>
 
       {/* Filters */}
@@ -401,19 +444,52 @@ const PlayersPage = () => {
             rookies
           </button>
         </div>
-        <div>
-          <select
-            value={season}
-            onChange={(e) => setSeason(Number(e.target.value))}
-            className="bg-slate-700 text-slate-300 text-sm p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            title="Select season to view player statistics for"
-          >
-            {years.map((yr) => (
-              <option key={yr} value={yr}>
-                {yr}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center gap-2">
+          {/* Stats / Projections toggle */}
+          <div className="flex rounded overflow-hidden border border-slate-600">
+            <button
+              onClick={() => setViewMode("stats")}
+              className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
+                viewMode === "stats" ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:text-white"
+              }`}
+            >
+              stats
+            </button>
+            <button
+              onClick={() => setViewMode("projections")}
+              className={`px-3 py-1.5 text-sm font-semibold transition-colors ${
+                viewMode === "projections" ? "bg-indigo-600 text-white" : "bg-slate-700 text-slate-400 hover:text-white"
+              }`}
+            >
+              projections
+            </button>
+          </div>
+
+          {viewMode === "stats" ? (
+            <select
+              value={season}
+              onChange={(e) => setSeason(Number(e.target.value))}
+              className="bg-slate-700 text-slate-300 text-sm p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              title="Select season to view player statistics for"
+            >
+              {years.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select
+              value={projWeek}
+              onChange={(e) => setProjWeek(Number(e.target.value))}
+              className="bg-slate-700 text-slate-300 text-sm p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              title="Select week for projections"
+            >
+              {Array.from({ length: 18 }, (_, i) => i + 1).map(w => (
+                <option key={w} value={w}>Week {w}</option>
+              ))}
+            </select>
+          )}
         </div>
       </div>
 
@@ -430,7 +506,7 @@ const PlayersPage = () => {
 
       {/* Table */}
       <div className="flex-1 bg-slate-800 rounded-lg relative min-h-0 flex flex-col p-4">
-        {loading ? (
+        {(loading || projLoading) ? (
           <div className="text-center text-slate-400 py-8">Loading players...</div>
         ) : filteredPlayers.length === 0 ? (
           <div className="text-center text-slate-400 py-8">No players found.</div>
@@ -517,6 +593,26 @@ const PlayersPage = () => {
                       <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>
                         {typeof player.adp === "number" && Number.isFinite(player.adp) ? player.adp.toFixed(1) : "-"}
                       </td>
+                      {viewMode === "projections" ? (() => {
+                        const p = getProj;
+                        const id = player.id;
+                        const fmt = (v: number | undefined) => typeof v === "number" ? v.toFixed(1) : "-";
+                        const fmtInt = (v: number | undefined) => typeof v === "number" ? Math.round(v) : "-";
+                        return <>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmt(p(id, "pts_ppr", "pts_half_ppr", "pts_std", "fantasy_points"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rush_att"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rush_yd"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rush_td"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rec_tgt"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rec"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rec_yd"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "rec_td"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "pass_att"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "pass_cmp"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "pass_yd"))}</td>
+                          <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{fmtInt(p(id, "pass_td"))}</td>
+                        </>;
+                      })() : <>
                       <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>
                         {typeof player.fantasyPoints === "number" ? player.fantasyPoints.toFixed(1) : "-"}
                       </td>
@@ -534,6 +630,7 @@ const PlayersPage = () => {
                       <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{player.passCmp ?? "-"}</td>
                       <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{player.passYds ?? "-"}</td>
                       <td className={`${CELL_NUM} whitespace-nowrap tabular-nums`}>{player.passTD ?? "-"}</td>
+                      </>}
                     </tr>
                   ))}
                 </tbody>
