@@ -156,21 +156,6 @@ const toPickArray = (players: Player[], picksPerRound: number): Pick[] =>
     timestamp: Date.now() / 1000,
   }))
 
-// Helper to map progress % to Tailwind width class
-const getProgressWidthClass = (progress: number): string => {
-  const rounded = Math.round(progress)
-  if (rounded >= 100) return "w-full"
-  if (rounded >= 90) return "w-[90%]"
-  if (rounded >= 80) return "w-[80%]"
-  if (rounded >= 70) return "w-[70%]"
-  if (rounded >= 60) return "w-[60%]"
-  if (rounded >= 50) return "w-[50%]"
-  if (rounded >= 40) return "w-[40%]"
-  if (rounded >= 30) return "w-[30%]"
-  if (rounded >= 20) return "w-[20%]"
-  if (rounded >= 10) return "w-[10%]"
-  return "w-[5%]"
-}
 
 export default function DraftPage() {
   const { season, isConnected, allRosteredIds, rosterOwners, myPlayerIds, leagueSettings, totalRosters, leagueId, platform, userId } = useLeague()
@@ -615,7 +600,7 @@ export default function DraftPage() {
     return withOverall
   }, [players])
 
-  const progressWidthClass = getProgressWidthClass(progress)
+
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-300 p-6">
@@ -713,20 +698,22 @@ export default function DraftPage() {
             </select>
           </div>
 
-          {/* Rounds */}
-          <div>
-            <label className="block text-sm text-slate-400 mb-1">rounds</label>
-            <select
-              className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
-              value={draftRounds}
-              onChange={(e) => setDraftRounds(Number(e.target.value))}
-              title="Number of draft rounds"
-            >
-              {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
+          {/* Rounds - hidden in online mode since we fetch from Sleeper */}
+          {!(isOnlineMode && sleeperDraftSettings) && (
+            <div>
+              <label className="block text-sm text-slate-400 mb-1">rounds</label>
+              <select
+                className="w-full text-slate-300 text-sm p-2 rounded bg-slate-700"
+                value={draftRounds}
+                onChange={(e) => setDraftRounds(Number(e.target.value))}
+                title="Number of draft rounds"
+              >
+                {Array.from({ length: 20 }, (_, i) => i + 1).map(n => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
         </div>
 
@@ -818,7 +805,8 @@ export default function DraftPage() {
           </p>
           <div className="w-full h-3 bg-slate-700 rounded overflow-hidden mb-2">
             <div
-              className={`h-full bg-linear-45 bg-linear-to-r/oklch from-cyan-400 via-sky-400 to-indigo-400 transition-all duration-300 ${progressWidthClass}`}
+              className="h-full bg-cyan-500 transition-all duration-300"
+              style={{ width: `${Math.max(progress, 2)}%` }}
               role="progressbar"
               aria-valuenow={Math.round(progress)}
               aria-valuemin={0}
