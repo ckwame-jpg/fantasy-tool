@@ -816,12 +816,12 @@ export default function DraftPage() {
               aria-valuenow={Math.round(progress)}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label={`Draft progress: ${drafted.length} of ${TOTAL_PICKS} picks completed`}
+              aria-label={`Draft progress: ${totalDraftedCount} of ${TOTAL_PICKS} picks completed`}
               title={`Draft progress: ${progress.toFixed(1)}% complete`}
             />
           </div>
           <p className="text-xs text-slate-400">
-            {drafted.length} of {TOTAL_PICKS} picks completed ({progress.toFixed(1)}%)
+            {totalDraftedCount} of {TOTAL_PICKS} picks completed ({progress.toFixed(1)}%)
           </p>
         </div>
 
