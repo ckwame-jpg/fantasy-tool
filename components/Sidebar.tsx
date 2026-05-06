@@ -1,67 +1,313 @@
 'use client'
 
-import { Home, List, PersonStanding, Trophy, TrendingUp, Users, Target, ChevronsLeft, ChevronsRight, Swords, ArrowLeftRight } from "lucide-react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import clsx from "clsx"
-import { useState } from "react"
+import {
+  Home,
+  Sparkles,
+  Globe2,
+  ListOrdered,
+  ArrowLeftRight,
+  UserRound,
+  Target,
+  TrendingUp,
+  Users,
+  PersonStanding,
+  LineChart,
+  List as ListIcon,
+  Trophy,
+} from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import clsx from 'clsx'
+import { useLeague } from '@/lib/league-context'
+import BrandOrb from './BrandOrb'
 
-const links = [
-  { href: "/", label: "home", icon: Home },
-  { href: "/draftboard", label: "draftboard", icon: List },
-  { href: "/players", label: "players", icon: PersonStanding },
-  { href: "/trade-analyzer", label: "trade analyzer", icon: TrendingUp },
-  { href: "/waiver-wire", label: "waiver wire", icon: Users },
-  { href: "/matchups", label: "matchups", icon: Swords },
-  { href: "/transactions", label: "transactions", icon: ArrowLeftRight },
-  { href: "/lineup-optimizer", label: "lineup optimizer", icon: Target },
-  { href: "/draft-recap", label: "draft recap", icon: Trophy },
+interface NavItem {
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number; className?: string }>
+  badge?: { text: string; tone?: 'neon' | 'hot' }
+  emphasis?: 'gm'
+}
+
+interface NavGroup {
+  label?: string
+  items: NavItem[]
+}
+
+const groups: NavGroup[] = [
+  {
+    items: [
+      { href: '/', label: 'home', icon: Home },
+      { href: '/ask-gm', label: 'ask the GM', icon: Sparkles, emphasis: 'gm' },
+    ],
+  },
+  {
+    label: 'league',
+    items: [
+      { href: '/matchups', label: 'matchups', icon: Globe2, badge: { text: 'live', tone: 'neon' } },
+      { href: '/standings', label: 'standings', icon: ListOrdered },
+      { href: '/transactions', label: 'transactions', icon: ArrowLeftRight },
+    ],
+  },
+  {
+    label: 'my team',
+    items: [
+      { href: '/roster', label: 'my roster', icon: UserRound },
+      { href: '/lineup-optimizer', label: 'lineup optimizer', icon: Target },
+      { href: '/trade-analyzer', label: 'trade analyzer', icon: TrendingUp },
+      { href: '/waiver-wire', label: 'waiver wire', icon: Users },
+    ],
+  },
+  {
+    label: 'research',
+    items: [
+      { href: '/players', label: 'players', icon: PersonStanding },
+      { href: '/projections', label: 'projections', icon: LineChart },
+      { href: '/draftboard', label: 'draftboard', icon: ListIcon },
+      { href: '/draft-recap', label: 'draft recap', icon: Trophy },
+    ],
+  },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [collapsed, setCollapsed] = useState(false)
+  const { isConnected, leagueName, username } = useLeague()
+  const initial = (username || 'W').charAt(0).toUpperCase()
+  const teamLabel = isConnected ? leagueName || 'connected' : 'not connected'
 
   return (
-    <aside
-      className={clsx(
-        "fixed inset-y-0 left-0 z-40 bg-slate-900 text-white p-4 hidden md:flex flex-col border-r border-slate-800 overflow-y-auto transition-all duration-300",
-        collapsed ? "w-16 items-center" : "w-64"
-      )}
-    >
-      {/* Header with title + collapse toggle */}
-      <div className={clsx("flex items-center mb-4", collapsed ? "justify-center" : "justify-between")}>
-        {!collapsed && <div className="text-2xl font-bold">only W's</div>}
-        <button
-          type="button"
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1.5 rounded hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-          aria-label="Toggle Sidebar"
-        >
-          {collapsed ? <ChevronsRight size={18} /> : <ChevronsLeft size={18} />}
-        </button>
+    <aside className="side hidden md:flex">
+      <div className="side-brand">
+        <BrandOrb size={32} />
+        <div>
+          <div className="brand-name">RN</div>
+          <div className="brand-sub">command center</div>
+        </div>
       </div>
 
-      {/* Navigation links */}
-      <nav className="flex flex-col gap-1.5 flex-1">
-        {links.map(({ href, label, icon: Icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className={clsx(
-              "flex items-center gap-3 px-3 py-2 rounded text-sm transition-colors",
-              pathname === href
-                ? "bg-slate-800 text-white"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
-            )}
-            aria-label={label}
-            title={collapsed ? label : undefined}
-          >
-            <Icon size={18} className="shrink-0" />
-            {!collapsed && label}
-          </Link>
+      <nav className="nav">
+        {groups.map((group, gi) => (
+          <div key={gi} className="nav-group">
+            {group.label && <div className="nav-label">{group.label}</div>}
+            {group.items.map((item) => {
+              const Icon = item.icon
+              const isActive =
+                pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href))
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={clsx(
+                    'nav-item',
+                    item.emphasis === 'gm' && 'nav-item--gm',
+                    isActive && 'nav-item--active',
+                  )}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  <span className="ico">
+                    <Icon size={16} />
+                  </span>
+                  <span className="lbl">{item.label}</span>
+                  {item.emphasis === 'gm' && <span className="gm-pulse" aria-hidden />}
+                  {item.badge && (
+                    <span className={clsx('badge', item.badge.tone === 'hot' && 'badge--hot')}>
+                      {item.badge.text}
+                    </span>
+                  )}
+                </Link>
+              )
+            })}
+          </div>
         ))}
       </nav>
+
+      <div className="side-foot">
+        <div className="avatar">{initial}</div>
+        <div className="me-meta">
+          <div className="me-name">{username || 'sign in'}</div>
+          <div className="me-team">{teamLabel}</div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        .side {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: var(--sidebar-w);
+          height: 100vh;
+          z-index: 40;
+          flex-direction: column;
+          border-right: 1px solid var(--line);
+          background: linear-gradient(180deg, rgba(20, 18, 40, 0.6), rgba(8, 10, 22, 0.85));
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          padding: 22px 0 18px;
+        }
+        .side-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 0 22px 22px;
+          border-bottom: 1px solid var(--line-2);
+        }
+        .brand-name {
+          font-family: var(--font-display);
+          font-size: 22px;
+          letter-spacing: 0.04em;
+          line-height: 1;
+          color: var(--ink);
+        }
+        .brand-sub {
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          letter-spacing: 0.18em;
+          color: var(--ink-3);
+          margin-top: 3px;
+          text-transform: uppercase;
+        }
+        .nav {
+          display: flex;
+          flex-direction: column;
+          padding: 8px 12px 6px;
+          flex: 1;
+          overflow-y: auto;
+          gap: 0;
+        }
+        .nav-group {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
+        }
+        .nav-label {
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--ink-3);
+          padding: 16px 10px 6px;
+        }
+        :global(.nav-item) {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 9px 12px;
+          border-radius: 8px;
+          color: var(--ink-2);
+          font-size: 13.5px;
+          font-weight: 500;
+          transition: background 0.12s, color 0.12s;
+          position: relative;
+          cursor: pointer;
+        }
+        :global(.nav-item:hover) {
+          background: rgba(255, 255, 255, 0.03);
+          color: var(--ink);
+        }
+        :global(.nav-item .ico) {
+          width: 16px;
+          height: 16px;
+          display: grid;
+          place-items: center;
+          color: var(--ink-3);
+          flex-shrink: 0;
+        }
+        :global(.nav-item:hover .ico),
+        :global(.nav-item--active .ico) {
+          color: var(--neon);
+        }
+        :global(.nav-item--active) {
+          background: linear-gradient(90deg, rgba(115, 110, 245, 0.18), rgba(115, 110, 245, 0.04));
+          color: var(--ink);
+        }
+        :global(.nav-item--active::before) {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 8px;
+          bottom: 8px;
+          width: 2px;
+          background: var(--neon);
+          border-radius: 0 2px 2px 0;
+          box-shadow: 0 0 8px var(--neon);
+        }
+        :global(.nav-item--gm) {
+          background: linear-gradient(90deg, rgba(115, 110, 245, 0.08), transparent);
+          border: 1px dashed rgba(115, 110, 245, 0.3);
+          margin: 4px 0;
+        }
+        :global(.nav-item--gm.nav-item--active) {
+          background: linear-gradient(90deg, rgba(115, 110, 245, 0.18), rgba(115, 110, 245, 0.04));
+          border-color: rgba(115, 110, 245, 0.5);
+        }
+        :global(.nav-item .gm-pulse) {
+          width: 6px;
+          height: 6px;
+          border-radius: 999px;
+          background: var(--neon);
+          box-shadow: 0 0 8px var(--neon);
+          margin-left: auto;
+          animation: pulse 1.6s ease-in-out infinite;
+        }
+        :global(.nav-item .badge) {
+          margin-left: auto;
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background: rgba(115, 110, 245, 0.18);
+          color: var(--neon);
+          text-transform: uppercase;
+        }
+        :global(.nav-item .badge--hot) {
+          background: rgba(255, 80, 60, 0.16);
+          color: hsl(8 90% 70%);
+        }
+        .side-foot {
+          padding: 14px 14px 4px;
+          border-top: 1px solid var(--line-2);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 999px;
+          background: linear-gradient(135deg, hsl(262 60% 36%), hsl(262 70% 22%));
+          display: grid;
+          place-items: center;
+          font-family: var(--font-display);
+          font-size: 15px;
+          color: var(--ink);
+          border: 1px solid rgba(115, 110, 245, 0.45);
+        }
+        .me-meta {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          min-width: 0;
+        }
+        .me-name {
+          font-size: 12.5px;
+          font-weight: 600;
+          color: var(--ink);
+          text-transform: lowercase;
+        }
+        .me-team {
+          font-family: var(--font-quicksand), system-ui, sans-serif;
+          font-size: 11px;
+          font-weight: 500;
+          color: var(--ink-3);
+          letter-spacing: 0.01em;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 160px;
+        }
+      `}</style>
     </aside>
   )
 }

@@ -16,12 +16,17 @@ regex_env = os.environ.get("CORS_ORIGIN_REGEX", "").strip()
 default_local = [
     "http://localhost:3000",
     "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
 ]
 extra = [o for o in (x.strip() for x in origins_env.split(",")) if o]
 allow_origins = list({*default_local, *extra})  # unique
-allow_origin_regex = regex_env or r"^https://[a-z0-9-]+\.vercel\.app$"
+# Accept any localhost port for dev + the configured Vercel pattern in prod.
+allow_origin_regex = regex_env or r"^(https://[a-z0-9-]+\.vercel\.app|http://(localhost|127\.0\.0\.1):\d+)$"
 
 fastapi_app.add_middleware(
     CORSMiddleware,

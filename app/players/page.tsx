@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { PersonStanding } from "lucide-react";
 import { API_BASE_URL } from "../../constants";
 import { fetcher } from "../../lib/api";
 import PlayerDetailModal from "@/components/PlayerDetailModal";
+import PageFrame from "@/components/PageFrame";
 import { useLeague } from "@/lib/league-context";
 
 // Extended Player type with normalized fields and computed fields
@@ -399,14 +401,34 @@ const PlayersPage = () => {
   );
 
   return (
-    <div className="h-screen overflow-hidden p-6 flex flex-col">
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold text-slate-300">players</h1>
-        <p className="text-sm text-slate-400">
-          {viewMode === "stats" ? `showing ${season} stats` : `week ${projWeek} projections`}
-        </p>
-      </div>
-
+    <PageFrame
+      crumb="players"
+      rightPill={
+        <span className="week-pill">
+          <PersonStanding size={12} />
+          {viewMode === "stats" ? `${season} stats` : `wk ${projWeek} proj`}
+        </span>
+      }
+      hero={{
+        eyebrow: "research · player database",
+        title: (
+          <>
+            every player. <span className="ch-hl">every metric.</span>
+          </>
+        ),
+        sub: (
+          <>
+            sortable across stats and projections. star your favorites; the table remembers them.
+          </>
+        ),
+        chips: [
+          { label: viewMode === "stats" ? "season" : "week", value: viewMode === "stats" ? String(season) : `wk ${projWeek}` },
+          { label: "view", value: viewMode },
+          { label: "filter", value: position },
+        ],
+      }}
+    >
+      <div className="players-shell">
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-4">
         <div className="flex space-x-2">
@@ -644,7 +666,25 @@ const PlayersPage = () => {
         player={selectedPlayer}
         onClose={() => setSelectedPlayer(null)}
       />
-    </div>
+      </div>
+
+      <style jsx>{`
+        .players-shell {
+          border: 1px solid var(--surface-border);
+          border-radius: var(--radius-xl);
+          background: var(--surface);
+          backdrop-filter: blur(var(--glass-blur));
+          padding: 18px;
+          /* Compact: cap the panel so the inner table scrolls instead of pushing
+             the page longer and longer. The existing flex-1 + min-h-0 on the
+             table wrapper inside takes it from there. */
+          height: calc(100vh - 340px);
+          min-height: 480px;
+          display: flex;
+          flex-direction: column;
+        }
+      `}</style>
+    </PageFrame>
   );
 };
 

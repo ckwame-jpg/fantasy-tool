@@ -8,3 +8,4 @@ beautifulsoup4>=4.12,<5
 lxml>=4.9,<5
 aiofiles>=23.0,<24
 python-multipart>=0.0.6,<1
+openai>=1.40,<2

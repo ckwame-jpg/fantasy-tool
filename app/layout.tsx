@@ -1,23 +1,43 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Bebas_Neue, Space_Grotesk, Quicksand, JetBrains_Mono } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
-import MobileNav from "@/components/MobileNav";
+import MobileBottomNav from "@/components/MobileBottomNav";
+import Starfield from "@/components/Starfield";
+import ShootingStars from "@/components/ShootingStars";
 import Providers from "./providers";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bebasNeue = Bebas_Neue({
+  variable: "--font-display",
+  weight: "400",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-sans",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
+});
+
+const quicksand = Quicksand({
+  variable: "--font-quicksand",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "W Fantasy",
-  description: "We only get W's",
+  title: "RN Command Center",
+  description: "command center",
 };
 
 export default function RootLayout({
@@ -27,15 +47,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-white`}>
+      <body
+        className={`${bebasNeue.variable} ${spaceGrotesk.variable} ${quicksand.variable} ${jetbrainsMono.variable} antialiased`}
+      >
         <Providers>
-          <div className="flex min-h-screen">
+          <Starfield />
+          <ShootingStars />
+          <div className="app-shell">
             <Sidebar />
-            <MobileNav />
-            <main className="flex-1 md:ml-64">
-              {children}
-            </main>
+            <main className="app-main">{children}</main>
           </div>
+          <MobileBottomNav />
         </Providers>
       </body>
     </html>

@@ -1,118 +1,197 @@
 'use client'
 
-import Link from "next/link"
-import { List, PersonStanding, TrendingUp, Users, Target, Trophy, Swords, ArrowLeftRight } from "lucide-react"
-import PlatformConnect from "@/components/PlatformConnect"
-import { useLeague } from "@/lib/league-context"
+import { useMemo } from 'react'
+import { useLeague } from '@/lib/league-context'
+import { useHomeData, type PulseItem, type SlimPlayer } from '@/hooks/useHomeData'
+import LiveTicker, { type TickerItem } from '@/components/LiveTicker'
+import Scoreboard from '@/components/home/Scoreboard'
+import RosterCompare from '@/components/home/RosterCompare'
+import PulseFeedView from '@/components/home/PulseFeed'
+import StandingsRail from '@/components/home/StandingsRail'
+import CollapsibleSection from '@/components/CollapsibleSection'
+import PlatformConnect from '@/components/PlatformConnect'
 
-const features = [
-  {
-    href: "/draftboard",
-    icon: List,
-    title: "draftboard",
-    description: "mock draft with ADP rankings, positional tiers, and team builder.",
-    color: "text-indigo-400",
-    bg: "bg-indigo-500/10",
-  },
-  {
-    href: "/players",
-    icon: PersonStanding,
-    title: "players",
-    description: "browse all NFL players with stats, projections, and detailed profiles.",
-    color: "text-cyan-400",
-    bg: "bg-cyan-500/10",
-  },
-  {
-    href: "/trade-analyzer",
-    icon: TrendingUp,
-    title: "trade analyzer",
-    description: "VORP-based trade calculator with contender/rebuilder modes and lineup impact.",
-    color: "text-green-400",
-    bg: "bg-green-500/10",
-  },
-  {
-    href: "/waiver-wire",
-    icon: Users,
-    title: "waiver wire",
-    description: "find available players ranked by priority with add/drop trends.",
-    color: "text-amber-400",
-    bg: "bg-amber-500/10",
-  },
-  {
-    href: "/lineup-optimizer",
-    icon: Target,
-    title: "lineup optimizer",
-    description: "optimize your weekly lineup with projected, ceiling, and floor strategies.",
-    color: "text-purple-400",
-    bg: "bg-purple-500/10",
-  },
-  {
-    href: "/matchups",
-    icon: Swords,
-    title: "matchups",
-    description: "weekly head-to-head scores with starter breakdowns for every matchup.",
-    color: "text-orange-400",
-    bg: "bg-orange-500/10",
-  },
-  {
-    href: "/transactions",
-    icon: ArrowLeftRight,
-    title: "transactions",
-    description: "trades, waivers, and free agent moves with full player and pick details.",
-    color: "text-teal-400",
-    bg: "bg-teal-500/10",
-  },
-  {
-    href: "/draft-recap",
-    icon: Trophy,
-    title: "draft recap",
-    description: "post-draft analysis with grades, bye week distribution, and starting lineup.",
-    color: "text-rose-400",
-    bg: "bg-rose-500/10",
-  },
-]
+function buildTicker(items: PulseItem[], players: Record<string, SlimPlayer>): TickerItem[] {
+  return items.slice(0, 18).map((item, idx) => {
+    if (item.kind === 'trade') {
+      const adds = item.adds || []
+      const drops = item.drops || []
+      const head = adds[0] || drops[0]
+      return {
+        id: `t-${idx}`,
+        label: 'trade',
+        position: head?.position,
+        detail: [
+          adds.map((a) => a.name).join(' + '),
+          drops.length ? `for ${drops.map((d) => d.name).join(' + ')}` : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      }
+    }
+    if (item.kind === 'waiver' || item.kind === 'free_agent') {
+      const head = (item.adds || [])[0]
+      return {
+        id: `w-${idx}`,
+        label: head?.name || 'pickup',
+        position: head?.position,
+        detail: item.kind === 'waiver' ? 'waiver claim' : 'free agent',
+        pts: item.waiver_bid != null ? `$${item.waiver_bid}` : undefined,
+        trend: 'up',
+      }
+    }
+    if (item.kind === 'injury' && item.player) {
+      return {
+        id: `i-${idx}`,
+        label: item.player.name,
+        position: item.player.position,
+        detail: `${item.status}${item.body_part ? ` (${item.body_part})` : ''}`,
+        trend: 'down',
+      }
+    }
+    if (item.kind === 'trending') {
+      const p = (item.adds || [])[0]
+      return {
+        id: `tr-${idx}`,
+        label: p?.name || 'trending',
+        position: p?.position,
+        detail: item.count != null ? `+${item.count.toLocaleString()} adds` : 'trending up',
+        trend: 'up',
+      }
+    }
+    return { id: `o-${idx}`, label: 'league activity' }
+  })
+}
 
 export default function HomePage() {
-  const { isConnected, leagueName } = useLeague()
+  const league = useLeague()
+  const data = useHomeData()
+
+  const rosterSlots = league.leagueSettings.rosterSlots
+
+  const myStartersPoints = data.myMatchup?.starters_points || []
+  const oppStartersPoints = data.oppMatchup?.starters_points || []
+
+  const myProj = useMemo(() => {
+    if (!data.myMatchup) return 0
+    const ids = data.myMatchup.starters || []
+    return ids.reduce((sum, id) => {
+      const p = data.projections[id]?.stats
+      return sum + Number(p?.pts_ppr ?? p?.pts_half_ppr ?? 0)
+    }, 0)
+  }, [data.myMatchup, data.projections])
+
+  const oppProj = useMemo(() => {
+    if (!data.oppMatchup) return 0
+    const ids = data.oppMatchup.starters || []
+    return ids.reduce((sum, id) => {
+      const p = data.projections[id]?.stats
+      return sum + Number(p?.pts_ppr ?? p?.pts_half_ppr ?? 0)
+    }, 0)
+  }, [data.oppMatchup, data.projections])
+
+  const tickerItems = useMemo(() => buildTicker(data.pulse?.items ?? [], data.players), [data.pulse, data.players])
+
+  const isLive = (data.myMatchup?.points ?? 0) > 0 || (data.oppMatchup?.points ?? 0) > 0
 
   return (
-    <main className="min-h-screen p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Hero */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">only W's fantasy</h1>
-          <p className="text-slate-400">
-            your all-in-one fantasy football toolkit. connect your Sleeper or ESPN league to get started.
-          </p>
-        </div>
-
-        {/* League connect */}
-        <PlatformConnect />
-
-        {/* Feature grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-6">
-          {features.map(({ href, icon: Icon, title, description, color, bg }) => (
-            <Link
-              key={href}
-              href={href}
-              className="group bg-slate-800/50 border border-slate-700 hover:border-slate-600 rounded-lg p-4 transition-colors"
+    <>
+      <div className="page-frame">
+        {league.isConnected && (
+          <div className="page-pill-row">
+            <span className="week-pill">
+              <span className="live-d" />
+              week {data.week} · {league.platform}
+            </span>
+          </div>
+        )}
+        {!league.isConnected ? (
+          <div style={{ maxWidth: 720, margin: '40px auto' }}>
+            <h1
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: 56,
+                lineHeight: 0.95,
+                letterSpacing: '0.02em',
+                margin: '0 0 12px',
+              }}
             >
-              <div className={`inline-flex p-2 rounded-lg ${bg} mb-3`}>
-                <Icon size={20} className={color} />
-              </div>
-              <h3 className="text-sm font-semibold text-white group-hover:text-indigo-300 transition-colors">
-                {title}
-              </h3>
-              <p className="text-xs text-slate-400 mt-1 leading-relaxed">{description}</p>
-            </Link>
-          ))}
-        </div>
+              connect your league.
+            </h1>
+            <p style={{ color: 'var(--ink-2)', fontSize: 15, margin: '0 0 24px', lineHeight: 1.55 }}>
+              only W's pulls live from Sleeper or ESPN — your roster, your matchup, the whole league pulse, and the GM
+              that has your back. drop your Sleeper username below to wake the cosmos.
+            </p>
+            <PlatformConnect />
+          </div>
+        ) : (
+          <>
+            {tickerItems.length > 0 && <LiveTicker items={tickerItems} />}
 
-        {/* Footer note */}
-        <p className="text-[10px] text-slate-600 mt-8 text-center">
-          built with Next.js, FastAPI, and Sleeper API
-        </p>
+            <Scoreboard
+              leagueName={league.leagueName}
+              week={data.week}
+              myTeamName={data.myName}
+              myRecord={data.myRecord}
+              mySeed={data.myStanding}
+              myScore={data.myMatchup?.points ?? 0}
+              myProjected={myProj}
+              oppTeamName={data.opponentName ?? 'opponent'}
+              oppRecord={
+                data.oppMatchup
+                  ? data.rosterSettings[data.oppMatchup.roster_id] || { wins: 0, losses: 0, ties: 0 }
+                  : { wins: 0, losses: 0, ties: 0 }
+              }
+              oppSeed={
+                data.oppMatchup ? data.standings.findIndex((s) => s.rosterId === data.oppMatchup!.roster_id) + 1 || null : null
+              }
+              oppScore={data.oppMatchup?.points ?? 0}
+              oppProjected={oppProj}
+              winProb={data.winProb}
+              isLive={isLive}
+            />
+
+            <CollapsibleSection title="on the field" meta="starters · live">
+              <RosterCompare
+                myTeamName={data.myName}
+                myStarters={data.myMatchup?.starters || []}
+                myStartersPoints={myStartersPoints}
+                myTotal={data.myMatchup?.points ?? 0}
+                oppTeamName={data.opponentName ?? 'opponent'}
+                oppStarters={data.oppMatchup?.starters || []}
+                oppStartersPoints={oppStartersPoints}
+                oppTotal={data.oppMatchup?.points ?? 0}
+                rosterSlots={rosterSlots}
+                players={data.players}
+                projections={data.projections}
+              />
+            </CollapsibleSection>
+
+            <div className="below">
+              <CollapsibleSection title="league pulse" meta="trades · waivers · injuries">
+                <PulseFeedView data={data.pulse} players={data.players} />
+              </CollapsibleSection>
+              <CollapsibleSection title="standings" meta={`wk ${data.week}`}>
+                <StandingsRail rows={data.standings} myRosterId={league.rosterId} limit={10} />
+              </CollapsibleSection>
+            </div>
+          </>
+        )}
       </div>
-    </main>
+
+      <style jsx>{`
+        .below {
+          display: grid;
+          grid-template-columns: 1fr 380px;
+          gap: 24px;
+          margin-top: 6px;
+        }
+        @media (max-width: 1100px) {
+          .below {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </>
   )
 }

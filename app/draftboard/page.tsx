@@ -8,6 +8,8 @@ import { getPicks, savePicks, clearPicks, type Pick } from "@/lib/api"
 import type { Player as BasePlayer } from "@/types"
 import PlayerDetailModal from "@/components/PlayerDetailModal"
 import PlatformConnect from "@/components/PlatformConnect"
+import PageFrame from "@/components/PageFrame"
+import { List as ListIcon } from "lucide-react"
 import { useLeague } from "@/lib/league-context"
 import { SLOT_ELIGIBLE, countSlots, sortSlotsByPriority, slotLabel } from "@/lib/roster-utils"
 import io from "socket.io-client"
@@ -434,7 +436,7 @@ export default function DraftPage() {
         .then((picks) => {
           if (!Array.isArray(picks)) return
           const allDraftedIds = picks.map((p: any) => String(p.player_id))
-          console.log("[draft-sync] Fetched", allDraftedIds.length, "picks")
+          // (debug log removed; counts are visible in the draft progress UI)
           setDraftedFromPlatform(allDraftedIds)
 
           // Auto-populate "my picks" from the user's Sleeper draft selections
@@ -603,17 +605,34 @@ export default function DraftPage() {
 
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-300 p-6">
-      {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold">draftboard</h1>
-        <p className="text-sm text-slate-400">
-          showing {DISPLAY_YEAR} stats + adp
-          {selectedWeek > 0 && ` • week ${selectedWeek} focus`}
-          {isOnlineMode ? " • live draft mode" : " • offline mode"}
-        </p>
-      </div>
-
+    <PageFrame
+      crumb="draftboard"
+      rightPill={
+        <span className="week-pill">
+          <ListIcon size={12} />
+          {isOnlineMode ? 'live draft' : 'offline mock'}
+        </span>
+      }
+      hero={{
+        eyebrow: 'research · draftboard',
+        title: (
+          <>
+            mock the draft. <span className="ch-hl">find the value.</span>
+          </>
+        ),
+        sub: (
+          <>
+            ADP rankings, positional tiers, and a team builder that respects your roster format. switch to online mode to track a live Sleeper draft.
+          </>
+        ),
+        chips: [
+          { label: 'season', value: String(DISPLAY_YEAR) },
+          { label: 'mode', value: isOnlineMode ? 'online' : 'offline' },
+          ...(selectedWeek > 0 ? [{ label: 'wk focus', value: String(selectedWeek) }] : []),
+        ],
+      }}
+    >
+      <div className="db-shell">
       {/* League Connection */}
       <PlatformConnect />
 
@@ -1206,5 +1225,12 @@ export default function DraftPage() {
         isDrafted={drafted.some(p => p.id === selectedPlayer?.id)}
       />
       </div>
+
+      <style jsx>{`
+        .db-shell {
+          color: var(--ink);
+        }
+      `}</style>
+    </PageFrame>
   )
 }

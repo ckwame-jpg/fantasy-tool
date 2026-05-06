@@ -2,135 +2,1437 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   only W's — cosmos shell tokens
+   Mirrors the Sika design system (deep cosmos + violet bloom)
+   ============================================================ */
+
 :root {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(37.2% 0.044 257.287);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(37.2% 0.044 257.287);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(37.2% 0.044 257.287);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.18 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.248 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(37.2% 0.044 257.287);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
-  --panel: #2B303B;
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --radius: 0.625rem;
-}
+  /* Cosmos backdrop */
+  --bg-0: hsl(245 45% 5%);
+  --bg-1: hsl(245 35% 8%);
+  --bg-2: hsl(245 28% 11%);
 
-.light {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(37.2% 0.044 257.287);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(37.2% 0.044 257.287);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(37.2% 0.044 257.287);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(37.2% 0.044 257.287);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
-  --panel: #2B303B;
-}
+  /* Ink ramp */
+  --ink: hsl(150 25% 96%);
+  --ink-2: hsl(150 14% 72%);
+  --ink-3: hsl(150 12% 48%);
 
-@layer utilities {
-  /* Works in Chrome, Edge, Safari */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-  }
+  /* Lines */
+  --line: hsl(245 18% 18%);
+  --line-2: hsl(245 18% 14%);
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: #18181b;
-  }
+  /* Energy */
+  --neon: hsl(245 90% 68%);
+  --neon-dim: hsl(245 70% 50%);
+  --hot: hsl(8 95% 60%);
+  --gold: hsl(42 95% 60%);
+  --chalk: hsl(0 0% 95%);
 
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #6b21a8;
-    border-radius: 9999px;
-  }
+  /* Cosmos additions */
+  --cosmos-violet: hsl(262 60% 58%);
+  --cosmos-cyan: hsl(190 80% 60%);
+  --cosmos-ink: hsl(250 45% 9%);
 
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #9333ea;
-  }
+  /* Position tints */
+  --pos-qb: hsl(0 78% 62%);
+  --pos-rb: hsl(170 75% 52%);
+  --pos-wr: hsl(210 80% 64%);
+  --pos-te: hsl(40 92% 60%);
+  --pos-k: hsl(280 60% 70%);
+  --pos-def: hsl(190 75% 60%);
 
-  /* For Firefox - using @supports for better compatibility */
-  @supports (scrollbar-width: thin) {
-    .custom-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #6b21a8 #18181b;
-    }
-  }
+  /* Glass */
+  --glass-blur: 14px;
+  --surface: hsl(245 30% 9% / 0.55);
+  --surface-bright: hsl(245 30% 12% / 0.7);
+  --surface-border: rgba(160, 140, 220, 0.18);
+  --surface-border-bright: rgba(160, 140, 220, 0.3);
 
-  /* Favorite star styles */
-  .favorite-star {
-    color: #52525b; /* zinc-600 */
-    transition: color 0.2s;
-  }
+  /* Radii */
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
 
-  .favorite-star:hover {
-    color: #22d3ee; /* cyan-400 */
-  }
+  /* Layout */
+  --sidebar-w: 240px;
+  --content-max: 1480px;
+  --content-pad: 28px;
 
-  .favorite-star--active {
-    color: #22d3ee; /* cyan-400 */
-  }
+  /* ============ Sika cosmos tokens (full set) ============ */
+
+  /* Cosmos feature-surface tokens */
+  --color-cosmos-text-bright: hsl(258 100% 96%);
+  --color-cosmos-text-muted: hsl(215 18% 58%);
+  --color-cosmos-title-hl: hsl(258 100% 86%);
+
+  --color-cosmos-surface-dim: hsl(0 0% 0% / 0.35);
+  --color-cosmos-surface-dimmer: hsl(0 0% 0% / 0.42);
+  --color-cosmos-surface-table: hsl(0 0% 0% / 0.2);
+  --color-cosmos-surface-thead: hsl(0 0% 0% / 0.4);
+  --color-cosmos-border-soft: hsl(0 0% 100% / 0.08);
+  --color-cosmos-border-softer: hsl(0 0% 100% / 0.06);
+  --color-cosmos-border-panel: hsl(220 25% 24% / 0.5);
+  --color-cosmos-border-panel-faint: hsl(220 25% 24% / 0.3);
+
+  --color-cosmos-violet-edge: hsl(262 60% 70% / 0.14);
+  --color-cosmos-violet-edge-hover: hsl(262 60% 70% / 0.22);
+  --color-cosmos-violet-hairline: hsl(262 60% 70% / 0.4);
+  --color-cosmos-violet-hairline-strong: hsl(262 60% 70% / 0.45);
+  --color-cosmos-violet-row-tint: hsl(262 60% 70% / 0.05);
+  --color-cosmos-violet-dashed: hsl(262 60% 70% / 0.35);
+  --color-cosmos-violet-glow: hsl(262 60% 70% / 0.8);
+  --color-cosmos-violet-default-tint: hsl(262 60% 70% / 0.6);
+  --color-cosmos-violet-hero-peak: hsl(262 70% 50% / 0.2);
+  --color-cosmos-violet-orb-halo: hsl(262 70% 55% / 0.22);
+
+  --color-cosmos-cyan-edge: hsl(190 80% 50% / 0.14);
+  --color-cosmos-cyan-hairline: hsl(190 80% 70% / 0.3);
+  --color-cosmos-cyan-hairline-strong: hsl(190 80% 70% / 0.35);
+
+  --color-cosmos-hero-ink: hsl(250 55% 4% / 0.55);
+  --color-cosmos-hero-ink-mid: hsl(250 55% 4% / 0.25);
+  --color-cosmos-hero-ink-faint: hsl(250 55% 4% / 0.08);
+  --color-cosmos-hero-ink-strong: hsl(250 55% 4% / 0.72);
+  --color-cosmos-hero-shadow: hsl(0 0% 0% / 0.45);
+
+  --color-cosmos-pos: hsl(150 65% 60%);
+  --color-cosmos-neg: hsl(0 70% 65%);
+  --color-cosmos-outcome-won-fg: hsl(150 60% 70%);
+  --color-cosmos-outcome-lost-fg: hsl(355 70% 75%);
+  --color-cosmos-stats-white: hsl(0 0% 100%);
+
+  /* HSL triplets — enable alpha composition: hsl(var(--color-cosmos-violet-500-hsl) / 0.22) */
+  --color-cosmos-violet-50-hsl: 253 100% 96%;
+  --color-cosmos-violet-200-hsl: 262 70% 80%;
+  --color-cosmos-violet-300-hsl: 252 100% 85%;
+  --color-cosmos-violet-500-hsl: 261 100% 77%;
+  --color-cosmos-violet-700-hsl: 253 51% 50%;
+  --color-cosmos-violet-soft-hsl: 252 42% 76%;
+  --color-cosmos-violet-muted-hsl: 262 35% 35%;
+
+  --color-cosmos-cyan-300-hsl: 195 100% 81%;
+  --color-cosmos-cyan-500-hsl: 198 100% 77%;
+
+  --color-cosmos-surface-hsl: 222 42% 9%;
+  --color-cosmos-surface-deep-hsl: 222 45% 6%;
+
+  --color-cosmos-ink-900-hsl: 0 0% 0%;
+  --color-cosmos-ink-850-hsl: 240 30% 1%;
+  --color-cosmos-ink-800-hsl: 240 50% 0.5%;
+  --color-cosmos-ink-700-hsl: 245 35% 4%;
+
+  --color-cosmos-success-hsl: 154 67% 59%;
+
+  --color-cosmos-violet-300: hsl(var(--color-cosmos-violet-300-hsl));
+  --color-cosmos-violet-500: hsl(var(--color-cosmos-violet-500-hsl));
+  --color-cosmos-violet-700: hsl(var(--color-cosmos-violet-700-hsl));
+  --color-cosmos-cyan-300: hsl(var(--color-cosmos-cyan-300-hsl));
+  --color-cosmos-cyan-500: hsl(var(--color-cosmos-cyan-500-hsl));
+
+  --color-cosmos-accent: var(--color-cosmos-violet-500);
+  --color-cosmos-accent-deep: var(--color-cosmos-violet-700);
+  --color-cosmos-accent-bright: var(--color-cosmos-violet-300);
+  --color-cosmos-satellite: var(--color-cosmos-cyan-300);
+
+  /* shadcn/legacy compatibility */
+  --background: var(--bg-0);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --card-foreground: var(--ink);
+  --popover: var(--bg-1);
+  --popover-foreground: var(--ink);
+  --primary: var(--neon);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: var(--surface-bright);
+  --secondary-foreground: var(--ink);
+  --muted: var(--bg-2);
+  --muted-foreground: var(--ink-3);
+  --accent: var(--neon);
+  --accent-foreground: hsl(0 0% 100%);
+  --destructive: var(--hot);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--neon);
+  --panel: var(--bg-1);
+  --color-background: var(--bg-0);
+  --color-foreground: var(--ink);
+  --radius: 8px;
 }
 
 @layer base {
   * {
-    border-color: var(--border);
-    outline-color: rgba(var(--ring), 0.5);
+    border-color: var(--line);
+    outline-color: rgba(115, 110, 245, 0.5);
   }
+
+  html,
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  body {
+    color: var(--ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    background-color: var(--bg-0);
+    background-image: radial-gradient(1400px 900px at 78% -10%, rgba(140, 90, 220, 0.22), transparent 55%),
+      radial-gradient(1100px 800px at 12% 110%, rgba(125, 115, 245, 0.16), transparent 55%),
+      radial-gradient(900px 700px at 50% 50%, rgba(80, 140, 220, 0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+}
+
+/* Layout shell — sidebar + main, with starfield underneath */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+.app-main {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    margin-left: var(--sidebar-w);
+  }
+}
+
+.page-frame {
+  padding: 28px var(--content-pad) 80px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+/* Brand orb spin */
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes lr-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes flash {
+  0% {
+    color: var(--ink);
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    color: #fff;
+    text-shadow: 0 0 30px var(--neon);
+  }
+  100% {
+    color: var(--neon);
+    text-shadow: 0 0 22px rgba(115, 110, 245, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-orb .ring,
+  .brand-orb .ring2,
+  .live-rail .lr-strip,
+  .pulse-dot {
+    animation: none !important;
+  }
+
+  #starfield {
+    display: none !important;
+  }
+}
+
+/* Sika starfield canvas — fixed full-bleed, behind everything */
+.page-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+.page-canvas.shooting-stars {
+  z-index: 0;
+}
+
+/* Legacy id alias kept for any older references */
+#starfield {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Orbit hint — small UI prompt for drag-the-sky */
+.orbit-hint {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(220, 220, 255, 0.55);
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(10, 10, 30, 0.45);
+  border: 1px solid rgba(160, 140, 220, 0.25);
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+.orbit-hint.hide {
+  opacity: 0;
+}
+
+/* ============ Cosmos hero (per-page) ============ */
+.cosmos-hero {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--color-cosmos-violet-edge);
+  border-radius: var(--radius-xl);
+  background:
+    radial-gradient(120% 80% at 10% 0%, var(--color-cosmos-violet-hero-peak), transparent 60%),
+    radial-gradient(100% 70% at 90% 100%, var(--color-cosmos-cyan-edge), transparent 60%),
+    var(--color-cosmos-hero-ink);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  min-height: 240px;
+  display: grid;
+  grid-template-columns: 1fr;
+  isolation: isolate;
+  margin-bottom: 22px;
+}
+.cosmos-hero-canvas-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.cosmos-hero-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  opacity: 0.9;
+}
+.cosmos-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--color-cosmos-hero-ink-strong) 0%,
+    var(--color-cosmos-hero-ink-mid) 55%,
+    var(--color-cosmos-hero-ink-faint) 100%
+  );
+}
+.cosmos-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(120% 70% at 50% 100%, transparent 45%, var(--color-cosmos-hero-shadow) 100%);
+}
+.cosmos-hero-inner {
+  position: relative;
+  z-index: 2;
+  padding: 22px 26px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 720px;
+}
+.ch-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-cosmos-text-muted);
+}
+.ch-title {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 0.5px;
+  line-height: 1.05;
+  margin: 4px 0 4px;
+  max-width: 720px;
+  color: var(--color-cosmos-text-bright);
+}
+.ch-title .ch-hl {
+  background: linear-gradient(90deg, #c4b5ff, #8cdcff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.ch-sub {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-cosmos-text-muted);
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+  max-width: 680px;
+  line-height: 1.5;
+}
+.ch-sub b {
+  color: var(--color-cosmos-violet-300);
+  font-weight: 600;
+}
+.ch-chips {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+.ch-chip {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 8px 14px;
+  border: 1px solid var(--color-cosmos-violet-edge);
+  border-radius: 10px;
+  background: hsl(var(--color-cosmos-violet-700-hsl) / 0.1);
+  min-width: 96px;
+}
+.ch-chip-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-cosmos-text-muted);
+}
+.ch-chip-value {
+  font-family: var(--font-quicksand), system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-cosmos-violet-300);
+  margin-top: 3px;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 720px) {
+  .cosmos-hero {
+    min-height: 200px;
+  }
+  .cosmos-hero-inner {
+    padding: 18px;
+  }
+  .ch-title {
+    font-size: 28px;
+  }
+}
+
+/* Glass panel primitive */
+.glass {
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--radius-xl);
+}
+
+/* Section header */
+.section-h {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 0 14px;
+}
+.section-h .title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.section-h .meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.section-h .rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line) 0%, transparent 100%);
+}
+.section-h .more {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--neon);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.section-h .more:hover {
+  color: var(--ink);
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px var(--content-pad);
+  border-bottom: 1px solid var(--line);
+  background: rgba(10, 10, 24, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar .crumbs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  text-transform: uppercase;
+}
+.topbar .crumbs b {
+  color: var(--ink);
+  font-weight: 600;
+}
+.topbar .crumbs .sep {
+  color: var(--line);
+}
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.week-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(115, 110, 245, 0.35);
+  background: rgba(115, 110, 245, 0.1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: hsl(245 80% 82%);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.week-pill .live-d {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--neon);
+  box-shadow: 0 0 8px var(--neon);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* Position pill (default 28px square) */
+.pos-pill {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 22px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: color-mix(in oklab, var(--pos-color, var(--line)) 14%, transparent);
+  border: 1px solid color-mix(in oklab, var(--pos-color, var(--line)) 60%, transparent);
+  color: var(--pos-color, var(--ink-2));
+  text-transform: uppercase;
+}
+.pos-pill[data-p="QB"] { --pos-color: var(--pos-qb); }
+.pos-pill[data-p="RB"] { --pos-color: var(--pos-rb); }
+.pos-pill[data-p="WR"] { --pos-color: var(--pos-wr); }
+.pos-pill[data-p="TE"] { --pos-color: var(--pos-te); }
+.pos-pill[data-p="K"]  { --pos-color: var(--pos-k); }
+.pos-pill[data-p="DEF"] { --pos-color: var(--pos-def); }
+.pos-pill[data-p="FLEX"] { --pos-color: var(--pos-rb); }
+.pos-pill[data-p="WRRB_FLEX"] { --pos-color: var(--pos-rb); }
+.pos-pill[data-p="REC_FLEX"] { --pos-color: var(--pos-wr); }
+.pos-pill[data-p="SUPER_FLEX"] { --pos-color: var(--pos-qb); }
+.pos-pill[data-p="BE"], .pos-pill[data-p="BN"] { --pos-color: var(--ink-3); }
+.pos-pill[data-p="IR"] { --pos-color: var(--hot); }
+
+/* Quicksand for player names + standings */
+.q-name {
+  font-family: var(--font-quicksand), system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* Tabular numerals — rounded sans (Quicksand) for readability, keeps column alignment via 'tnum' */
+.tnum {
+  font-family: var(--font-quicksand), system-ui, sans-serif;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cosmos scrollbar — applies globally and to .custom-scrollbar opt-ins */
+@layer utilities {
+  /* Webkit (Chrome, Safari, Edge) — applied globally inside .app-main and to .custom-scrollbar */
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(var(--color-cosmos-violet-500-hsl) / 0.45), hsl(var(--color-cosmos-violet-700-hsl) / 0.55));
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+    box-shadow: inset 0 0 4px hsl(var(--color-cosmos-violet-500-hsl) / 0.25);
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(var(--color-cosmos-violet-500-hsl) / 0.7), hsl(var(--color-cosmos-violet-700-hsl) / 0.8));
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--color-cosmos-violet-500-hsl) / 0.5) transparent;
+  }
+
+  /* Slightly thicker scrollbar for tables (.custom-scrollbar opt-in still works) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 12px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--neon-dim), hsl(var(--color-cosmos-violet-700-hsl)));
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--neon), var(--neon-dim));
+    background-clip: padding-box;
+  }
+
+  .favorite-star {
+    color: var(--ink-3);
+    transition: color 0.2s;
+  }
+  .favorite-star:hover,
+  .favorite-star--active {
+    color: var(--neon);
+  }
+}
+
+/* ============================================================
+   Cosmos theme override — remap Tailwind slate/indigo/cyan
+   utilities used inside legacy components to cosmos vars.
+   Scoped to .app-main so the sidebar/topbar are not affected.
+   ============================================================ */
+
+.app-main {
+  /* ---- backgrounds: slate ramp -> cosmos surfaces ---- */
+}
+.app-main .bg-slate-950 { background-color: transparent !important; }
+.app-main .bg-slate-900,
+.app-main .bg-slate-900\/50,
+.app-main .bg-slate-900\/80 { background-color: var(--color-cosmos-surface-dim) !important; }
+.app-main .bg-slate-800,
+.app-main .bg-slate-800\/50,
+.app-main .bg-slate-800\/80,
+.app-main .bg-slate-800\/90 { background-color: var(--color-cosmos-surface-dim) !important; }
+.app-main .bg-slate-700,
+.app-main .bg-slate-700\/50,
+.app-main .bg-slate-700\/80 { background-color: hsl(var(--color-cosmos-surface-hsl) / 0.85) !important; }
+.app-main .bg-slate-600,
+.app-main .bg-slate-600\/50 { background-color: hsl(var(--color-cosmos-violet-700-hsl) / 0.35) !important; }
+
+/* opacity-modified slate backgrounds */
+.app-main .bg-slate-950\/95,
+.app-main .bg-slate-950\/90 { background-color: hsl(var(--color-cosmos-ink-700-hsl) / 0.95) !important; }
+
+/* slate.bg custom token from tailwind.config */
+.app-main .bg-slate-bg { background-color: var(--color-cosmos-surface-dim) !important; }
+
+/* ---- text colors: slate -> ink ramp ---- */
+.app-main .text-white,
+.app-main .text-slate-100,
+.app-main .text-slate-200,
+.app-main .text-slate-300 { color: var(--ink) !important; }
+.app-main .text-slate-400 { color: var(--ink-2) !important; }
+.app-main .text-slate-500,
+.app-main .text-slate-600 { color: var(--ink-3) !important; }
+.app-main .text-slate-700 { color: var(--ink-3) !important; }
+.app-main .placeholder-slate-500::placeholder,
+.app-main .placeholder-slate-400::placeholder { color: var(--ink-3) !important; }
+
+/* ---- borders ---- */
+.app-main .border-slate-600 { border-color: var(--surface-border-bright) !important; }
+.app-main .border-slate-700,
+.app-main .border-slate-700\/50 { border-color: var(--surface-border) !important; }
+.app-main .border-slate-800 { border-color: var(--line) !important; }
+.app-main .divide-slate-700 > :not([hidden]) ~ :not([hidden]),
+.app-main .divide-slate-700\/50 > :not([hidden]) ~ :not([hidden]) { border-color: var(--surface-border) !important; }
+
+/* ---- indigo accents -> cosmos violet ---- */
+.app-main .bg-indigo-500 { background-color: var(--neon-dim) !important; }
+.app-main .bg-indigo-500\/10 { background-color: hsl(var(--color-cosmos-violet-500-hsl) / 0.1) !important; }
+.app-main .bg-indigo-500\/20 { background-color: hsl(var(--color-cosmos-violet-500-hsl) / 0.18) !important; }
+.app-main .bg-indigo-600 { background-color: var(--neon-dim) !important; }
+.app-main .bg-indigo-700 { background-color: hsl(var(--color-cosmos-violet-700-hsl)) !important; }
+.app-main .text-indigo-200,
+.app-main .text-indigo-300,
+.app-main .text-indigo-400 { color: var(--color-cosmos-violet-300) !important; }
+.app-main .border-indigo-500,
+.app-main .border-indigo-600 { border-color: var(--color-cosmos-violet-hairline) !important; }
+.app-main .border-indigo-500\/20,
+.app-main .border-indigo-500\/30 { border-color: var(--color-cosmos-violet-edge) !important; }
+.app-main .ring-indigo-500 { --tw-ring-color: var(--color-cosmos-violet-hairline) !important; }
+.app-main .focus\:ring-indigo-500:focus { --tw-ring-color: var(--color-cosmos-violet-hairline) !important; }
+.app-main .focus\:border-indigo-500:focus { border-color: var(--color-cosmos-violet-hairline) !important; }
+
+/* ---- cyan -> cosmos cyan ---- */
+.app-main .bg-cyan-500\/10 { background-color: hsl(var(--color-cosmos-cyan-500-hsl) / 0.1) !important; }
+.app-main .bg-cyan-500\/20 { background-color: hsl(var(--color-cosmos-cyan-500-hsl) / 0.18) !important; }
+.app-main .bg-cyan-600,
+.app-main .bg-cyan-700 { background-color: hsl(var(--color-cosmos-cyan-500-hsl) / 0.65) !important; }
+.app-main .text-cyan-300,
+.app-main .text-cyan-400 { color: var(--color-cosmos-cyan-300) !important; }
+.app-main .border-cyan-500\/20,
+.app-main .border-cyan-500\/30 { border-color: hsl(var(--color-cosmos-cyan-500-hsl) / 0.3) !important; }
+
+/* ---- success / failure -> cosmos pos / neg ---- */
+.app-main .bg-green-500\/10,
+.app-main .bg-emerald-500\/10 { background-color: hsl(var(--color-cosmos-success-hsl) / 0.12) !important; }
+.app-main .bg-green-500\/20 { background-color: hsl(var(--color-cosmos-success-hsl) / 0.22) !important; }
+.app-main .border-green-500\/20,
+.app-main .border-emerald-500\/20 { border-color: hsl(var(--color-cosmos-success-hsl) / 0.3) !important; }
+.app-main .text-green-300,
+.app-main .text-green-400,
+.app-main .text-emerald-400 { color: var(--color-cosmos-pos) !important; }
+
+.app-main .bg-red-500\/10,
+.app-main .bg-rose-500\/10 { background-color: hsl(0 70% 65% / 0.12) !important; }
+.app-main .bg-red-500\/20 { background-color: hsl(0 70% 65% / 0.22) !important; }
+.app-main .border-red-500\/20,
+.app-main .border-red-500\/30 { border-color: hsl(0 70% 65% / 0.3) !important; }
+.app-main .text-red-300,
+.app-main .text-red-400,
+.app-main .text-rose-400 { color: var(--color-cosmos-neg) !important; }
+
+/* ---- amber / yellow / orange (warning + accents) ---- */
+.app-main .bg-amber-500\/10,
+.app-main .bg-yellow-500\/10,
+.app-main .bg-orange-500\/10 { background-color: hsl(40 95% 58% / 0.12) !important; }
+.app-main .text-amber-300,
+.app-main .text-amber-400,
+.app-main .text-yellow-300,
+.app-main .text-yellow-400 { color: hsl(40 95% 70%) !important; }
+.app-main .text-orange-300,
+.app-main .text-orange-400 { color: hsl(190 75% 65%) !important; } /* used for DEF position */
+.app-main .border-amber-500\/20,
+.app-main .border-yellow-500\/20,
+.app-main .border-orange-500\/20 { border-color: hsl(40 95% 58% / 0.3) !important; }
+
+/* ---- purple / violet inline -> cosmos accent ---- */
+.app-main .bg-purple-500\/10,
+.app-main .bg-violet-500\/10 { background-color: hsl(var(--color-cosmos-violet-500-hsl) / 0.1) !important; }
+.app-main .text-purple-300,
+.app-main .text-purple-400,
+.app-main .text-violet-300,
+.app-main .text-violet-400 { color: var(--color-cosmos-violet-300) !important; }
+
+/* ---- hover states ---- */
+.app-main .hover\:bg-slate-800:hover,
+.app-main .hover\:bg-slate-800\/50:hover { background-color: var(--color-cosmos-violet-row-tint) !important; }
+.app-main .hover\:bg-slate-700:hover,
+.app-main .hover\:bg-slate-700\/50:hover { background-color: var(--color-cosmos-violet-row-tint) !important; }
+.app-main .hover\:bg-slate-600:hover { background-color: var(--color-cosmos-violet-edge-hover) !important; }
+.app-main .hover\:text-white:hover { color: var(--ink) !important; }
+.app-main .hover\:text-slate-300:hover,
+.app-main .hover\:text-slate-200:hover { color: var(--ink) !important; }
+.app-main .hover\:bg-indigo-500:hover { background-color: var(--neon) !important; }
+.app-main .hover\:bg-indigo-600:hover { background-color: var(--neon) !important; }
+.app-main .hover\:text-indigo-300:hover,
+.app-main .hover\:text-indigo-400:hover { color: var(--color-cosmos-violet-300) !important; }
+.app-main .hover\:border-slate-500:hover,
+.app-main .hover\:border-slate-600:hover { border-color: var(--color-cosmos-violet-hairline) !important; }
+
+/* ---- focus rings ---- */
+.app-main .focus\:ring-2:focus { box-shadow: 0 0 0 2px var(--color-cosmos-violet-hairline) !important; }
+
+/* ---- form widgets ---- */
+.app-main input,
+.app-main textarea,
+.app-main select {
+  caret-color: var(--neon);
+}
+.app-main input.bg-slate-700,
+.app-main input.bg-slate-800,
+.app-main textarea.bg-slate-700,
+.app-main textarea.bg-slate-800,
+.app-main select.bg-slate-700,
+.app-main select.bg-slate-800 {
+  background-color: var(--color-cosmos-surface-dim) !important;
+  border-color: var(--surface-border) !important;
+  color: var(--ink) !important;
+}
+.app-main input:focus,
+.app-main textarea:focus,
+.app-main select:focus {
+  outline: none;
+  border-color: var(--color-cosmos-violet-hairline) !important;
+}
+
+/* ---- legacy h1/h2/h3 inside the app-main get cosmos display when not styled inline ---- */
+.app-main h1.text-2xl,
+.app-main h1.text-3xl,
+.app-main h2.text-2xl,
+.app-main h2.text-3xl,
+.app-main h3.text-2xl,
+.app-main h3.text-xl,
+.app-main h2.text-xl,
+.app-main h3.text-lg.font-semibold,
+.app-main h3.text-lg.font-bold,
+.app-main h4.text-base.font-semibold {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  font-weight: 400;
+  font-size: 18px;
+}
+.app-main h3.text-xl.font-bold,
+.app-main h2.text-xl.font-bold {
+  font-size: 22px;
+}
+.app-main h2.text-2xl.font-bold,
+.app-main h3.text-2xl.font-bold,
+.app-main h1.text-2xl.font-bold {
+  font-size: 26px;
+}
+.app-main h1.text-3xl.font-bold {
+  font-size: 32px;
+}
+
+/* ---- big numerical KPIs (e.g. "50" priority cards in waiver) ---- */
+.app-main .text-3xl.font-bold,
+.app-main .text-2xl.font-bold.tabular-nums,
+.app-main .text-xl.font-bold.tabular-nums {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+/* ---- blue-tinted UI elements (used for WR position pills & info chips) ---- */
+.app-main .bg-blue-500\/10 { background-color: hsl(210 80% 64% / 0.1) !important; }
+.app-main .bg-blue-500\/20 { background-color: hsl(210 80% 64% / 0.2) !important; }
+.app-main .text-blue-300,
+.app-main .text-blue-400 { color: hsl(210 80% 75%) !important; }
+.app-main .border-blue-500\/20,
+.app-main .border-blue-500\/30 { border-color: hsl(210 80% 64% / 0.35) !important; }
+
+/* ---- buttons rendered with bg-indigo-X get a glow when hovered ---- */
+.app-main button.bg-indigo-600,
+.app-main button.bg-indigo-700,
+.app-main button.bg-indigo-500 {
+  background: linear-gradient(135deg, var(--neon), var(--neon-dim)) !important;
+  color: hsl(250 60% 6%) !important;
+  box-shadow: 0 4px 14px rgba(115, 110, 245, 0.25);
+}
+.app-main button.bg-indigo-600:hover,
+.app-main button.bg-indigo-500:hover {
+  filter: brightness(1.08);
+}
+
+/* ---- cyan accent button (online mode in draftboard) ---- */
+.app-main button.bg-cyan-700,
+.app-main button.bg-cyan-600 {
+  background: linear-gradient(135deg, hsl(var(--color-cosmos-cyan-500-hsl)), hsl(195 70% 50%)) !important;
+  color: hsl(250 60% 6%) !important;
+  box-shadow: 0 4px 14px hsl(var(--color-cosmos-cyan-500-hsl) / 0.25);
+}
+
+/* ---- inputs / selects / textareas: lift to cosmos surface even without slate class ---- */
+.app-main input:not([type='checkbox']):not([type='radio']),
+.app-main select,
+.app-main textarea {
+  background-color: var(--color-cosmos-surface-dim);
+  border: 1px solid var(--surface-border);
+  color: var(--ink);
+  border-radius: 8px;
+}
+.app-main input:focus,
+.app-main select:focus,
+.app-main textarea:focus {
+  border-color: var(--color-cosmos-violet-hairline);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(115, 110, 245, 0.18);
+}
+
+/* ---- panel cards (any rounded slate-800 box) get a subtle violet hairline + glass blur ---- */
+.app-main div.rounded.bg-slate-800,
+.app-main div.rounded-lg.bg-slate-800,
+.app-main div.rounded-xl.bg-slate-800,
+.app-main div.rounded-2xl.bg-slate-800,
+.app-main div.rounded.bg-slate-800\/50,
+.app-main div.rounded-lg.bg-slate-800\/50,
+.app-main div.rounded-xl.bg-slate-800\/50 {
+  border: 1px solid var(--surface-border);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ---- "live", "hot", and pulse dots in feed/trans ---- */
+.app-main .bg-green-400,
+.app-main .bg-emerald-400 { background-color: var(--color-cosmos-pos) !important; }
+.app-main .bg-red-400,
+.app-main .bg-rose-400 { background-color: var(--color-cosmos-neg) !important; }
+
+/* ---- common section panels (rounded slate boxes) get violet hairline ---- */
+.app-main .border.border-slate-700,
+.app-main .border.border-slate-800 {
+  border-color: var(--surface-border) !important;
+}
+.app-main .rounded-lg.border-slate-700,
+.app-main .rounded-xl.border-slate-700,
+.app-main .rounded.border-slate-700 {
+  border-color: var(--surface-border) !important;
+}
+.app-main .rounded.bg-slate-800,
+.app-main .rounded-lg.bg-slate-800,
+.app-main .rounded-xl.bg-slate-800,
+.app-main .rounded-2xl.bg-slate-800 {
+  background-color: var(--color-cosmos-surface-dim) !important;
+  border: 1px solid var(--surface-border);
+}
+
+/* ---- table rows in player-like tables get violet row tint on hover ---- */
+.app-main tbody tr:hover {
+  background-color: var(--color-cosmos-violet-row-tint);
+}
+/* Sticky table headers must be opaque so player rows don't bleed through them.
+   Higher specificity than `.app-main .bg-slate-800` so it actually wins. */
+.app-main thead,
+.app-main thead.sticky,
+.app-main thead.bg-slate-800 {
+  background: hsl(var(--color-cosmos-ink-700-hsl)) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.app-main thead tr,
+.app-main thead.bg-slate-800 tr {
+  background: transparent !important;
+}
+.app-main thead th {
+  background: hsl(var(--color-cosmos-ink-700-hsl)) !important;
+}
+.app-main thead th {
+  color: var(--ink-3) !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+/* ---- tabular numbers + Aptos cells inside .app-main: rounded Quicksand with tnum ---- */
+.app-main .tabular-nums,
+.app-main .font-aptos {
+  font-family: var(--font-quicksand), system-ui, sans-serif !important;
+  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums;
+}
+
+/* Keep the player-table cells (and any cell-level table content) rounded */
+.app-main table,
+.app-main td,
+.app-main th {
+  font-family: var(--font-quicksand), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+/* Re-cosmic the table headers (mono-styled small caps) */
+.app-main thead th {
+  font-family: var(--font-mono);
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE PASS
+   - Compresses cosmos hero (smaller title, less padding)
+   - Tightens page-frame padding + leaves room for bottom nav
+   - Compacts KPI cards, tables, sidebar drawer pieces
+   ============================================================ */
+@media (max-width: 768px) {
+  :root {
+    --content-pad: 14px;
+  }
+
+  /* page-frame: tighter padding + leave space for the bottom nav */
+  .app-main {
+    margin-left: 0 !important;
+    padding-bottom: 76px; /* bottom nav (~56) + breathing room */
+  }
+  .page-frame {
+    padding: 14px 14px 24px !important;
+  }
+
+  /* cosmos hero: smaller, tighter */
+  .cosmos-hero {
+    min-height: 160px !important;
+    margin-bottom: 14px !important;
+    border-radius: 14px !important;
+  }
+  .cosmos-hero-inner {
+    padding: 16px 16px 18px !important;
+    gap: 6px !important;
+  }
+  .ch-title {
+    font-size: 26px !important;
+    line-height: 1.05 !important;
+    margin: 2px 0 !important;
+  }
+  .ch-eyebrow {
+    font-size: 9.5px !important;
+    letter-spacing: 0.14em !important;
+  }
+  .ch-sub {
+    font-size: 11px !important;
+    line-height: 1.45 !important;
+    margin-top: 2px !important;
+  }
+  .ch-chips {
+    gap: 6px !important;
+    margin-top: 10px !important;
+  }
+  .ch-chip {
+    padding: 5px 9px !important;
+    min-width: 0 !important;
+    border-radius: 8px !important;
+  }
+  .ch-chip-label {
+    font-size: 8.5px !important;
+    letter-spacing: 0.12em !important;
+  }
+  .ch-chip-value {
+    font-size: 13px !important;
+    margin-top: 1px !important;
+  }
+
+  /* topbar (still used on home + ask-gm if present) */
+  .topbar {
+    padding: 12px 14px !important;
+  }
+  .week-pill {
+    font-size: 9.5px !important;
+    padding: 4px 9px !important;
+  }
+  .page-pill-row {
+    margin-bottom: 8px !important;
+  }
+
+  /* section header */
+  .section-h {
+    padding: 6px 0 8px !important;
+    gap: 10px !important;
+  }
+  .section-h .title {
+    font-size: 22px !important;
+  }
+  .section-h .meta {
+    font-size: 10px !important;
+  }
+
+  /* big numerical KPIs (waiver wire, etc.) */
+  .app-main .text-3xl.font-bold {
+    font-size: 22px !important;
+  }
+  .app-main .text-2xl.font-bold {
+    font-size: 20px !important;
+  }
+  .app-main .text-xl.font-bold {
+    font-size: 18px !important;
+  }
+  /* legacy h-screen wrappers shouldn't pin to viewport on mobile */
+  .app-main .h-screen,
+  .app-main .min-h-screen {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  /* compact internal padding on slate panels */
+  .app-main .p-6 {
+    padding: 14px !important;
+  }
+  .app-main .p-4 {
+    padding: 10px !important;
+  }
+  .app-main .gap-6 {
+    gap: 10px !important;
+  }
+  .app-main .gap-4 {
+    gap: 8px !important;
+  }
+
+  /* tables: tighter rows */
+  .app-main table {
+    font-size: 12px !important;
+  }
+  .app-main td,
+  .app-main th {
+    padding: 4px 6px !important;
+  }
+
+  /* Players page: filter row overflowed and shoved the page horizontally.
+     Allow it to wrap so everything stays inside the viewport. */
+  .players-shell .flex.space-x-2 {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .players-shell .flex.space-x-2 > * {
+    margin-left: 0 !important;
+  }
+  /* Also prevent the body from picking up phantom horizontal scroll on any page. */
+  html,
+  body {
+    overflow-x: hidden;
+  }
+  .app-main {
+    overflow-x: hidden;
+  }
+
+  /* Matchups: stack the expanded starter columns vertically on mobile, and
+     shrink the closed matchup row so two team names + scores fit comfortably. */
+  .app-main .grid.grid-cols-2 {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+  .app-main .text-xl.font-bold.tabular-nums {
+    font-size: 14px !important;
+  }
+  /* Closed matchup card: tighter padding, gaps, and smaller "vs" label. */
+  .app-main button.w-full.p-4 {
+    padding: 10px 12px !important;
+  }
+  .app-main button.w-full.p-4 .gap-4 {
+    gap: 8px !important;
+  }
+  .app-main button.w-full.p-4 .gap-3 {
+    gap: 6px !important;
+  }
+  .app-main button.w-full.p-4 .px-4 {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  /* Long team names in the matchup row truncate gracefully. */
+  .app-main button p.font-semibold {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12.5px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* ---- Body / overall typography compression on mobile ---- */
+  body {
+    font-size: 13px;
+  }
+  .app-main .text-base {
+    font-size: 12px !important;
+  }
+  .app-main .text-sm {
+    font-size: 12px !important;
+  }
+  .app-main .text-xs {
+    font-size: 10.5px !important;
+  }
+  .app-main .text-lg {
+    font-size: 14px !important;
+  }
+  /* Section heading compression */
+  .app-main h1.text-2xl,
+  .app-main h2.text-2xl,
+  .app-main h3.text-2xl {
+    font-size: 20px !important;
+  }
+  .app-main h1.text-3xl {
+    font-size: 22px !important;
+  }
+  .app-main h2.text-xl,
+  .app-main h3.text-xl {
+    font-size: 16px !important;
+  }
+  /* Form controls */
+  .app-main input,
+  .app-main select,
+  .app-main textarea {
+    font-size: 13px !important;
+  }
+  /* Buttons */
+  .app-main button {
+    font-size: 12.5px;
+  }
+
+  /* scoreboard hero (home page) — collapse + compress for phone */
+  .scoreboard {
+    border-radius: 14px !important;
+    margin-bottom: 14px !important;
+  }
+  .sb-board {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    padding: 12px 14px !important;
+    align-items: stretch !important;
+  }
+  .sb-team {
+    padding: 0 !important;
+    align-items: flex-start !important;
+    text-align: left !important;
+  }
+  .sb-team.away {
+    align-items: flex-end !important;
+    text-align: right !important;
+  }
+  .sb-team .meta {
+    font-size: 9px !important;
+    letter-spacing: 0.1em !important;
+  }
+  .sb-team .name {
+    font-size: 18px !important;
+    line-height: 1.05 !important;
+    margin-top: 2px !important;
+    /* Truncate long owner / team names */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .sb-team .score {
+    font-size: 40px !important;
+    line-height: 0.9 !important;
+    margin-top: 4px !important;
+  }
+  .sb-team .proj {
+    font-size: 9px !important;
+    margin-top: 4px !important;
+  }
+  /* sb-clock takes its own narrow center column on mobile (between you/away) */
+  .sb-clock {
+    grid-column: 1 / -1 !important;
+    grid-row: 2 !important;
+    text-align: center !important;
+    padding: 4px 0 !important;
+    border-top: 1px dashed var(--line-2);
+    margin-top: 4px;
+  }
+  .sb-clock .qtr {
+    font-size: 16px !important;
+  }
+  .sb-clock .time {
+    font-size: 11px !important;
+  }
+  .sb-clock .vs {
+    display: none !important;
+  }
+  /* Banner: shrink + allow wrap, hide the trailing date on phones to keep it 1 line */
+  .sb-banner {
+    padding: 8px 12px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.1em !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  .sb-banner > :nth-child(3) {
+    display: none !important;
+  }
+  .sb-prob {
+    padding: 8px 14px 12px !important;
+    gap: 10px !important;
+  }
+  .sb-prob-label {
+    font-size: 9px !important;
+  }
+  .sb-prob-pcts {
+    font-size: 11px !important;
+  }
+
+  /* roster compare collapses to single column on phones */
+  .roster {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    margin-bottom: 18px !important;
+  }
+  .roster-side .head {
+    padding: 10px 14px !important;
+  }
+  .roster-side .head .nm {
+    font-size: 16px !important;
+  }
+  .roster-side .head .total {
+    font-size: 22px !important;
+  }
+  .player-row {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+    grid-template-columns: 30px 1fr auto auto !important;
+  }
+  .player-row .nm {
+    font-size: 13px !important;
+  }
+  .player-row .gm {
+    font-size: 9.5px !important;
+  }
+
+  /* below-the-fold pulse + standings collapse */
+  .below {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Pulse filter tabs were overflowing the panel on phones — compress them. */
+  .pulse-tabs {
+    padding: 0 4px !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    min-width: 0;
+  }
+  .pulse-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .pulse-tab {
+    padding: 10px 8px !important;
+    font-size: 9.5px !important;
+    letter-spacing: 0.06em !important;
+    flex-shrink: 0;
+    gap: 4px !important;
+  }
+  .pulse-tab .ct {
+    font-size: 8.5px !important;
+    padding: 1px 4px !important;
+  }
+
+  /* Cap the pulse panel list height so the page doesn't become a single tall scroll. */
+  .pulse-list {
+    max-height: 360px !important;
+  }
+
+  /* All panels must respect their parent's width — without these clamps,
+     internal grid tracks (pulse-tabs row, stand-row 1fr, etc.) inflate the
+     panel wider than the page-frame, making league-pulse / standings cards
+     wider than the on-the-field roster cards above them. */
+  .app-main .pulse,
+  .app-main .standings,
+  .app-main .scoreboard,
+  .app-main .roster-side,
+  .app-main .glass {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .app-main .below > * {
+    min-width: 0;
+  }
+
+  /* standings rail row tightening */
+  .stand-row,
+  .hd,
+  .row {
+    padding: 8px 12px !important;
+  }
+
+  /* players panel: shorter so the bottom nav doesn't crowd it */
+  .players-shell {
+    height: calc(100vh - 280px) !important;
+    min-height: 320px !important;
+    padding: 12px !important;
+  }
+
+  /* Ask the GM: collapse context rail (hidden), give chat full width */
+  .gm-layout {
+    grid-template-columns: 1fr !important;
+    height: calc(100vh - 64px) !important; /* leave bottom-nav room */
+  }
+  .gm-context {
+    display: none !important;
+  }
+  .gm-hero h1 {
+    font-size: 32px !important;
+  }
+  .composer-wrap {
+    padding: 12px 14px 18px !important;
+  }
+}
+
+/* tighter still on phones */
+@media (max-width: 420px) {
+  .ch-title {
+    font-size: 22px !important;
+  }
+  .cosmos-hero {
+    min-height: 140px !important;
+  }
+  .cosmos-hero-inner {
+    padding: 14px !important;
+  }
+  .section-h .title {
+    font-size: 18px !important;
+  }
+  .ch-chips {
+    flex-wrap: wrap !important;
+  }
+  /* Even smaller scoreboard on phones */
+  .sb-team .name {
+    font-size: 16px !important;
+  }
+  .sb-team .score {
+    font-size: 32px !important;
+  }
+  .sb-team .meta,
+  .sb-team .proj {
+    font-size: 8.5px !important;
+  }
+  .sb-board {
+    padding: 10px 12px !important;
+    gap: 6px !important;
+  }
+  .sb-banner {
+    font-size: 8.5px !important;
+    padding: 6px 10px !important;
+  }
+  .sb-clock .qtr {
+    font-size: 14px !important;
   }
 }

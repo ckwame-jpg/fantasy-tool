@@ -210,9 +210,10 @@ def get_players(
     adp_year = season
     stats_year = season - 1  # show last year's production on the draftboard
 
-    # Per-season+scoring cache
+    # Per-season+scoring+on_team_only cache (key MUST include on_team_only or
+    # an `on_team_only=false` caller will poison the cache for stricter callers).
     current_time = time.time()
-    cache_key = f"{season}:{scoring}"
+    cache_key = f"{season}:{scoring}:{int(bool(on_team_only))}"
     cache_bucket = _players_cache.get(cache_key, {})
     if "data" in cache_bucket and current_time - cache_bucket.get("timestamp", 0) < 300:
         cached_players = cache_bucket["data"]
@@ -273,11 +274,18 @@ def get_players(
 
     for player_id, player_data in data_players.items():
         team_code = (player_data.get("team") or "").strip()
-        is_rookie = player_data.get("years_exp", -1) == 0
-        # Include rookies even without a team (pre-NFL-draft prospects)
-        if on_team_only and not team_code and not is_rookie:
+        years_exp = player_data.get("years_exp")
+        is_rookie = years_exp == 0  # explicit rookies only (pre-NFL-draft prospects)
+        status = (player_data.get("status") or "").strip().lower()
+        # Always drop "Sleeper-active but team-less veterans" — these are retired/free agent
+        # placeholders (e.g. Tom Brady, Drew Brees) that have player records but no real team.
+        # Rookies (years_exp == 0) are kept even without a team.
+        if not team_code:
+            if not is_rookie:
+                continue
+        # Status-based exclusions (Sleeper marks retired players in a few flavors)
+        if status in ("inactive", "retired"):
             continue
-        # Skip explicitly inactive/retired entries when on_team_only is True
         if on_team_only and player_data.get("active") is False:
             continue
 
@@ -639,3 +647,394 @@ def sleeper_trending_drop(lookback_hours: int = Query(default=24), limit: int = 
     if data is None:
         return []
     return data
+
+
+# -------------------------------------------
+# Sleeper Player Metadata (cached)
+# -------------------------------------------
+
+_sleeper_players_cache: dict[str, Any] = {"data": None, "ts": 0.0}
+_SLEEPER_PLAYERS_TTL = 60 * 60 * 6  # 6h
+
+
+def _get_sleeper_players() -> dict[str, Any]:
+    """Return Sleeper's full NFL player metadata, cached locally."""
+    now = time.time()
+    cached = _sleeper_players_cache.get("data")
+    if cached and now - _sleeper_players_cache.get("ts", 0) < _SLEEPER_PLAYERS_TTL:
+        return cached
+    fresh = _safe_get_json("https://api.sleeper.app/v1/players/nfl")
+    if isinstance(fresh, dict):
+        _sleeper_players_cache["data"] = fresh
+        _sleeper_players_cache["ts"] = now
+        return fresh
+    return cached or {}
+
+
+def _slim_player(pid: str, p: dict[str, Any]) -> dict[str, Any]:
+    first = (p.get("first_name") or "").strip()
+    last = (p.get("last_name") or "").strip()
+    full = (p.get("full_name") or f"{first} {last}").strip()
+    return {
+        "id": str(pid),
+        "name": full or str(pid),
+        "first_name": first,
+        "last_name": last,
+        "position": p.get("position") or "",
+        "team": p.get("team") or "",
+        "injury_status": p.get("injury_status") or None,
+        "injury_body_part": p.get("injury_body_part") or None,
+        "bye_week": p.get("bye_week"),
+        "fantasy_positions": p.get("fantasy_positions") or [],
+    }
+
+
+@router.get("/sleeper/players/slim")
+def sleeper_players_slim(ids: Optional[str] = Query(default=None)):
+    """
+    Slim Sleeper player metadata (id → name/position/team/injury). Pass ?ids=1,2,3 to filter.
+    Cached on the backend for 6h to avoid hammering Sleeper's 5MB feed.
+    """
+    raw = _get_sleeper_players()
+    if not raw:
+        return {}
+    if ids:
+        wanted = {x.strip() for x in ids.split(",") if x.strip()}
+        return {pid: _slim_player(pid, p) for pid, p in raw.items() if pid in wanted and isinstance(p, dict)}
+    # Without filter, only return offensive skill positions to keep payload reasonable
+    return {
+        pid: _slim_player(pid, p)
+        for pid, p in raw.items()
+        if isinstance(p, dict) and (p.get("position") or "") in {"QB", "RB", "WR", "TE", "K", "DEF"}
+    }
+
+
+# -------------------------------------------
+# League Pulse (aggregated activity feed)
+# -------------------------------------------
+
+_pulse_cache: dict[str, dict[str, Any]] = {}
+_PULSE_TTL = 30  # seconds
+
+
+@router.get("/league/{league_id}/pulse")
+def league_pulse(
+    league_id: str,
+    week: int = Query(...),
+    weeks_back: int = Query(default=2, ge=1, le=8),
+    limit: int = Query(default=40, ge=1, le=200),
+):
+    """
+    Aggregated league pulse feed.
+    Combines recent transactions (trades / waivers / drops), trending players,
+    and roster injuries into a single normalized feed sorted newest-first.
+    """
+    cache_key = f"{league_id}:{week}:{weeks_back}"
+    now = time.time()
+    hit = _pulse_cache.get(cache_key)
+    if hit and now - hit.get("ts", 0) < _PULSE_TTL:
+        return hit["data"]
+
+    feed: list[dict[str, Any]] = []
+    players_meta = _get_sleeper_players()
+
+    def player_name(pid: str) -> str:
+        p = players_meta.get(pid) if isinstance(players_meta, dict) else None
+        if not isinstance(p, dict):
+            return str(pid)
+        full = (p.get("full_name") or f"{p.get('first_name', '')} {p.get('last_name', '')}").strip()
+        return full or str(pid)
+
+    def player_pos(pid: str) -> str:
+        p = players_meta.get(pid) if isinstance(players_meta, dict) else None
+        return (p.get("position") if isinstance(p, dict) else "") or ""
+
+    # ---- transactions ----
+    # Always cover weeks 0..2 in preseason (Sleeper stores draft-day trades under week=1
+    # even when state.week == 0), plus the standard look-back during the season.
+    start = max(0, week - weeks_back + 1)
+    end_inclusive = max(week, 2)
+    for w in range(start, end_inclusive + 1):
+        url = f"https://api.sleeper.app/v1/league/{league_id}/transactions/{w}"
+        txns = _safe_get_json(url) or []
+        if not isinstance(txns, list):
+            continue
+        for txn in txns:
+            if not isinstance(txn, dict):
+                continue
+            ttype = txn.get("type") or "transaction"
+            status = txn.get("status") or ""
+            if status not in ("complete", "processed", "executed"):
+                continue
+            adds = txn.get("adds") or {}
+            drops = txn.get("drops") or {}
+            ts = txn.get("status_updated") or txn.get("created") or 0
+            # normalize ms → s if needed
+            if ts and ts > 1e12:
+                ts = ts / 1000.0
+            kind = (
+                "trade"
+                if ttype == "trade"
+                else "waiver"
+                if ttype == "waiver"
+                else "free_agent"
+                if ttype == "free_agent"
+                else ttype
+            )
+            adds_list = [{"id": pid, "name": player_name(pid), "position": player_pos(pid)} for pid in adds.keys()]
+            drops_list = [{"id": pid, "name": player_name(pid), "position": player_pos(pid)} for pid in drops.keys()]
+
+            # Draft picks attached to a trade (rare for waivers/free-agent moves).
+            picks_raw = txn.get("draft_picks") or []
+            picks_list: list[dict[str, Any]] = []
+            if isinstance(picks_raw, list):
+                for dp in picks_raw:
+                    if not isinstance(dp, dict):
+                        continue
+                    season_str = str(dp.get("season") or "").strip()
+                    rnd = dp.get("round")
+                    if not season_str or rnd is None:
+                        continue
+                    picks_list.append(
+                        {
+                            "season": season_str,
+                            "round": int(rnd),
+                            "label": f"{season_str} Round {int(rnd)}",
+                            "owner_roster_id": dp.get("owner_id"),
+                            "previous_owner_roster_id": dp.get("previous_owner_id"),
+                            "original_roster_id": dp.get("roster_id"),
+                        }
+                    )
+
+            feed.append(
+                {
+                    "kind": kind,
+                    "ts": ts,
+                    "week": w,
+                    "adds": adds_list,
+                    "drops": drops_list,
+                    "picks": picks_list,
+                    "waiver_bid": (txn.get("settings") or {}).get("waiver_bid"),
+                    "roster_ids": txn.get("roster_ids") or [],
+                }
+            )
+
+    # ---- trending adds ----
+    trending_add = (
+        _safe_get_json("https://api.sleeper.app/v1/players/nfl/trending/add?lookback_hours=24&limit=10") or []
+    )
+    if isinstance(trending_add, list):
+        for entry in trending_add[:8]:
+            if not isinstance(entry, dict):
+                continue
+            pid = entry.get("player_id")
+            if not pid:
+                continue
+            feed.append(
+                {
+                    "kind": "trending",
+                    "ts": now,
+                    "week": week,
+                    "adds": [{"id": str(pid), "name": player_name(str(pid)), "position": player_pos(str(pid))}],
+                    "count": entry.get("count"),
+                }
+            )
+
+    # ---- roster injuries ----
+    rosters = _safe_get_json(f"https://api.sleeper.app/v1/league/{league_id}/rosters") or []
+    if isinstance(rosters, list) and isinstance(players_meta, dict):
+        seen_injuries: set[str] = set()
+        for r in rosters:
+            if not isinstance(r, dict):
+                continue
+            for pid in (r.get("players") or [])[:30]:
+                p = players_meta.get(str(pid))
+                if not isinstance(p, dict):
+                    continue
+                status = p.get("injury_status")
+                if status and status in ("Out", "IR", "Questionable", "Doubtful"):
+                    key = f"{pid}:{status}"
+                    if key in seen_injuries:
+                        continue
+                    seen_injuries.add(key)
+                    feed.append(
+                        {
+                            "kind": "injury",
+                            "ts": now,
+                            "week": week,
+                            "player": {
+                                "id": str(pid),
+                                "name": player_name(str(pid)),
+                                "position": player_pos(str(pid)),
+                            },
+                            "status": status,
+                            "body_part": p.get("injury_body_part"),
+                        }
+                    )
+
+    feed.sort(key=lambda x: x.get("ts") or 0, reverse=True)
+    feed = feed[:limit]
+    payload = {"items": feed, "generated_at": now, "week": week}
+    _pulse_cache[cache_key] = {"data": payload, "ts": now}
+    return payload
+
+
+# -------------------------------------------
+# Ask the GM (OpenAI-backed chat)
+# -------------------------------------------
+
+class GmMessage(BaseModel):
+    role: str  # "user" | "assistant"
+    content: str
+
+
+class GmChatRequest(BaseModel):
+    league_id: Optional[str] = None
+    user_id: Optional[str] = None
+    roster_id: Optional[int] = None
+    week: Optional[int] = None
+    question: str
+    history: List[GmMessage] = Field(default_factory=list)
+
+
+class GmChatResponse(BaseModel):
+    answer: str
+    model: str
+    latency_ms: int
+    used_context: bool
+
+
+def _build_gm_context(req: GmChatRequest) -> str:
+    """Fetch roster + matchup + recent transactions and serialize to a compact string."""
+    if not req.league_id:
+        return ""
+    parts: list[str] = []
+    players_meta = _get_sleeper_players()
+
+    def name(pid: str) -> str:
+        p = players_meta.get(pid) if isinstance(players_meta, dict) else None
+        if not isinstance(p, dict):
+            return str(pid)
+        return (p.get("full_name") or f"{p.get('first_name','')} {p.get('last_name','')}").strip() or str(pid)
+
+    def pos(pid: str) -> str:
+        p = players_meta.get(pid) if isinstance(players_meta, dict) else None
+        return (p.get("position") if isinstance(p, dict) else "") or ""
+
+    def team(pid: str) -> str:
+        p = players_meta.get(pid) if isinstance(players_meta, dict) else None
+        return (p.get("team") if isinstance(p, dict) else "") or ""
+
+    league = _safe_get_json(f"https://api.sleeper.app/v1/league/{req.league_id}") or {}
+    rosters = _safe_get_json(f"https://api.sleeper.app/v1/league/{req.league_id}/rosters") or []
+    users = _safe_get_json(f"https://api.sleeper.app/v1/league/{req.league_id}/users") or []
+    user_map = {u.get("user_id"): (u.get("display_name") or u.get("username") or "Unknown") for u in users if isinstance(u, dict)}
+
+    if isinstance(league, dict) and league.get("name"):
+        parts.append(f"League: {league.get('name')} ({league.get('season')})")
+        rps = league.get("roster_positions") or []
+        if rps:
+            parts.append(f"Starting roster: {', '.join(rps)}")
+
+    my_roster = None
+    if isinstance(rosters, list):
+        for r in rosters:
+            if not isinstance(r, dict):
+                continue
+            if (req.roster_id and r.get("roster_id") == req.roster_id) or (
+                req.user_id and r.get("owner_id") == req.user_id
+            ):
+                my_roster = r
+                break
+
+    if my_roster:
+        owner = user_map.get(my_roster.get("owner_id")) or "you"
+        settings = my_roster.get("settings") or {}
+        wins = settings.get("wins") or 0
+        losses = settings.get("losses") or 0
+        pf = round(float(settings.get("fpts", 0)) + float(settings.get("fpts_decimal", 0)) / 100, 2)
+        parts.append(f"Your team: {owner} · record {wins}-{losses} · PF {pf}")
+        starters = my_roster.get("starters") or []
+        bench = [p for p in (my_roster.get("players") or []) if p not in starters]
+        parts.append("Starters: " + ", ".join(f"{name(p)} ({pos(p)} {team(p)})" for p in starters if p and p != "0"))
+        if bench:
+            parts.append("Bench: " + ", ".join(f"{name(p)} ({pos(p)} {team(p)})" for p in bench[:10] if p and p != "0"))
+
+    if req.week:
+        matchups = _safe_get_json(f"https://api.sleeper.app/v1/league/{req.league_id}/matchups/{req.week}") or []
+        if isinstance(matchups, list) and my_roster:
+            mine = next((m for m in matchups if isinstance(m, dict) and m.get("roster_id") == my_roster.get("roster_id")), None)
+            if mine:
+                opp = next(
+                    (
+                        m
+                        for m in matchups
+                        if isinstance(m, dict)
+                        and m.get("matchup_id") == mine.get("matchup_id")
+                        and m.get("roster_id") != mine.get("roster_id")
+                    ),
+                    None,
+                )
+                opp_owner = "opponent"
+                if opp and isinstance(rosters, list):
+                    opp_roster = next((r for r in rosters if isinstance(r, dict) and r.get("roster_id") == opp.get("roster_id")), None)
+                    if opp_roster:
+                        opp_owner = user_map.get(opp_roster.get("owner_id"), "opponent")
+                parts.append(
+                    f"Week {req.week} matchup: you {mine.get('points', 0)} vs {opp_owner} {opp.get('points', 0) if opp else '—'}"
+                )
+
+    return "\n".join(parts)
+
+
+_GM_SYSTEM_PROMPT = (
+    "You are 'the GM' — a fantasy football assistant for the only W's app. "
+    "You answer in a confident, conversational tone. Stay concise (2-4 short paragraphs at most). "
+    "Use lowercase headers when grouping advice. Cite specific players, weeks, and matchups. "
+    "Always ground recommendations in the supplied league context. If context is missing, say so honestly. "
+    "Reserve red/hot framing for losing-side or injury calls; use violet/neon framing for wins and recommendations. "
+    "Never invent players that are not on the user's roster or the public NFL pool."
+)
+
+
+@router.post("/gm/chat", response_model=GmChatResponse)
+def gm_chat(req: GmChatRequest):
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="OPENAI_API_KEY not configured on the backend. Set it in the backend env to enable Ask the GM.",
+        )
+
+    try:
+        from openai import OpenAI
+    except ImportError as e:
+        raise HTTPException(status_code=503, detail=f"openai package not installed: {e}") from e
+
+    context = _build_gm_context(req)
+    messages: list[dict[str, str]] = [{"role": "system", "content": _GM_SYSTEM_PROMPT}]
+    if context:
+        messages.append({"role": "system", "content": f"League context for this conversation:\n{context}"})
+    for h in req.history[-8:]:
+        if h.role in ("user", "assistant") and h.content:
+            messages.append({"role": h.role, "content": h.content})
+    messages.append({"role": "user", "content": req.question})
+
+    model = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+    client = OpenAI(api_key=api_key)
+
+    started = time.time()
+    try:
+        completion = client.chat.completions.create(
+            model=model,
+            messages=messages,  # type: ignore[arg-type]
+            temperature=0.6,
+            max_tokens=600,
+        )
+    except Exception as e:
+        logger.exception("OpenAI request failed")
+        raise HTTPException(status_code=502, detail=f"OpenAI request failed: {e}") from e
+
+    elapsed = int((time.time() - started) * 1000)
+    answer = (completion.choices[0].message.content or "").strip()
+    return GmChatResponse(answer=answer, model=model, latency_ms=elapsed, used_context=bool(context))

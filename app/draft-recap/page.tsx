@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { Trophy } from 'lucide-react'
 import { API_BASE_URL } from '@/constants'
 import DraftRecap from '@/components/DraftRecap'
+import PageFrame from '@/components/PageFrame'
 import { useLeague } from '@/lib/league-context'
 
 export default function DraftRecapPage() {
@@ -16,13 +19,11 @@ export default function DraftRecapPage() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Fetch all players
         const playersRes = await fetch(`${API_BASE_URL}/players?season=${season}&on_team_only=true`)
         const playersData = await playersRes.json()
         const players = Array.isArray(playersData) ? playersData : []
         setAllPlayers(players)
 
-        // If connected to a league, use roster player IDs
         if (isConnected && myPlayerIds.length > 0) {
           const myPlayerIdSet = new Set(myPlayerIds)
           const roster = players.filter((p: any) => myPlayerIdSet.has(String(p.id)))
@@ -32,7 +33,6 @@ export default function DraftRecapPage() {
           return
         }
 
-        // Otherwise try loading from draftboard picks
         try {
           const picksRes = await fetch(`${API_BASE_URL}/drafts/global-draft/picks`)
           const picksData = await picksRes.json()
@@ -47,9 +47,8 @@ export default function DraftRecapPage() {
             }
           }
         } catch {
-          // draftboard picks not available, that's fine
+          /* ignore */
         }
-
         setSource('none')
         setLoading(false)
       } catch {
@@ -57,65 +56,111 @@ export default function DraftRecapPage() {
         setLoading(false)
       }
     }
-
     loadData()
   }, [season, isConnected, myPlayerIds])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-slate-400">loading draft data...</div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-red-400">{error}</div>
-      </div>
-    )
-  }
-
-  if (source === 'none' || draftedPlayers.length === 0) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <div className="text-center max-w-md">
-          <h2 className="text-2xl font-bold mb-3">no draft data found</h2>
-          <p className="text-slate-400 text-sm mb-4">
-            connect a fantasy platform to import your roster, or use the draftboard to mock draft first.
-          </p>
-          <div className="flex gap-3 justify-center">
-            <a href="/draftboard" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm rounded transition-colors">
-              go to draftboard
-            </a>
-          </div>
-        </div>
-      </div>
-    )
-  }
+  const sourceLabel = source === 'league' ? leagueName || 'league' : source === 'draftboard' ? 'draftboard' : 'unset'
 
   return (
-    <div>
-      {source === 'league' && (
-        <div className="bg-slate-950 px-4 md:px-8 pt-6">
-          <div className="max-w-4xl mx-auto">
-            <span className="text-xs text-slate-500">
-              showing roster from <span className="text-slate-300">{leagueName}</span>
-            </span>
-          </div>
+    <PageFrame
+      crumb="draft recap"
+      rightPill={
+        <span className="week-pill">
+          <Trophy size={12} />
+          {sourceLabel}
+        </span>
+      }
+      hero={{
+        eyebrow: 'research · draft recap',
+        title: (
+          <>
+            grade your draft <span className="ch-hl">before</span> the season has its say.
+          </>
+        ),
+        sub: (
+          <>
+            position breakdown, bye-week distribution, and a projected starting lineup based on the roster you actually drafted.
+          </>
+        ),
+        chips: [
+          { label: 'roster', value: draftedPlayers.length || '—' },
+          { label: 'source', value: source },
+          { label: 'season', value: String(season) },
+        ],
+      }}
+    >
+      {loading ? (
+        <div className="empty-state">loading draft data…</div>
+      ) : error ? (
+        <div className="empty-state error">{error}</div>
+      ) : source === 'none' || draftedPlayers.length === 0 ? (
+        <div className="empty-state-rich glass">
+          <h2>no draft data yet</h2>
+          <p>connect a fantasy platform to import your roster, or use the draftboard to mock draft first.</p>
+          <Link href="/draftboard">go to draftboard</Link>
+        </div>
+      ) : (
+        <div className="dr-wrap">
+          <DraftRecap
+            draftedPlayers={draftedPlayers}
+            onClose={() => {}}
+            isPage
+            rosterSlots={leagueSettings.rosterSlots}
+          />
         </div>
       )}
-      {source === 'draftboard' && (
-        <div className="bg-slate-950 px-4 md:px-8 pt-6">
-          <div className="max-w-4xl mx-auto">
-            <span className="text-xs text-slate-500">
-              showing picks from draftboard
-            </span>
-          </div>
-        </div>
-      )}
-      <DraftRecap draftedPlayers={draftedPlayers} onClose={() => {}} isPage rosterSlots={leagueSettings.rosterSlots} />
-    </div>
+
+      <style jsx>{`
+        .empty-state {
+          padding: 80px 20px;
+          text-align: center;
+          color: var(--ink-3);
+          font-family: var(--font-mono);
+          font-size: 12px;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+        .empty-state.error {
+          color: var(--hot);
+        }
+        .empty-state-rich {
+          padding: 60px 28px;
+          text-align: center;
+          max-width: 520px;
+          margin: 40px auto;
+        }
+        .empty-state-rich h2 {
+          font-family: var(--font-display);
+          font-size: 32px;
+          letter-spacing: 0.04em;
+          margin: 0 0 10px;
+          color: var(--ink);
+        }
+        .empty-state-rich p {
+          color: var(--ink-2);
+          font-size: 14px;
+          line-height: 1.55;
+          margin: 0 0 20px;
+        }
+        .empty-state-rich a {
+          display: inline-block;
+          padding: 10px 18px;
+          background: linear-gradient(135deg, var(--neon), var(--neon-dim));
+          color: hsl(250 60% 6%);
+          font-weight: 600;
+          font-size: 13px;
+          border-radius: 10px;
+          text-decoration: none;
+          box-shadow: 0 6px 20px -6px rgba(140, 100, 255, 0.6);
+        }
+        .dr-wrap {
+          border: 1px solid var(--surface-border);
+          border-radius: var(--radius-xl);
+          background: var(--surface);
+          backdrop-filter: blur(var(--glass-blur));
+          overflow: hidden;
+        }
+      `}</style>
+    </PageFrame>
   )
 }
