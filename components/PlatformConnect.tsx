@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useLeague } from "@/lib/league-context"
 import { ChevronDown, ChevronUp, Wifi, RefreshCw, X } from "lucide-react"
 
-type UITab = "sleeper" | "espn" | "nfl"
+type UITab = "sleeper" | "espn"
 
 export default function PlatformConnect() {
   const {
@@ -99,7 +99,7 @@ export default function PlatformConnect() {
       {showPlatformSelector && (
         <>
           <div className="flex gap-2 mb-3">
-            {(["sleeper", "espn", "nfl"] as UITab[]).map((tab) => (
+            {(["sleeper", "espn"] as UITab[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setSelectedTab(tab)}
@@ -109,7 +109,7 @@ export default function PlatformConnect() {
                     : "bg-slate-700 text-slate-400 hover:text-white"
                 }`}
               >
-                {tab === "sleeper" ? "Sleeper" : tab === "espn" ? "ESPN" : "NFL.com"}
+                {tab === "sleeper" ? "Sleeper" : "ESPN"}
               </button>
             ))}
           </div>
@@ -168,12 +168,6 @@ export default function PlatformConnect() {
             </div>
           )}
 
-          {/* NFL.com stub */}
-          {selectedTab === "nfl" && (
-            <p className="text-xs text-slate-500">
-              NFL.com doesn't offer a public API. Use manual roster entry or import from Sleeper/ESPN instead.
-            </p>
-          )}
         </>
       )}
 

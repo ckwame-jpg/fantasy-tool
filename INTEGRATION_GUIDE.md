@@ -30,18 +30,6 @@ ESPN's fantasy API requires authentication setup, which makes it more complex to
 
 ---
 
-## 🚧 **NFL.com Integration** (In the works)
-
-NFL.com has limited public API access, exploring:
-
-- **Web scraping methods** for public leagues
-- **Browser extension** approach for private leagues
-- **Manual import tools** as an interim solution
-
-**Timeline**: Future update
-
----
-
 ## 💡 **How Live Sync Works**
 
 1. **Connect**: Enter your platform's draft ID

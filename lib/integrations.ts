@@ -1,5 +1,5 @@
 // Platform integrations for live draft tracking
-export type Platform = 'sleeper' | 'espn' | 'nfl'
+export type Platform = 'sleeper' | 'espn'
 
 export interface DraftConnection {
   platform: Platform
@@ -235,32 +235,15 @@ export class ESPNIntegration {
   }
 }
 
-// NFL.com integration placeholder
-export class NFLIntegration {
-  async connectToDraft(leagueId: string): Promise<DraftConnection> {
-    return {
-      platform: 'nfl',
-      isConnected: false,
-      error: 'NFL.com integration coming soon'
-    }
-  }
-  
-  async getDraftPicks(leagueId: string): Promise<DraftPick[]> {
-    return []
-  }
-}
-
 // Main integration manager
 export class DraftIntegrationManager {
   private sleeper = new SleeperIntegration()
   private espn = new ESPNIntegration()
-  private nfl = new NFLIntegration()
-  
+
   getIntegration(platform: Platform) {
     switch (platform) {
       case 'sleeper': return this.sleeper
       case 'espn': return this.espn
-      case 'nfl': return this.nfl
       default: throw new Error(`Unknown platform: ${platform}`)
     }
   }
