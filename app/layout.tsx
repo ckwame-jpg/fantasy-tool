@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Bebas_Neue, Space_Grotesk, Quicksand, JetBrains_Mono } from "next/font/google";
 import Sidebar from "@/components/Sidebar";
 import MobileBottomNav from "@/components/MobileBottomNav";
@@ -36,8 +36,26 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RN Command Center",
-  description: "command center",
+  title: {
+    default: "RN Command Center",
+    template: "%s · RN",
+  },
+  description: "Fantasy football command center — rosters, matchups, and the GM that has your back.",
+  applicationName: "RN Command Center",
+  appleWebApp: {
+    capable: true,
+    title: "RN",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0b1a",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
