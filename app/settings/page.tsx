@@ -1,12 +1,23 @@
 'use client'
 
-import { UserCog, Wifi, WifiOff } from 'lucide-react'
+import { UserCog, Wifi, WifiOff, RefreshCw } from 'lucide-react'
 import PageFrame from '@/components/PageFrame'
 import PlatformConnect from '@/components/PlatformConnect'
 import { useLeague } from '@/lib/league-context'
 
 export default function SettingsPage() {
-  const { isConnected, platform, username, leagueName, season, myPlayerIds, totalRosters, disconnect } = useLeague()
+  const {
+    isConnected,
+    platform,
+    username,
+    leagueName,
+    season,
+    myPlayerIds,
+    totalRosters,
+    isLoading,
+    disconnect,
+    refreshRoster,
+  } = useLeague()
 
   return (
     <PageFrame
@@ -69,9 +80,20 @@ export default function SettingsPage() {
                 <span className="acct-v">{myPlayerIds.length} players</span>
               </div>
               <div className="acct-actions">
-                <button type="button" className="btn-danger" onClick={disconnect}>
-                  sign out / switch account
-                </button>
+                <div className="acct-btn-row">
+                  <button
+                    type="button"
+                    className="btn-secondary"
+                    onClick={() => refreshRoster()}
+                    disabled={isLoading}
+                  >
+                    <RefreshCw size={12} />
+                    {isLoading ? 'refreshing…' : 'refresh roster'}
+                  </button>
+                  <button type="button" className="btn-danger" onClick={disconnect}>
+                    sign out / switch account
+                  </button>
+                </div>
                 <p className="hint">disconnects this account so you (or someone else) can sign in to a different Sleeper or ESPN league.</p>
               </div>
             </div>
@@ -159,8 +181,36 @@ export default function SettingsPage() {
           flex-direction: column;
           gap: 6px;
         }
+        .acct-btn-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .btn-secondary {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 14px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid var(--line);
+          color: var(--ink-2);
+          font-size: 12.5px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: background 0.12s, color 0.12s, border-color 0.12s;
+        }
+        .btn-secondary:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.08);
+          color: var(--ink);
+          border-color: var(--line-2);
+        }
+        .btn-secondary:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
         .btn-danger {
-          align-self: flex-start;
           padding: 8px 14px;
           background: rgba(255, 80, 60, 0.08);
           border: 1px solid rgba(255, 80, 60, 0.35);
