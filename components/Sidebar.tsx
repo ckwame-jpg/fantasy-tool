@@ -14,6 +14,7 @@ import {
   LineChart,
   List as ListIcon,
   Trophy,
+  ChevronRight,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -121,13 +122,19 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <div className="side-foot">
+      <Link
+        href="/settings"
+        className={clsx('side-foot', pathname === '/settings' && 'side-foot--active')}
+        aria-current={pathname === '/settings' ? 'page' : undefined}
+        title={isConnected ? 'account & settings' : 'sign in'}
+      >
         <div className="avatar">{initial}</div>
         <div className="me-meta">
           <div className="me-name">{username || 'sign in'}</div>
           <div className="me-team">{teamLabel}</div>
         </div>
-      </div>
+        <ChevronRight size={14} className="me-chev" />
+      </Link>
 
       <style jsx>{`
         .side {
@@ -265,12 +272,47 @@ export default function Sidebar() {
           background: rgba(255, 80, 60, 0.16);
           color: hsl(8 90% 70%);
         }
-        .side-foot {
-          padding: 14px 14px 4px;
+        :global(.side-foot) {
+          padding: 14px 14px 14px;
           border-top: 1px solid var(--line-2);
           display: flex;
           align-items: center;
           gap: 10px;
+          cursor: pointer;
+          color: inherit;
+          text-decoration: none;
+          transition: background 0.12s;
+          position: relative;
+        }
+        :global(.side-foot:hover) {
+          background: rgba(255, 255, 255, 0.04);
+        }
+        :global(.side-foot--active) {
+          background: linear-gradient(90deg, rgba(115, 110, 245, 0.18), rgba(115, 110, 245, 0.04));
+        }
+        :global(.side-foot--active::before) {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 12px;
+          bottom: 12px;
+          width: 2px;
+          background: var(--neon);
+          border-radius: 0 2px 2px 0;
+          box-shadow: 0 0 8px var(--neon);
+        }
+        :global(.side-foot .me-chev) {
+          margin-left: auto;
+          color: var(--ink-3);
+          flex-shrink: 0;
+          transition: color 0.12s, transform 0.12s;
+        }
+        :global(.side-foot:hover .me-chev),
+        :global(.side-foot--active .me-chev) {
+          color: var(--neon);
+        }
+        :global(.side-foot:hover .me-chev) {
+          transform: translateX(2px);
         }
         .avatar {
           width: 32px;

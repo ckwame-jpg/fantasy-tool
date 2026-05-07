@@ -14,6 +14,7 @@ import {
   LineChart,
   List as ListIcon,
   Trophy,
+  UserCog,
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -41,6 +42,7 @@ const ITEMS: NavItem[] = [
   { href: '/projections', label: 'projections', icon: LineChart },
   { href: '/draftboard', label: 'draftboard', icon: ListIcon },
   { href: '/draft-recap', label: 'recap', icon: Trophy },
+  { href: '/settings', label: 'account', icon: UserCog },
 ]
 
 export default function MobileBottomNav() {
