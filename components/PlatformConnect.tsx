@@ -6,7 +6,12 @@ import { ChevronDown, ChevronUp, Wifi, RefreshCw, X } from "lucide-react"
 
 type UITab = "sleeper" | "espn"
 
-export default function PlatformConnect() {
+interface PlatformConnectProps {
+  /** Force the form to be expanded even when connected. Useful for the settings page. */
+  defaultExpanded?: boolean
+}
+
+export default function PlatformConnect({ defaultExpanded = false }: PlatformConnectProps) {
   const {
     platform,
     username,
@@ -27,7 +32,7 @@ export default function PlatformConnect() {
     updateLeagueSettings,
   } = useLeague()
 
-  const [expanded, setExpanded] = useState(!isConnected)
+  const [expanded, setExpanded] = useState(defaultExpanded || !isConnected)
   const [inputUsername, setInputUsername] = useState("")
   const [espnLeagueId, setEspnLeagueId] = useState("")
   const [espnSeason, setEspnSeason] = useState(String(new Date().getFullYear()))
