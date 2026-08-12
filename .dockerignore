@@ -1,0 +1,16 @@
+# Global dockerignore
+**/.git
+**/.gitignore
+**/.venv
+**/.mypy_cache
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+**/.next
+**/.turbo
+**/build
+**/dist
+**/.DS_Store
+**/.vscode
+**/*.log
+**/.cache
