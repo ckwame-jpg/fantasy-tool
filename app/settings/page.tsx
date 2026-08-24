@@ -38,9 +38,9 @@ export default function SettingsPage() {
           <>switch fantasy accounts, connect a new league, or tune your scoring &amp; roster setup.</>
         ),
         chips: [
-          { label: 'platform', value: isConnected ? platform : '—' },
-          { label: 'season', value: isConnected ? String(season) : '—' },
-          { label: 'roster', value: isConnected ? `${myPlayerIds.length} players` : '—' },
+          { label: 'platform', value: isConnected ? platform : '-' },
+          { label: 'season', value: isConnected ? String(season) : '-' },
+          { label: 'roster', value: isConnected ? `${myPlayerIds.length} players` : '-' },
         ],
       }}
     >
@@ -61,11 +61,11 @@ export default function SettingsPage() {
               </div>
               <div className="acct-row">
                 <span className="acct-k">username</span>
-                <span className="acct-v">{username || '—'}</span>
+                <span className="acct-v">{username || '-'}</span>
               </div>
               <div className="acct-row">
                 <span className="acct-k">league</span>
-                <span className="acct-v">{leagueName || '—'}</span>
+                <span className="acct-v">{leagueName || '-'}</span>
               </div>
               <div className="acct-row">
                 <span className="acct-k">season</span>

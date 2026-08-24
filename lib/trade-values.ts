@@ -88,10 +88,10 @@ export function calculateStarterDemand(
     if (!eligible) continue
 
     if (eligible.length === 1) {
-      // Dedicated slot — full demand
+      // Dedicated slot - full demand
       demand[eligible[0]] = (demand[eligible[0]] || 0) + leagueSize
     } else {
-      // Flex slot — distribute demand proportionally by typical usage
+      // Flex slot - distribute demand proportionally by typical usage
       // In practice: FLEX is ~45% RB, ~40% WR, ~15% TE
       // SUPER_FLEX is ~60% QB, ~15% RB, ~15% WR, ~10% TE
       const weights = getFlexWeights(slot)
@@ -166,7 +166,7 @@ export function calculateVORP(
   const replacement = ctx.replacementLevels[pos] || 0
 
   let vorp = points - replacement
-  // Floor at 0 — negative VORP players are replacement-level
+  // Floor at 0 - negative VORP players are replacement-level
   vorp = Math.max(vorp, 0)
 
   // ---- Mode adjustments ----

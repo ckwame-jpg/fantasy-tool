@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* ============================================================
-   only W's — cosmos shell tokens
+   only W's - cosmos shell tokens
    Mirrors the Sika design system (deep cosmos + violet bloom)
    ============================================================ */
 
@@ -105,7 +105,7 @@
   --color-cosmos-outcome-lost-fg: hsl(355 70% 75%);
   --color-cosmos-stats-white: hsl(0 0% 100%);
 
-  /* HSL triplets — enable alpha composition: hsl(var(--color-cosmos-violet-500-hsl) / 0.22) */
+  /* HSL triplets - enable alpha composition: hsl(var(--color-cosmos-violet-500-hsl) / 0.22) */
   --color-cosmos-violet-50-hsl: 253 100% 96%;
   --color-cosmos-violet-200-hsl: 262 70% 80%;
   --color-cosmos-violet-300-hsl: 252 100% 85%;
@@ -189,7 +189,7 @@
   }
 }
 
-/* Layout shell — sidebar + main, with starfield underneath */
+/* Layout shell - sidebar + main, with starfield underneath */
 .app-shell {
   display: flex;
   min-height: 100vh;
@@ -270,7 +270,7 @@
   }
 }
 
-/* Sika starfield canvas — fixed full-bleed, behind everything */
+/* Sika starfield canvas - fixed full-bleed, behind everything */
 .page-canvas {
   position: fixed;
   inset: 0;
@@ -293,7 +293,7 @@
   z-index: 0;
 }
 
-/* Orbit hint — small UI prompt for drag-the-sky */
+/* Orbit hint - small UI prompt for drag-the-sky */
 .orbit-hint {
   position: fixed;
   bottom: 18px;
@@ -597,16 +597,16 @@
   font-weight: 600;
 }
 
-/* Tabular numerals — rounded sans (Quicksand) for readability, keeps column alignment via 'tnum' */
+/* Tabular numerals - rounded sans (Quicksand) for readability, keeps column alignment via 'tnum' */
 .tnum {
   font-family: var(--font-quicksand), system-ui, sans-serif;
   font-feature-settings: 'tnum';
   font-variant-numeric: tabular-nums;
 }
 
-/* Cosmos scrollbar — applies globally and to .custom-scrollbar opt-ins */
+/* Cosmos scrollbar - applies globally and to .custom-scrollbar opt-ins */
 @layer utilities {
-  /* Webkit (Chrome, Safari, Edge) — applied globally inside .app-main and to .custom-scrollbar */
+  /* Webkit (Chrome, Safari, Edge) - applied globally inside .app-main and to .custom-scrollbar */
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
@@ -661,7 +661,7 @@
 }
 
 /* ============================================================
-   Cosmos theme override — remap Tailwind slate/indigo/cyan
+   Cosmos theme override - remap Tailwind slate/indigo/cyan
    utilities used inside legacy components to cosmos vars.
    Scoped to .app-main so the sidebar/topbar are not affected.
    ============================================================ */
@@ -1204,7 +1204,7 @@
     font-size: 12.5px;
   }
 
-  /* scoreboard hero (home page) — collapse + compress for phone */
+  /* scoreboard hero (home page) - collapse + compress for phone */
   .scoreboard {
     border-radius: 14px !important;
     margin-bottom: 14px !important;
@@ -1320,7 +1320,7 @@
     gap: 14px !important;
   }
 
-  /* Pulse filter tabs were overflowing the panel on phones — compress them. */
+  /* Pulse filter tabs were overflowing the panel on phones - compress them. */
   .pulse-tabs {
     padding: 0 4px !important;
     overflow-x: auto;
@@ -1348,7 +1348,7 @@
     max-height: 360px !important;
   }
 
-  /* All panels must respect their parent's width — without these clamps,
+  /* All panels must respect their parent's width - without these clamps,
      internal grid tracks (pulse-tabs row, stand-row 1fr, etc.) inflate the
      panel wider than the page-frame, making league-pulse / standings cards
      wider than the on-the-field roster cards above them. */

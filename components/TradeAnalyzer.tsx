@@ -772,14 +772,14 @@ export default function TradeAnalyzer({
                       {teams[0].players.map((p) => (
                         <li key={p.id} className="text-xs text-slate-300">
                           {p.name} ({p.position}
-                          {isDynasty && p.age ? `, ${p.age}` : ''}) —{' '}
+                          {isDynasty && p.age ? `, ${p.age}` : ''}) -{' '}
                           {calculateVORP(p, vorpCtx, mode, isDynasty, hasSuperFlex).toFixed(1)} VORP
                         </li>
                       ))}
                       {teams[0].picks.map((p) => (
                         <li key={p.id} className="text-xs text-slate-300">
                           {p.label}
-                          {p.position?.kind !== 'unknown' ? ` (${p.position?.kind})` : ''} —{' '}
+                          {p.position?.kind !== 'unknown' ? ` (${p.position?.kind})` : ''} -{' '}
                           {calculatePickValue(p, season, leagueSize, starterCount, mode)} value
                         </li>
                       ))}
@@ -793,14 +793,14 @@ export default function TradeAnalyzer({
                       {teams[1].players.map((p) => (
                         <li key={p.id} className="text-xs text-slate-300">
                           {p.name} ({p.position}
-                          {isDynasty && p.age ? `, ${p.age}` : ''}) —{' '}
+                          {isDynasty && p.age ? `, ${p.age}` : ''}) -{' '}
                           {calculateVORP(p, vorpCtx, mode, isDynasty, hasSuperFlex).toFixed(1)} VORP
                         </li>
                       ))}
                       {teams[1].picks.map((p) => (
                         <li key={p.id} className="text-xs text-slate-300">
                           {p.label}
-                          {p.position?.kind !== 'unknown' ? ` (${p.position?.kind})` : ''} —{' '}
+                          {p.position?.kind !== 'unknown' ? ` (${p.position?.kind})` : ''} -{' '}
                           {calculatePickValue(p, season, leagueSize, starterCount, mode)} value
                         </li>
                       ))}

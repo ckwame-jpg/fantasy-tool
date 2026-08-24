@@ -12,7 +12,7 @@ export const SLOT_ELIGIBLE: Record<string, string[]> = {
   DEF: ["DEF"],
 }
 
-/** Slot fill priority — more restrictive slots should be filled first */
+/** Slot fill priority - more restrictive slots should be filled first */
 const SLOT_PRIORITY: Record<string, number> = {
   QB: 0,
   RB: 0,

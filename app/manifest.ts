@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'RN Command Center',
     short_name: 'RN',
-    description: 'Fantasy football command center — rosters, matchups, and the GM that has your back.',
+    description: 'Fantasy football command center - rosters, matchups, and the GM that has your back.',
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait',

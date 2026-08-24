@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     default: "RN Command Center",
     template: "%s · RN",
   },
-  description: "Fantasy football command center — rosters, matchups, and the GM that has your back.",
+  description: "Fantasy football command center - rosters, matchups, and the GM that has your back.",
   applicationName: "RN Command Center",
   appleWebApp: {
     capable: true,

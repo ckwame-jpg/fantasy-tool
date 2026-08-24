@@ -81,7 +81,7 @@ export default function StandingsRail({ rows, myRosterId, limit = 10 }: Standing
         }
         .stand-row {
           display: grid;
-          /* minmax(0, 1fr) — without it, long team names grow the track and
+          /* minmax(0, 1fr) - without it, long team names grow the track and
              push the panel wider than its parent on mobile. */
           grid-template-columns: 24px minmax(0, 1fr) auto;
           gap: 12px;

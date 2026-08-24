@@ -119,7 +119,7 @@ export default function HomePage() {
               connect your league.
             </h1>
             <p style={{ color: 'var(--ink-2)', fontSize: 15, margin: '0 0 24px', lineHeight: 1.55 }}>
-              only W's pulls live from Sleeper or ESPN — your roster, your matchup, the whole league pulse, and the GM
+              only W's pulls live from Sleeper or ESPN - your roster, your matchup, the whole league pulse, and the GM
               that has your back. drop your Sleeper username below to wake the cosmos.
             </p>
             <PlatformConnect />

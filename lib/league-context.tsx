@@ -173,7 +173,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
     }
   }, [state.isConnected, state.leagueId, state.myPlayerIds, state.allRosteredIds, state.leagueSettings])
 
-  // Connect to Sleeper: step 1 — look up user + fetch leagues
+  // Connect to Sleeper: step 1 - look up user + fetch leagues
   const connectSleeper = useCallback(async (username: string) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null, platform: "sleeper" }))
     try {
@@ -205,7 +205,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  // Connect to Sleeper: step 2 — select a league and load rosters
+  // Connect to Sleeper: step 2 - select a league and load rosters
   const selectLeague = useCallback(
     async (leagueId: string) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }))
@@ -309,7 +309,7 @@ export function LeagueProvider({ children }: { children: ReactNode }) {
 
       setEspnLeagueData(data)
 
-      // ESPN player IDs are numeric — we'll store them as strings for consistency
+      // ESPN player IDs are numeric - we'll store them as strings for consistency
       const teams: EspnTeam[] = data.teams.map((t: any) => {
         const playerIds: string[] = (t.roster?.entries || []).map(
           (e: any) => String(e.playerId)

@@ -20,7 +20,7 @@ interface Suggestion {
 const SUGGESTIONS: Suggestion[] = [
   {
     cat: 'start / sit',
-    q: 'who should i start at flex this week — and why?',
+    q: 'who should i start at flex this week - and why?',
     Icon: Sparkles,
   },
   {
@@ -103,7 +103,7 @@ export default function AskGmPage() {
           content:
             "i can't reach the model right now. " +
             (msg.toLowerCase().includes('openai_api_key')
-              ? 'the backend is missing OPENAI_API_KEY — set it and restart.'
+              ? 'the backend is missing OPENAI_API_KEY - set it and restart.'
               : msg),
         },
       ])
@@ -127,7 +127,7 @@ export default function AskGmPage() {
   }
 
   const ctxCards = useMemo(() => {
-    const seedLabel = home.myStanding ? `#${home.myStanding}` : '—'
+    const seedLabel = home.myStanding ? `#${home.myStanding}` : '-'
     return [
       {
         title: league.leagueName || 'your team',
@@ -146,7 +146,7 @@ export default function AskGmPage() {
             val: `${(home.myMatchup?.points ?? 0).toFixed(1)} – ${(home.oppMatchup?.points ?? 0).toFixed(1)}`,
           },
           { lbl: 'win prob', val: `${Math.round(home.winProb * 100)}%` },
-          { lbl: 'opponent', val: home.opponentName || '—' },
+          { lbl: 'opponent', val: home.opponentName || '-' },
         ],
       },
     ]
@@ -171,7 +171,7 @@ export default function AskGmPage() {
                   </h1>
                   <p>
                     your gm has eyes on your roster, the waiver pool, every league move, and the latest projections. ask
-                    anything — start/sit calls, waiver targets, trade grades, even what to say in #trash-talk.
+                    anything - start/sit calls, waiver targets, trade grades, even what to say in #trash-talk.
                   </p>
                   <div className="suggestions">
                     {SUGGESTIONS.map((s) => {

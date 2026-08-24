@@ -50,7 +50,7 @@ export default function StandingsPage() {
             ties: Number(s.ties || 0),
             pf,
             pa,
-            streak: streak === 0 ? '—' : streak > 0 ? `W${streak}` : `L${Math.abs(streak)}`,
+            streak: streak === 0 ? '-' : streak > 0 ? `W${streak}` : `L${Math.abs(streak)}`,
           }
         })
         next.sort((a, b) => (b.wins !== a.wins ? b.wins - a.wins : b.pf - a.pf))
@@ -89,8 +89,8 @@ export default function StandingsPage() {
         ),
         sub: <>seeds, points-for, points-against, and streaks for every team in the league.</>,
         chips: [
-          { label: 'teams', value: String(rows.length || rosterOwners.length || '—') },
-          { label: 'avg PF', value: totals.avgPf > 0 ? totals.avgPf.toFixed(1) : '—' },
+          { label: 'teams', value: String(rows.length || rosterOwners.length || '-') },
+          { label: 'avg PF', value: totals.avgPf > 0 ? totals.avgPf.toFixed(1) : '-' },
         ],
       }}
     >

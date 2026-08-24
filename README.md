@@ -6,13 +6,13 @@ A full-stack fantasy football toolkit built with Next.js and FastAPI. Connect yo
 
 ## Features
 
-- **Draftboard** — Mock draft with ADP rankings, positional tiers, and team builder
-- **Players** — Browse all NFL players with stats, projections, sortable columns, and favorites
-- **Trade Analyzer** — VORP-based trade calculator with contender/rebuilder modes, dynasty pick values, Sleeper trending data, and projected lineup impact
-- **Waiver Wire** — Find available players ranked by priority with roster-aware filtering
-- **Lineup Optimizer** — Optimize your weekly lineup with projected, ceiling, and floor strategies across configurable roster slots
-- **Draft Recap** — Post-draft analysis with grades, bye week distribution, and starting lineup projection
-- **Sleeper Integration** — Connect your league to sync rosters, scoring settings, and roster construction
+- **Draftboard**: Mock draft with ADP rankings, positional tiers, and team builder
+- **Players**: Browse all NFL players with stats, projections, sortable columns, and favorites
+- **Trade Analyzer**: VORP-based trade calculator with contender/rebuilder modes, dynasty pick values, Sleeper trending data, and projected lineup impact
+- **Waiver Wire**: Find available players ranked by priority with roster-aware filtering
+- **Lineup Optimizer**: Optimize your weekly lineup with projected, ceiling, and floor strategies across configurable roster slots
+- **Draft Recap**: Post-draft analysis with grades, bye week distribution, and starting lineup projection
+- **Sleeper Integration**: Connect your league to sync rosters, scoring settings, and roster construction
 
 ## Tech Stack
 
@@ -59,8 +59,8 @@ The frontend runs on `http://localhost:3000` and expects the backend at `http://
 
 ## Deployment
 
-- **Frontend:** Vercel — set `NEXT_PUBLIC_API_URL` to your backend URL
-- **Backend:** Render/Railway/Fly.io — set `CORS_ORIGINS` to your frontend domain
+- **Frontend:** Vercel - set `NEXT_PUBLIC_API_URL` to your backend URL
+- **Backend:** Render/Railway/Fly.io - set `CORS_ORIGINS` to your frontend domain
 
 ## License
 

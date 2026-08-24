@@ -38,7 +38,7 @@ export default function MatchupsPage() {
   const heroChips = [
     { label: 'week', value: String(currentWeek) },
     { label: 'teams', value: String(rosterOwners.length || 12) },
-    { label: 'league', value: leagueName || '—' },
+    { label: 'league', value: leagueName || '-' },
   ]
 
   return (

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import CosmosHero, { type CosmosHeroChip } from './CosmosHero'
 
 interface PageFrameProps {
-  /** Kept for backwards compatibility — no longer rendered. */
+  /** Kept for backwards compatibility - no longer rendered. */
   crumb?: string
   /** Optional pill anchored to the top-right of the hero (e.g. live week, mode). */
   rightPill?: ReactNode

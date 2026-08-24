@@ -242,7 +242,7 @@ export const getPositionGrade = (position: string, count: number): { grade: stri
   }
 }
 
-// 2025 NFL Schedule — 18 weeks, team → list of opponents (@ = away, BYE = bye week)
+// 2025 NFL Schedule - 18 weeks, team → list of opponents (@ = away, BYE = bye week)
 export const NFL_SCHEDULE_2025: Record<string, string[]> = {
   'ARI': ['@NO','CAR','@SF','SEA','TEN','@IND','GB','BYE','@DAL','@SEA','SF','JAX','@TB','LAR','@HOU','ATL','@CIN','@LAR'],
   'ATL': ['TB','@MIN','@CAR','WSH','BYE','BUF','@SF','MIA','@NE','@IND','CAR','@NO','@NYJ','SEA','@TB','@ARI','LAR','NO'],

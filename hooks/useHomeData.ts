@@ -115,7 +115,7 @@ export function useHomeData() {
   const week = nflState?.week ?? nflState?.display_week ?? 1
 
   // 2. Pull matchups for the current week (every 30s while connected).
-  // NB: week === 0 is a valid value (preseason) — only bail when undefined.
+  // NB: week === 0 is a valid value (preseason) - only bail when undefined.
   useEffect(() => {
     if (!isConnected || !leagueId || week == null) return
     let cancelled = false
@@ -131,7 +131,7 @@ export function useHomeData() {
     }
   }, [isConnected, leagueId, week])
 
-  // 3. Pull pulse feed (every 60s). Same caveat — week === 0 is valid in preseason.
+  // 3. Pull pulse feed (every 60s). Same caveat - week === 0 is valid in preseason.
   useEffect(() => {
     if (!isConnected || !leagueId || week == null) return
     let cancelled = false
@@ -161,7 +161,7 @@ export function useHomeData() {
     }
   }, [season, week])
 
-  // 5. Pull roster settings (records, points-for) — refreshes when matchups change.
+  // 5. Pull roster settings (records, points-for) - refreshes when matchups change.
   useEffect(() => {
     if (!isConnected || !leagueId) return
     let cancelled = false
@@ -221,7 +221,7 @@ export function useHomeData() {
     return () => {
       cancelled = true
     }
-    // We intentionally only depend on the join — adding `players` here causes a refetch loop.
+    // We intentionally only depend on the join - adding `players` here causes a refetch loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerIdsToResolve.join(',')])
 

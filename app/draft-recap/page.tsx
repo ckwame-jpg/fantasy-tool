@@ -83,7 +83,7 @@ export default function DraftRecapPage() {
           </>
         ),
         chips: [
-          { label: 'roster', value: draftedPlayers.length || '—' },
+          { label: 'roster', value: draftedPlayers.length || '-' },
           { label: 'source', value: source },
           { label: 'season', value: String(season) },
         ],

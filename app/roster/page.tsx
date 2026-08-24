@@ -96,7 +96,7 @@ export default function RosterPage() {
           { label: 'starters', value: String(myStarters.length) },
           { label: 'bench', value: String(benchIds.length) },
           { label: 'proj total', value: totalProj.toFixed(1) },
-          { label: 'league', value: leagueName || '—' },
+          { label: 'league', value: leagueName || '-' },
         ],
       }}
     >
@@ -119,10 +119,10 @@ export default function RosterPage() {
                   <div key={`${s.slot}-${i}`} className="row">
                     <PositionPill position={s.slot} />
                     <div className="who">
-                      <div className="nm q-name">{player?.name || '— empty —'}</div>
-                      <div className="meta">{player?.team || '—'}{player?.injury_status ? ` · ${player.injury_status}` : ''}</div>
+                      <div className="nm q-name">{player?.name || '- empty -'}</div>
+                      <div className="meta">{player?.team || '-'}{player?.injury_status ? ` · ${player.injury_status}` : ''}</div>
                     </div>
-                    <div className="pts tnum">{pts > 0 ? pts.toFixed(1) : '—'}</div>
+                    <div className="pts tnum">{pts > 0 ? pts.toFixed(1) : '-'}</div>
                   </div>
                 )
               })}
@@ -146,9 +146,9 @@ export default function RosterPage() {
                       <PositionPill position={player?.position || 'BN'} />
                       <div className="who">
                         <div className="nm q-name">{player?.name || pid}</div>
-                        <div className="meta">{player?.team || '—'}{player?.injury_status ? ` · ${player.injury_status}` : ''}</div>
+                        <div className="meta">{player?.team || '-'}{player?.injury_status ? ` · ${player.injury_status}` : ''}</div>
                       </div>
-                      <div className="pts tnum dim">{pts > 0 ? pts.toFixed(1) : '—'}</div>
+                      <div className="pts tnum dim">{pts > 0 ? pts.toFixed(1) : '-'}</div>
                     </div>
                   )
                 })

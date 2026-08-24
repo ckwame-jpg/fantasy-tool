@@ -5,12 +5,12 @@ import { useId } from 'react'
 interface BrandOrbProps {
   size?: number
   className?: string
-  /** rotation in degrees — defaults to a tossed-ball angle */
+  /** rotation in degrees - defaults to a tossed-ball angle */
   tilt?: number
 }
 
 /**
- * Brand mark — football silhouette in cosmos violet, rendered at a tossed-ball angle.
+ * Brand mark - football silhouette in cosmos violet, rendered at a tossed-ball angle.
  * Component is still named "BrandOrb" so imports across the app don't churn.
  */
 export default function BrandOrb({ size = 32, className = '', tilt = -28 }: BrandOrbProps) {

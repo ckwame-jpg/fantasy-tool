@@ -416,7 +416,7 @@ export default function PulseFeedView({ data, players: _players }: PulseFeedProp
         .feed-item {
           display: grid;
           /* minmax(0, 1fr) lets the body column actually shrink below content
-             width — without this, long names + statuses force the panel wider
+             width - without this, long names + statuses force the panel wider
              than the mobile viewport. */
           grid-template-columns: 36px minmax(0, 1fr) auto;
           gap: 14px;

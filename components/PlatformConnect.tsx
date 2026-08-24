@@ -235,7 +235,7 @@ export default function PlatformConnect({ defaultExpanded = false }: PlatformCon
         </div>
       )}
 
-      {/* Connected state (expanded view) — hidden when defaultExpanded (settings page renders its own summary) */}
+      {/* Connected state (expanded view) - hidden when defaultExpanded (settings page renders its own summary) */}
       {isConnected && !defaultExpanded && (
         <div>
           <div className="flex items-center gap-2 mb-2">

@@ -50,15 +50,15 @@ export default function RosterCompare(props: RosterCompareProps) {
         <PositionPill position={slot} />
         <div className="player-name">
           <div className="nm q-name">
-            {player?.name || (pid ? `Player ${pid}` : '— empty —')}
+            {player?.name || (pid ? `Player ${pid}` : '- empty -')}
             {injury && <span className="inj">{injury.charAt(0)}</span>}
           </div>
           <div className="gm">
-            {player?.team || '—'}
+            {player?.team || '-'}
             {projection > 0 ? ` · proj ${projection.toFixed(1)}` : ''}
           </div>
         </div>
-        <div className={`player-pts tnum ${tone}`}>{score > 0 ? score.toFixed(1) : '—'}</div>
+        <div className={`player-pts tnum ${tone}`}>{score > 0 ? score.toFixed(1) : '-'}</div>
         <div className="player-trend">
           {projection > 0 && score > 0 ? (
             score >= projection ? (
@@ -69,7 +69,7 @@ export default function RosterCompare(props: RosterCompareProps) {
           ) : projection > 0 ? (
             `${projection.toFixed(1)} proj`
           ) : (
-            '—'
+            '-'
           )}
         </div>
         <style jsx>{`

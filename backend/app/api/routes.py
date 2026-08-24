@@ -277,7 +277,7 @@ def get_players(
         years_exp = player_data.get("years_exp")
         is_rookie = years_exp == 0  # explicit rookies only (pre-NFL-draft prospects)
         status = (player_data.get("status") or "").strip().lower()
-        # Always drop "Sleeper-active but team-less veterans" — these are retired/free agent
+        # Always drop "Sleeper-active but team-less veterans" - these are retired/free agent
         # placeholders (e.g. Tom Brady, Drew Brees) that have player records but no real team.
         # Rookies (years_exp == 0) are kept even without a team.
         if not team_code:
@@ -981,7 +981,7 @@ def _build_gm_context(req: GmChatRequest) -> str:
                     if opp_roster:
                         opp_owner = user_map.get(opp_roster.get("owner_id"), "opponent")
                 parts.append(
-                    f"Week {req.week} matchup: you {mine.get('points', 0)} vs {opp_owner} {opp.get('points', 0) if opp else '—'}"
+                    f"Week {req.week} matchup: you {mine.get('points', 0)} vs {opp_owner} {opp.get('points', 0) if opp else '-'}"
                 )
 
     return "\n".join(parts)
@@ -994,7 +994,7 @@ share, route participation, snap counts, red-zone usage, schedule, coaching
 tendencies, weather. Every take is backed by real numbers, delivered deadpan.
 
 ABSOLUTE RULES
-- Never use em dashes (—) or en dashes (–). Use periods, commas, or line
+- Never use em dashes (-) or en dashes (–). Use periods, commas, or line
   breaks instead. This is non-negotiable. If you would reach for one, write
   two sentences instead.
 - Don't pile up slang. One slang move per response is the ceiling. If the
@@ -1069,7 +1069,7 @@ themselves, is fair game.
 
 def _strip_dashes(text: str) -> str:
     """Replace em/en dashes with commas as a safety net for the no-dashes rule."""
-    return text.replace(" — ", ", ").replace("—", ", ").replace(" – ", ", ").replace("–", ", ")
+    return text.replace(" - ", ", ").replace("-", ", ").replace(" – ", ", ").replace("–", ", ")
 
 
 @router.post("/gm/chat", response_model=GmChatResponse)

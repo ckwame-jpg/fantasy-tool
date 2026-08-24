@@ -101,7 +101,7 @@ export default function LineupOptimizerPage() {
             roster auto-imported from <b>{leagueName}</b>. add or trim players to test alternate starts.
           </>
         ) : (
-          <>build a roster below — the optimizer ranks every legal lineup against your league&apos;s scoring rules.</>
+          <>build a roster below - the optimizer ranks every legal lineup against your league&apos;s scoring rules.</>
         ),
         chips: heroChips,
       }}

@@ -37,7 +37,7 @@ export default function TransactionsPage() {
 
   const heroChips = [
     { label: 'week', value: String(currentWeek) },
-    { label: 'league', value: leagueName || '—' },
+    { label: 'league', value: leagueName || '-' },
     { label: 'teams', value: String(rosterOwners.length || 12) },
   ]
 
@@ -57,7 +57,7 @@ export default function TransactionsPage() {
             the <span className="ch-hl">paper trail</span> for every move in your league.
           </>
         ),
-        sub: <>trades, waivers, free agent claims — all the receipts, sorted by week.</>,
+        sub: <>trades, waivers, free agent claims - all the receipts, sorted by week.</>,
         chips: heroChips,
       }}
     >
